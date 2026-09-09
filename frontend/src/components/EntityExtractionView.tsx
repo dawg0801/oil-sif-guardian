@@ -88,60 +88,60 @@ const PRESET_SCENARIOS: PresetScenario[] = [
 
 const CATEGORY_COLORS: Record<string, { bg: string; border: string; text: string; badge: string; ring: string }> = {
   ACTIVITY: {
-    bg: 'bg-sky-50 dark:bg-sky-950/40',
-    border: 'border-sky-300 dark:border-sky-700',
-    text: 'text-sky-800 dark:text-sky-200',
-    badge: 'bg-sky-100 text-sky-800 dark:bg-sky-900/60 dark:text-sky-300',
-    ring: 'ring-sky-400'
+    bg: 'rgba(2, 132, 199, 0.09)',
+    border: 'rgba(2, 132, 199, 0.3)',
+    text: '#0284C7',
+    badge: 'rgba(2, 132, 199, 0.16)',
+    ring: '#0284C7'
   },
   HAZARD: {
-    bg: 'bg-rose-50 dark:bg-rose-950/40',
-    border: 'border-rose-300 dark:border-rose-700',
-    text: 'text-rose-800 dark:text-rose-200',
-    badge: 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300',
-    ring: 'ring-rose-400'
+    bg: 'rgba(225, 29, 72, 0.09)',
+    border: 'rgba(225, 29, 72, 0.3)',
+    text: '#E11D48',
+    badge: 'rgba(225, 29, 72, 0.16)',
+    ring: '#E11D48'
   },
   HAZARDOUS_ENERGY: {
-    bg: 'bg-purple-50 dark:bg-purple-950/40',
-    border: 'border-purple-300 dark:border-purple-700',
-    text: 'text-purple-800 dark:text-purple-200',
-    badge: 'bg-purple-100 text-purple-800 dark:bg-purple-900/60 dark:text-purple-300',
-    ring: 'ring-purple-400'
+    bg: 'rgba(124, 58, 237, 0.09)',
+    border: 'rgba(124, 58, 237, 0.3)',
+    text: '#7C3AED',
+    badge: 'rgba(124, 58, 237, 0.16)',
+    ring: '#7C3AED'
   },
   WORKER_EXPOSURE: {
-    bg: 'bg-amber-50 dark:bg-amber-950/40',
-    border: 'border-amber-300 dark:border-amber-700',
-    text: 'text-amber-800 dark:text-amber-200',
-    badge: 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300',
-    ring: 'ring-amber-400'
+    bg: 'rgba(217, 119, 6, 0.09)',
+    border: 'rgba(217, 119, 6, 0.3)',
+    text: '#D97706',
+    badge: 'rgba(217, 119, 6, 0.16)',
+    ring: '#D97706'
   },
   CRITICAL_CONTROL: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-    border: 'border-emerald-300 dark:border-emerald-700',
-    text: 'text-emerald-800 dark:text-emerald-200',
-    badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300',
-    ring: 'ring-emerald-400'
+    bg: 'rgba(5, 150, 105, 0.09)',
+    border: 'rgba(5, 150, 105, 0.3)',
+    text: '#059669',
+    badge: 'rgba(5, 150, 105, 0.16)',
+    ring: '#059669'
   },
   CONTROL_FAILURE: {
-    bg: 'bg-red-50 dark:bg-red-950/40',
-    border: 'border-red-400 dark:border-red-600',
-    text: 'text-red-900 dark:text-red-200 font-semibold',
-    badge: 'bg-red-100 text-red-900 dark:bg-red-900/60 dark:text-red-300',
-    ring: 'ring-red-500'
+    bg: 'rgba(220, 38, 38, 0.09)',
+    border: 'rgba(220, 38, 38, 0.3)',
+    text: '#DC2626',
+    badge: 'rgba(220, 38, 38, 0.16)',
+    ring: '#DC2626'
   },
   EQUIPMENT: {
-    bg: 'bg-cyan-50 dark:bg-cyan-950/40',
-    border: 'border-cyan-300 dark:border-cyan-700',
-    text: 'text-cyan-800 dark:text-cyan-200',
-    badge: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-300',
-    ring: 'ring-cyan-400'
+    bg: 'rgba(13, 148, 136, 0.09)',
+    border: 'rgba(13, 148, 136, 0.3)',
+    text: '#0D9488',
+    badge: 'rgba(13, 148, 136, 0.16)',
+    ring: '#0D9488'
   },
   CREDIBLE_CONSEQUENCE: {
-    bg: 'bg-indigo-50 dark:bg-indigo-950/40',
-    border: 'border-indigo-300 dark:border-indigo-700',
-    text: 'text-indigo-900 dark:text-indigo-200 font-semibold',
-    badge: 'bg-indigo-100 text-indigo-900 dark:bg-indigo-900/60 dark:text-indigo-300',
-    ring: 'ring-indigo-400'
+    bg: 'rgba(147, 51, 234, 0.09)',
+    border: 'rgba(147, 51, 234, 0.3)',
+    text: '#9333EA',
+    badge: 'rgba(147, 51, 234, 0.16)',
+    ring: '#9333EA'
   }
 };
 
@@ -149,13 +149,17 @@ export const EntityExtractionView: React.FC = () => {
   const [narrativeInput, setNarrativeInput] = useState(PRESET_SCENARIOS[0].narrative);
   const [activityInput, setActivityInput] = useState(PRESET_SCENARIOS[0].activity);
   const [siteInput, setSiteInput] = useState(PRESET_SCENARIOS[0].facility);
-  
+
+  const [loading, setLoading] = useState(false);
   const [extractionResult, setExtractionResult] = useState<ExtractionResponseData | null>(null);
   const [bioResult, setBioResult] = useState<BIOTaggingResponseData | null>(null);
   const [taxonomy, setTaxonomy] = useState<NERTaxonomyResponseData | null>(null);
-  
-  const [loading, setLoading] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'HIGHLIGHTER' | 'CAUSAL_FLOW' | 'BIO_TAGS'>('HIGHLIGHTER');
+  const [selectedSpan, setSelectedSpan] = useState<EntitySpanItem | null>(null);
+  const [copiedBio, setCopiedBio] = useState(false);
+
+  // Filter toggles
   const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>({
     ACTIVITY: true,
     HAZARD: true,
@@ -164,14 +168,13 @@ export const EntityExtractionView: React.FC = () => {
     CRITICAL_CONTROL: true,
     CONTROL_FAILURE: true,
     EQUIPMENT: true,
-    CREDIBLE_CONSEQUENCE: true,
+    CREDIBLE_CONSEQUENCE: true
   });
-  const [selectedSpan, setSelectedSpan] = useState<EntitySpanItem | null>(null);
-  const [copiedBio, setCopiedBio] = useState(false);
 
   useEffect(() => {
+    // Load taxonomy and run default scenario
     loadTaxonomy();
-    handleAnalyze();
+    handleAnalyze(PRESET_SCENARIOS[0].narrative, PRESET_SCENARIOS[0].activity, PRESET_SCENARIOS[0].facility);
   }, []);
 
   const loadTaxonomy = async () => {
@@ -179,23 +182,17 @@ export const EntityExtractionView: React.FC = () => {
       const data = await api.getNERTaxonomy();
       setTaxonomy(data);
     } catch (e) {
-      console.error('Failed to load taxonomy', e);
+      console.error('Failed to load NER taxonomy', e);
     }
   };
 
-  const handleAnalyze = async (customNarrative?: string, customAct?: string, customSite?: string) => {
-    const text = customNarrative || narrativeInput;
-    if (!text || !text.trim()) return;
-
+  const handleAnalyze = async (narrative = narrativeInput, activity = activityInput, site = siteInput) => {
+    if (!narrative.trim()) return;
     setLoading(true);
     try {
       const [extData, bioData] = await Promise.all([
-        api.extractSafetyEntities({
-          narrative: text,
-          activity: customAct || activityInput,
-          site: customSite || siteInput
-        }),
-        api.generateBIOTagging({ narrative: text })
+        api.extractSafetyEntities({ narrative, activity, site }),
+        api.generateBIOTagging({ narrative })
       ]);
       setExtractionResult(extData);
       setBioResult(bioData);
@@ -233,7 +230,7 @@ export const EntityExtractionView: React.FC = () => {
     const filteredSpans = all_spans.filter(s => activeFilters[s.label]);
 
     if (!filteredSpans.length) {
-      return <div className="text-slate-800 dark:text-slate-200 text-lg leading-relaxed p-4">{narrative}</div>;
+      return <div style={{ color: 'var(--text-primary)', fontSize: '15px', lineHeight: 1.8, padding: '16px' }}>{narrative}</div>;
     }
 
     const segments: React.ReactNode[] = [];
@@ -257,13 +254,38 @@ export const EntityExtractionView: React.FC = () => {
         <mark
           key={`span-${span.start_char}-${i}`}
           onClick={() => setSelectedSpan(span)}
-          className={`cursor-pointer inline-flex items-center gap-1.5 px-2 py-0.5 mx-0.5 rounded-md border text-sm font-medium transition-all duration-150 ${colors.bg} ${colors.border} ${colors.text} ${
-            isSelected ? `ring-2 ${colors.ring} shadow-md scale-105` : 'hover:opacity-80'
-          }`}
+          style={{
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '2px 8px',
+            margin: '2px 3px',
+            borderRadius: '8px',
+            backgroundColor: colors.bg,
+            border: `1.5px solid ${colors.border}`,
+            color: colors.text,
+            fontSize: '13.5px',
+            fontWeight: 600,
+            transition: 'all 0.15s ease',
+            boxShadow: isSelected ? `0 0 0 2px ${colors.text}` : 'none',
+            transform: isSelected ? 'scale(1.04)' : 'none',
+          }}
           title={`${span.label} [${span.start_char}:${span.end_char}] (${Math.round(span.confidence * 100)}%)`}
         >
           <span>{span.text}</span>
-          <span className={`text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded ${colors.badge}`}>
+          <span
+            style={{
+              fontSize: '9.5px',
+              textTransform: 'uppercase',
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              padding: '1px 6px',
+              borderRadius: '9999px',
+              backgroundColor: colors.badge,
+              color: colors.text,
+            }}
+          >
             {span.label.replace('_', ' ')}
           </span>
         </mark>
@@ -282,74 +304,152 @@ export const EntityExtractionView: React.FC = () => {
     }
 
     return (
-      <div className="text-slate-800 dark:text-slate-200 text-base leading-loose p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner min-h-[140px]">
+      <div
+        style={{
+          fontSize: '15px',
+          lineHeight: 1.9,
+          color: 'var(--text-primary)',
+          backgroundColor: 'var(--bg-surface)',
+          padding: '24px',
+          borderRadius: '20px',
+          border: '1px solid var(--border-color)',
+        }}
+      >
         {segments}
       </div>
     );
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
       {/* Header & Taxonomy strip */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 rounded-2xl text-white shadow-xl">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px',
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 text-xs font-semibold rounded-full flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-indigo-300" />
-              Phase 4 Architecture
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                color: '#D97706',
+                border: '1px solid rgba(245, 158, 11, 0.2)',
+              }}
+            >
+              <Tag style={{ width: '13px', height: '13px' }} />
+              Safety Information Extraction (NER)
             </span>
-            <span className="text-xs text-slate-400 font-mono">
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--bg-pill)',
+                color: 'var(--text-muted)',
+              }}
+            >
               Engine: {taxonomy?.engine || 'SafetyNER_OIL_v1.0'}
             </span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2.5">
-            <Tag className="w-6 h-6 text-indigo-400" />
-            Safety Information Extraction (NER & Gazetteers)
+
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
+            Named Entity Extraction & Gazetteers
           </h1>
-          <p className="text-sm text-slate-300 mt-1 max-w-3xl">
-            Extracts 8 grounded safety dimensions with exact character-level offsets, generates token-level BIO sequences, and synthesizes 5-stage explainable causal chains for Oil India Limited operations.
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '6px 0 0 0', maxWidth: '740px' }}>
+            Extracts 8 grounded safety dimensions with exact character-level offsets, generates token-level BIO sequences, and synthesizes explainable causal chains.
           </p>
         </div>
 
         {taxonomy && (
-          <div className="flex items-center gap-4 bg-slate-800/80 border border-slate-700/80 p-3 rounded-xl backdrop-blur-sm shrink-0">
-            <div className="text-center px-2">
-              <div className="text-xs text-slate-400 font-medium">Categories</div>
-              <div className="text-xl font-bold text-indigo-400">{taxonomy.supported_categories.length}</div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
+              padding: '8px 18px',
+              borderRadius: '9999px',
+              boxShadow: 'var(--card-shadow)',
+            }}
+          >
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Categories</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#D97706' }}>{taxonomy.supported_categories.length}</div>
             </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-2">
-              <div className="text-xs text-slate-400 font-medium">Trie Terms</div>
-              <div className="text-xl font-bold text-emerald-400">{taxonomy.trie_entries_loaded}</div>
+            <div style={{ width: '1px', height: '22px', backgroundColor: 'var(--border-color-subtle)' }} />
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Trie Terms</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#059669' }}>{taxonomy.trie_entries_loaded}</div>
             </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-2">
-              <div className="text-xs text-slate-400 font-medium">Regex Rules</div>
-              <div className="text-xl font-bold text-amber-400">{taxonomy.regex_patterns_count}</div>
+            <div style={{ width: '1px', height: '22px', backgroundColor: 'var(--border-color-subtle)' }} />
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Regex Rules</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#7C3AED' }}>{taxonomy.regex_patterns_count}</div>
             </div>
           </div>
         )}
       </div>
 
       {/* Preset Scenarios Strip */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <div
+        className="card-panel"
+        style={{
+          borderRadius: '24px',
+          padding: '20px 24px',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
           <span>OIL Operational Benchmark Scenarios</span>
           <span>Click to evaluate scenario</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
           {PRESET_SCENARIOS.map((p, idx) => (
             <button
               key={idx}
               onClick={() => handleSelectPreset(p)}
-              className="text-left p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-all text-xs group"
+              style={{
+                textAlign: 'left',
+                padding: '12px 14px',
+                borderRadius: '16px',
+                border: '1px solid var(--border-color-subtle)',
+                backgroundColor: 'var(--bg-input)',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-color-subtle)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <div className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-1">
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {p.title}
               </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <span className="truncate">{p.facility}</span>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#D97706', flexShrink: 0 }} />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.facility}</span>
               </div>
             </button>
           ))}
@@ -357,10 +457,19 @@ export const EntityExtractionView: React.FC = () => {
       </div>
 
       {/* Narrative Input & Analysis Card */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">
+      <div
+        className="card-panel"
+        style={{
+          borderRadius: '24px',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          <div className="form-group">
+            <label className="form-label">
               Operational Activity Context
             </label>
             <input
@@ -368,11 +477,11 @@ export const EntityExtractionView: React.FC = () => {
               value={activityInput}
               onChange={e => setActivityInput(e.target.value)}
               placeholder="e.g. Vessel Cleanout, Hydrotesting, Casing Hoisting"
-              className="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="form-input"
             />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">
+          <div className="form-group">
+            <label className="form-label">
               Asset / Installation
             </label>
             <input
@@ -380,13 +489,13 @@ export const EntityExtractionView: React.FC = () => {
               value={siteInput}
               onChange={e => setSiteInput(e.target.value)}
               placeholder="e.g. Early Production System EPS-1, Rig OIL-45"
-              className="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="form-input"
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">
+        <div className="form-group">
+          <label className="form-label">
             Raw HSSE Incident / Observation Narrative
           </label>
           <textarea
@@ -394,31 +503,43 @@ export const EntityExtractionView: React.FC = () => {
             value={narrativeInput}
             onChange={e => setNarrativeInput(e.target.value)}
             placeholder="Type or paste unstructured safety incident report..."
-            className="w-full text-sm p-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+            className="form-textarea font-mono"
+            style={{ fontSize: '13px', lineHeight: 1.6 }}
           />
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-slate-500">
-            {narrativeInput.length} characters | {narrativeInput.split(/\s+/).filter(Boolean).length} words
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+            {narrativeInput.length} characters &bull; {narrativeInput.split(/\s+/).filter(Boolean).length} words
           </div>
           <button
             onClick={() => handleAnalyze()}
             disabled={loading || !narrativeInput.trim()}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+            className="btn-primary"
+            style={{ padding: '10px 22px', fontSize: '13px' }}
           >
-            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Tag className="w-4 h-4" />}
-            Extract Entities & Causal Flow
+            {loading ? <RefreshCw style={{ width: '15px', height: '15px' }} className="animate-spin" /> : <Tag style={{ width: '15px', height: '15px' }} />}
+            <span>Extract Entities & Causal Flow</span>
           </button>
         </div>
       </div>
 
       {/* Category Filter Pills */}
       {extractionResult && (
-        <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-          <div className="text-xs font-semibold text-slate-500 uppercase flex items-center gap-1.5 mr-2">
-            <Filter className="w-3.5 h-3.5" />
-            Entity Filters:
+        <div
+          className="card-panel"
+          style={{
+            borderRadius: '20px',
+            padding: '12px 18px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', marginRight: '6px' }}>
+            <Filter style={{ width: '13px', height: '13px' }} />
+            <span>Entity Filters:</span>
           </div>
           {Object.keys(CATEGORY_COLORS).map(cat => {
             const count = extractionResult.entity_counts[cat] || 0;
@@ -428,35 +549,51 @@ export const EntityExtractionView: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => toggleFilter(cat)}
-                className={`text-xs px-2.5 py-1 rounded-full border font-medium flex items-center gap-1.5 transition-all ${
-                  active
-                    ? `${colors.bg} ${colors.border} ${colors.text} shadow-sm`
-                    : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 opacity-60'
-                }`}
+                style={{
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  padding: '5px 12px',
+                  borderRadius: '9999px',
+                  border: active ? `1.5px solid ${colors.border}` : '1px solid var(--border-color-subtle)',
+                  backgroundColor: active ? colors.bg : 'var(--bg-input)',
+                  color: active ? colors.text : 'var(--text-muted)',
+                  opacity: active ? 1 : 0.6,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
+                }}
               >
-                <span className={`w-2 h-2 rounded-full ${active ? colors.badge : 'bg-slate-400'}`} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: colors.text }} />
                 <span>{cat.replace('_', ' ')}</span>
-                <span className="font-bold ml-0.5">({count})</span>
+                <span style={{ fontWeight: 800, fontSize: '10px' }}>({count})</span>
               </button>
             );
           })}
         </div>
       )}
 
-      {/* Main Analysis Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-6">
+      {/* Main Analysis Sub-Tabs */}
+      <div className="sub-tabs-bar">
         <button
           onClick={() => setActiveTab('HIGHLIGHTER')}
-          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'HIGHLIGHTER'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
+          className={`sub-tab-btn ${activeTab === 'HIGHLIGHTER' ? 'active' : ''}`}
         >
-          <Eye className="w-4 h-4" />
-          Interactive Narrative Span Highlighter
+          <Eye style={{ width: '14px', height: '14px' }} />
+          <span>Interactive Narrative Span Highlighter</span>
           {extractionResult && (
-            <span className="px-2 py-0.5 text-xs bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 rounded-full font-bold">
+            <span
+              style={{
+                marginLeft: '6px',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontSize: '10.5px',
+                fontWeight: 800,
+                backgroundColor: activeTab === 'HIGHLIGHTER' ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-pill)',
+                color: activeTab === 'HIGHLIGHTER' ? '#FFFFFF' : 'var(--text-primary)',
+              }}
+            >
               {extractionResult.total_entities}
             </span>
           )}
@@ -464,20 +601,22 @@ export const EntityExtractionView: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('CAUSAL_FLOW')}
-          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'CAUSAL_FLOW'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
+          className={`sub-tab-btn ${activeTab === 'CAUSAL_FLOW' ? 'active' : ''}`}
         >
-          <Layers className="w-4 h-4" />
-          5-Stage Causal Flow & Safety Rationale
+          <Layers style={{ width: '14px', height: '14px' }} />
+          <span>5-Stage Causal Flow & Safety Rationale</span>
           {extractionResult && (
-            <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${
-              extractionResult.causal_flow.completeness_score >= 0.8
-                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
-                : 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300'
-            }`}>
+            <span
+              style={{
+                marginLeft: '6px',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontSize: '10.5px',
+                fontWeight: 800,
+                backgroundColor: activeTab === 'CAUSAL_FLOW' ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-pill)',
+                color: activeTab === 'CAUSAL_FLOW' ? '#FFFFFF' : '#059669',
+              }}
+            >
               {Math.round(extractionResult.causal_flow.completeness_score * 100)}% Complete
             </span>
           )}
@@ -485,16 +624,22 @@ export const EntityExtractionView: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('BIO_TAGS')}
-          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'BIO_TAGS'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
+          className={`sub-tab-btn ${activeTab === 'BIO_TAGS' ? 'active' : ''}`}
         >
-          <FileCode className="w-4 h-4" />
-          Token-Level BIO & CoNLL Inspector
+          <FileCode style={{ width: '14px', height: '14px' }} />
+          <span>Token-Level BIO & CoNLL Inspector</span>
           {bioResult && (
-            <span className="px-2 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full font-bold">
+            <span
+              style={{
+                marginLeft: '6px',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontSize: '10.5px',
+                fontWeight: 800,
+                backgroundColor: activeTab === 'BIO_TAGS' ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-pill)',
+                color: activeTab === 'BIO_TAGS' ? '#FFFFFF' : 'var(--text-muted)',
+              }}
+            >
               {bioResult.total_tokens} tokens
             </span>
           )}
@@ -503,14 +648,14 @@ export const EntityExtractionView: React.FC = () => {
 
       {/* TAB 1: HIGHLIGHTER */}
       {activeTab === 'HIGHLIGHTER' && (
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>
               <span>Click on any highlighted entity below to inspect character offsets and extraction confidence.</span>
               {selectedSpan && (
                 <button
                   onClick={() => setSelectedSpan(null)}
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-emerald-dark)', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}
                 >
                   Clear selection
                 </button>
@@ -521,40 +666,59 @@ export const EntityExtractionView: React.FC = () => {
 
           {/* Span Details Popover / Card */}
           {selectedSpan && (
-            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-indigo-200 dark:border-indigo-900/60 shadow-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2.5 py-1 rounded font-bold uppercase ${
-                    CATEGORY_COLORS[selectedSpan.label]?.badge || 'bg-slate-100 text-slate-800'
-                  }`}>
+            <div
+              className="card-panel"
+              style={{
+                borderRadius: '20px',
+                padding: '18px 22px',
+                border: '1.5px solid var(--accent-emerald-dark)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: CATEGORY_COLORS[selectedSpan.label]?.bg || 'rgba(0,0,0,0.05)',
+                      color: CATEGORY_COLORS[selectedSpan.label]?.text || 'var(--text-primary)',
+                      border: `1px solid ${CATEGORY_COLORS[selectedSpan.label]?.border || 'var(--border-color)'}`,
+                    }}
+                  >
                     {selectedSpan.label.replace('_', ' ')}
                   </span>
-                  <span className="text-base font-semibold text-slate-900 dark:text-white">
+                  <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     "{selectedSpan.text}"
                   </span>
                 </div>
-                <div className="text-xs text-slate-500 flex items-center gap-3">
-                  <span>Source: <strong className="text-slate-700 dark:text-slate-300">{selectedSpan.source}</strong></span>
-                  <span>Confidence: <strong className="text-emerald-600">{Math.round(selectedSpan.confidence * 100)}%</strong></span>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <span>Source: <strong style={{ color: 'var(--text-primary)' }}>{selectedSpan.source}</strong></span>
+                  <span>Confidence: <strong style={{ color: '#059669' }}>{Math.round(selectedSpan.confidence * 100)}%</strong></span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg text-xs">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', backgroundColor: 'var(--bg-input)', padding: '12px 16px', borderRadius: '14px' }}>
                 <div>
-                  <div className="text-slate-400 font-medium">Exact Character Offsets</div>
-                  <div className="font-mono font-bold text-slate-700 dark:text-slate-200 text-sm mt-0.5">
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Character Offsets</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '13.5px', color: 'var(--text-primary)', marginTop: '2px' }}>
                     [{selectedSpan.start_char} : {selectedSpan.end_char}]
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-400 font-medium">Length</div>
-                  <div className="font-mono font-bold text-slate-700 dark:text-slate-200 text-sm mt-0.5">
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Span Length</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '13.5px', color: 'var(--text-primary)', marginTop: '2px' }}>
                     {selectedSpan.end_char - selectedSpan.start_char} characters
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-400 font-medium">Category Role</div>
-                  <div className="text-slate-700 dark:text-slate-300 mt-0.5">
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Category Role</div>
+                  <div style={{ fontSize: '12.5px', color: 'var(--text-primary)', marginTop: '2px', fontWeight: 500 }}>
                     {selectedSpan.category_description || 'Domain safety entity'}
                   </div>
                 </div>
@@ -564,48 +728,90 @@ export const EntityExtractionView: React.FC = () => {
 
           {/* Extracted Entities Catalog */}
           {extractionResult && (
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-4">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                <Tag className="w-4 h-4 text-indigo-500" />
-                Extracted Entities Catalog ({extractionResult.total_entities} entities detected)
+            <div
+              className="card-panel"
+              style={{
+                borderRadius: '24px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <h3 style={{ fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Tag style={{ width: '16px', height: '16px', color: 'var(--accent-emerald-dark)' }} />
+                <span>Extracted Entities Catalog ({extractionResult.total_entities} entities detected)</span>
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
                 {Object.entries(extractionResult.entities_by_category).map(([cat, list]) => {
                   const colors = CATEGORY_COLORS[cat] || CATEGORY_COLORS.ACTIVITY;
                   return (
                     <div
                       key={cat}
-                      className={`p-3.5 rounded-lg border ${colors.border} ${colors.bg} space-y-2`}
+                      style={{
+                        padding: '16px',
+                        borderRadius: '18px',
+                        border: `1.5px solid ${colors.border}`,
+                        backgroundColor: colors.bg,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                      }}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: colors.text }}>
                           {cat.replace('_', ' ')}
                         </span>
-                        <span className={`text-xs px-1.5 py-0.5 rounded font-bold ${colors.badge}`}>
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            backgroundColor: colors.badge,
+                            color: colors.text,
+                          }}
+                        >
                           {list.length}
                         </span>
                       </div>
 
                       {list.length === 0 ? (
-                        <div className="text-xs text-slate-400 italic">None detected</div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>None detected</div>
                       ) : (
-                        <ul className="space-y-1.5 text-xs">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           {list.map((item, idx) => (
-                            <li
+                            <div
                               key={idx}
                               onClick={() => setSelectedSpan(item)}
-                              className="cursor-pointer flex items-center justify-between p-1.5 rounded hover:bg-white/60 dark:hover:bg-slate-800/80 transition-all"
+                              style={{
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '6px 10px',
+                                borderRadius: '10px',
+                                backgroundColor: 'var(--bg-surface)',
+                                border: '1px solid var(--border-color-subtle)',
+                                transition: 'all 0.15s ease',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateX(2px)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateX(0)';
+                              }}
                             >
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {item.text}
                               </span>
-                              <span className="font-mono text-[10px] text-slate-400 shrink-0 ml-1">
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0, marginLeft: '6px' }}>
                                 [{item.start_char}:{item.end_char}]
                               </span>
-                            </li>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       )}
                     </div>
                   );
@@ -618,80 +824,125 @@ export const EntityExtractionView: React.FC = () => {
 
       {/* TAB 2: CAUSAL FLOW & SAFETY RATIONALE */}
       {activeTab === 'CAUSAL_FLOW' && extractionResult && (
-        <div className="space-y-6">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Causal Synthesis Banner */}
-          <div className="bg-gradient-to-r from-slate-900 to-indigo-950 p-5 rounded-xl border border-indigo-900 text-white shadow-lg space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider ${
-                  extractionResult.causal_flow.risk_level === 'HIGH_PSIF'
-                    ? 'bg-rose-500/30 border border-rose-500/50 text-rose-300'
-                    : 'bg-amber-500/30 border border-amber-500/50 text-amber-300'
-                }`}>
+          <div
+            className="card-panel"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1.5px solid var(--border-color)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '9999px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    backgroundColor: extractionResult.causal_flow.risk_level === 'HIGH_PSIF' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                    color: extractionResult.causal_flow.risk_level === 'HIGH_PSIF' ? '#DC2626' : '#D97706',
+                    border: extractionResult.causal_flow.risk_level === 'HIGH_PSIF' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
+                  }}
+                >
                   {extractionResult.causal_flow.risk_level.replace('_', ' ')}
                 </span>
-                <span className="text-xs text-slate-300">
-                  Causal Completeness: <strong>{Math.round(extractionResult.causal_flow.completeness_score * 100)}%</strong>
+                <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                  Causal Completeness: <strong style={{ color: 'var(--text-primary)' }}>{Math.round(extractionResult.causal_flow.completeness_score * 100)}%</strong>
                 </span>
               </div>
-              <div className="text-xs text-slate-400">
-                Key Failure: <span className="font-semibold text-rose-300">{extractionResult.causal_flow.key_failure_mechanism}</span>
+              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                Key Failure: <span style={{ fontWeight: 700, color: '#DC2626' }}>{extractionResult.causal_flow.key_failure_mechanism}</span>
               </div>
             </div>
 
-            <div className="text-base font-medium text-slate-100 leading-relaxed bg-slate-800/60 p-4 rounded-lg border border-slate-700/60">
+            <div
+              style={{
+                fontSize: '14.5px',
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+                lineHeight: 1.7,
+                backgroundColor: 'var(--bg-input)',
+                padding: '18px 22px',
+                borderRadius: '16px',
+                border: '1px solid var(--border-color-subtle)',
+                fontStyle: 'italic',
+              }}
+            >
               "{extractionResult.causal_flow.causal_narrative}"
             </div>
           </div>
 
           {/* 5-Stage Visual Causal Pipeline */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <Layers className="w-4 h-4 text-indigo-500" />
-              5-Stage Precursor Causal Sequence
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <h3 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Layers style={{ width: '16px', height: '16px', color: 'var(--accent-emerald-dark)' }} />
+              <span>5-Stage Precursor Causal Sequence</span>
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
               {extractionResult.causal_flow.steps.map((step: CausalStepItem, idx: number) => {
                 const colors = CATEGORY_COLORS[step.category] || CATEGORY_COLORS.ACTIVITY;
                 return (
                   <div
                     key={idx}
-                    className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 transition-all ${
-                      step.has_evidence
-                        ? `${colors.bg} ${colors.border} shadow-sm`
-                        : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 opacity-60'
-                    }`}
+                    className="card-panel"
+                    style={{
+                      borderRadius: '20px',
+                      padding: '18px',
+                      border: step.has_evidence ? `1.5px solid ${colors.border}` : '1px solid var(--border-color-subtle)',
+                      backgroundColor: step.has_evidence ? colors.bg : 'var(--bg-surface)',
+                      opacity: step.has_evidence ? 1 : 0.65,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '14px',
+                    }}
                   >
                     <div>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="font-bold text-slate-400 uppercase">Step {step.step_id}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', marginBottom: '6px' }}>
+                        <span style={{ fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Step {step.step_id}</span>
                         {step.has_evidence ? (
-                          <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Evidenced
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700, color: '#059669' }}>
+                            <CheckCircle2 style={{ width: '13px', height: '13px' }} /> Evidenced
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-[11px] text-slate-400">
-                            <Info className="w-3.5 h-3.5" /> Latent / Unstated
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                            <Info style={{ width: '13px', height: '13px' }} /> Latent
                           </span>
                         )}
                       </div>
-                      <div className="font-bold text-slate-900 dark:text-white text-sm">
+                      <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
                         {step.title}
                       </div>
-                      <div className="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-snug">
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', lineHeight: 1.5 }}>
                         {step.summary}
                       </div>
                     </div>
 
                     {step.detected_entities.length > 0 && (
-                      <div className="pt-2 border-t border-slate-200 dark:border-slate-700/60">
-                        <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">Grounded Entities:</div>
-                        <div className="flex flex-wrap gap-1">
+                      <div style={{ paddingTop: '10px', borderTop: '1px solid var(--border-color-subtle)' }}>
+                        <div style={{ fontSize: '9.5px', textTransform: 'uppercase', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px' }}>Grounded Entities:</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                           {step.detected_entities.map((e, eIdx) => (
                             <span
                               key={eIdx}
-                              className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${colors.badge}`}
+                              style={{
+                                fontSize: '10px',
+                                padding: '2px 6px',
+                                borderRadius: '6px',
+                                fontWeight: 600,
+                                backgroundColor: colors.badge,
+                                color: colors.text,
+                              }}
                             >
                               {e}
                             </span>
@@ -707,18 +958,38 @@ export const EntityExtractionView: React.FC = () => {
 
           {/* Suggested Critical Controls */}
           {extractionResult.causal_flow.suggested_critical_controls.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                Targeted Critical Barrier Interventions
+            <div
+              className="card-panel"
+              style={{
+                borderRadius: '24px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <h3 style={{ fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldCheck style={{ width: '16px', height: '16px', color: '#059669' }} />
+                <span>Targeted Critical Barrier Interventions</span>
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
                 {extractionResult.causal_flow.suggested_critical_controls.map((s, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-2.5 p-3 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 text-xs text-slate-700 dark:text-slate-300"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                      padding: '14px 16px',
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                      border: '1px solid rgba(16, 185, 129, 0.2)',
+                      fontSize: '12.5px',
+                      color: 'var(--text-primary)',
+                      lineHeight: 1.5,
+                    }}
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 style={{ width: '16px', height: '16px', color: '#059669', flexShrink: 0, marginTop: '2px' }} />
                     <span>{s}</span>
                   </div>
                 ))}
@@ -730,32 +1001,53 @@ export const EntityExtractionView: React.FC = () => {
 
       {/* TAB 3: BIO TAGS & CONLL */}
       {activeTab === 'BIO_TAGS' && bioResult && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div
+            className="card-panel"
+            style={{
+              borderRadius: '20px',
+              padding: '18px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '14px',
+            }}
+          >
             <div>
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 BIO Sequence Representation (CoNLL-2003 Standard)
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Total Tokens: <strong>{bioResult.total_tokens}</strong> | Entity Tokens: <strong>{bioResult.entity_tokens_count}</strong>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
+                Total Tokens: <strong style={{ color: 'var(--text-primary)' }}>{bioResult.total_tokens}</strong> &bull; Entity Tokens: <strong style={{ color: '#059669' }}>{bioResult.entity_tokens_count}</strong>
               </p>
             </div>
             <button
               onClick={() => copyToClipboard(bioResult.conll_format)}
-              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 flex items-center gap-1.5 transition-all"
+              className="btn-secondary"
+              style={{ padding: '8px 16px', fontSize: '12px' }}
             >
-              <Copy className="w-3.5 h-3.5" />
-              {copiedBio ? 'Copied CoNLL!' : 'Copy CoNLL Text'}
+              <Copy style={{ width: '14px', height: '14px' }} />
+              <span>{copiedBio ? 'Copied CoNLL!' : 'Copy CoNLL Text'}</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
             {/* Tokens Table */}
-            <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            <div
+              className="card-panel"
+              style={{
+                borderRadius: '24px',
+                padding: '0',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <div style={{ padding: '14px 20px', backgroundColor: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-secondary)' }}>
                 Token-by-Token Sequence
               </div>
-              <div className="max-h-[450px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+              <div style={{ maxHeight: '480px', overflowY: 'auto' }}>
                 {bioResult.tokens.map((t, idx) => {
                   const isEntity = t.tag !== 'O';
                   const baseCat = isEntity ? t.tag.substring(2) : '';
@@ -763,27 +1055,53 @@ export const EntityExtractionView: React.FC = () => {
                   return (
                     <div
                       key={idx}
-                      className={`flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all ${
-                        isEntity ? 'bg-indigo-50/30 dark:bg-indigo-950/20' : ''
-                      }`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 20px',
+                        borderBottom: '1px solid var(--border-color-subtle)',
+                        backgroundColor: isEntity ? 'rgba(13, 148, 136, 0.04)' : 'transparent',
+                        fontSize: '12px',
+                      }}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="font-mono text-slate-400 text-[11px] w-6">{idx + 1}</span>
-                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', fontSize: '11px', width: '24px' }}>{idx + 1}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>
                           {t.token}
                         </span>
-                        <span className="font-mono text-[10px] text-slate-400">
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
                           [{t.start_char}:{t.end_char}]
                         </span>
                       </div>
 
                       <div>
                         {isEntity ? (
-                          <span className={`px-2 py-0.5 rounded font-mono font-bold text-[11px] ${colors?.badge}`}>
+                          <span
+                            style={{
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontFamily: 'var(--font-mono)',
+                              fontWeight: 700,
+                              fontSize: '11px',
+                              backgroundColor: colors?.badge,
+                              color: colors?.text,
+                              border: `1px solid ${colors?.border}`,
+                            }}
+                          >
                             {t.tag}
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded font-mono text-[11px] text-slate-400 bg-slate-100 dark:bg-slate-800">
+                          <span
+                            style={{
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '11px',
+                              color: 'var(--text-muted)',
+                              backgroundColor: 'var(--bg-input)',
+                            }}
+                          >
                             O
                           </span>
                         )}
@@ -795,16 +1113,26 @@ export const EntityExtractionView: React.FC = () => {
             </div>
 
             {/* CoNLL Text Box */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">
+            <div
+              className="card-panel"
+              style={{
+                borderRadius: '24px',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-secondary)' }}>
                 <span>CoNLL-2003 Output</span>
-                <span className="text-[10px] text-slate-400 font-normal">Ready for Model Training</span>
+                <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Ready for Model Training</span>
               </div>
               <textarea
                 readOnly
-                rows={18}
+                rows={19}
                 value={bioResult.conll_format}
-                className="w-full text-xs font-mono p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none"
+                className="form-textarea font-mono"
+                style={{ fontSize: '11.5px', lineHeight: 1.5, resize: 'none' }}
               />
             </div>
           </div>

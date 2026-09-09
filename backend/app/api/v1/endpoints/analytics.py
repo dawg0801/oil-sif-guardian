@@ -1,18 +1,19 @@
-from typing import Dict, Any, List
 import json
 import os
-from collections import defaultdict
 from datetime import datetime, timezone
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
+
 from backend.app.core.database import get_db
 from backend.app.models.report import (
-    ReportModel,
-    PredictionModel,
+    CorrectiveActionModel,
     IOGPPredictionModel,
+    PredictionModel,
+    ReportModel,
     ReviewModel,
-    CorrectiveActionModel
 )
 from backend.app.services.precursor_cluster_service import precursor_cluster_service
 

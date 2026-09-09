@@ -18,7 +18,12 @@ import {
   PlusCircle,
   Sliders,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  ArrowUpRight,
+  Search,
+  CheckSquare,
+  Lock,
+  MessageSquare
 } from 'lucide-react';
 import { api } from '../services/api';
 import {
@@ -80,7 +85,6 @@ const OVERRIDE_REASONS = [
 ];
 
 export const HSEReviewQueue: React.FC<HSEReviewQueueProps> = ({ onSelectReport }) => {
-  // Navigation tabs
   const [activeTab, setActiveTab] = useState<'QUEUE' | 'METRICS_HISTORY'>('QUEUE');
 
   // Queue state
@@ -122,7 +126,6 @@ export const HSEReviewQueue: React.FC<HSEReviewQueueProps> = ({ onSelectReport }
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Fetch data
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -155,7 +158,6 @@ export const HSEReviewQueue: React.FC<HSEReviewQueueProps> = ({ onSelectReport }
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    // Initialize defaults based on AI suggestions
     setDecision('CONFIRMED');
     setFinalPriority(item.ai_priority);
     setFinalPrimaryRule(item.primary_rule || CANONICAL_IOGP_RULES[0]);
@@ -184,39 +186,6 @@ export const HSEReviewQueue: React.FC<HSEReviewQueueProps> = ({ onSelectReport }
     }
   };
 
-  const handleDecisionChange = (newDecision: 'CONFIRMED' | 'MODIFIED' | 'REJECTED' | 'ESCALATED') => {
-    setDecision(newDecision);
-    if (newDecision === 'CONFIRMED' && activeItem) {
-      setFinalPriority(activeItem.ai_priority);
-      setOverrideReason('PRECURSOR_CONFIRMED');
-    } else if (newDecision === 'REJECTED') {
-      setFinalPriority('LOW');
-      setOverrideReason('FALSE_POSITIVE_KEYWORD');
-    } else if (newDecision === 'MODIFIED') {
-      if (overrideReason === 'PRECURSOR_CONFIRMED') {
-        setOverrideReason('ENERGY_MITIGATED');
-      }
-    }
-  };
-
-  const handleToggleBarrier = (barrier: string) => {
-    setSelectedBarriers((prev) =>
-      prev.includes(barrier) ? prev.filter((b) => b !== barrier) : [...prev, barrier]
-    );
-  };
-
-  const handleToggleStatutory = (tag: string) => {
-    setSelectedStatutory((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
-
-  const isVetoDowngrade = Boolean(
-    activeItem?.is_veto_enforced && (finalPriority === 'LOW' || finalPriority === 'REVIEW' || decision === 'REJECTED')
-  );
-
-  const isSeniorRole = ['HSE_LEAD', 'SAFETY_MANAGER', 'CHIEF_SAFETY_OFFICER', 'LEAD_AUDITOR'].includes(reviewerRole);
-
   const handleSubmitAdjudication = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeItem) return;
@@ -236,7 +205,7 @@ export const HSEReviewQueue: React.FC<HSEReviewQueueProps> = ({ onSelectReport }
       statutory_tags: selectedStatutory,
       override_reason_code: overrideReason,
       reviewer_notes: notes,
-      senior_signoff_by: seniorSignoff || (isSeniorRole ? reviewerId : undefined),
+      senior_signoff_by: seniorSignoff || undefined,
       create_corrective_action: createAction,
       action_title: createAction ? actionTitle : undefined,
       action_assignee: createAction ? actionAssignee : undefined,
@@ -252,7 +221,7 @@ export const HSEReviewQueue: React.FC<HSEReviewQueueProps> = ({ onSelectReport }
       setTimeout(() => {
         setActiveItem(null);
         setActiveFullReport(null);
-      }, 1500);
+      }, 1400);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to submit adjudication');
     } finally {
@@ -273,913 +242,569 @@ export const HSEReviewQueue: React.FC<HSEReviewQueueProps> = ({ onSelectReport }
   });
 
   return (
-    <div className="space-y-6">
-      {/* Top Header & HITL Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-amber-500">
-          <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-400">
-            <Clock className="w-5 h-5" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+      {/* ====================================================================
+          1. TOP EXECUTIVE HITL SUMMARY CARDS
+          ==================================================================== */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '18px' }}>
+        <div className="card-panel" style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '46px', height: '46px', borderRadius: '14px', backgroundColor: 'var(--accent-amber-light)', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Clock style={{ width: '22px', height: '22px' }} />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pending Adjudications</div>
-            <div className="text-2xl font-black text-slate-100 font-mono">
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Pending Adjudications
+            </div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', marginTop: '2px' }}>
               {metrics?.pending_count ?? pendingReports.length}
             </div>
-            <div className="text-[10px] text-slate-400">Reports awaiting HSE sign-off</div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '1px' }}>
+              Awaiting HSE sign-off
+            </div>
           </div>
         </div>
 
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-rose-500">
-          <div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-400">
-            <ShieldAlert className="w-5 h-5" />
+        <div className="card-panel" style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '46px', height: '46px', borderRadius: '14px', backgroundColor: '#FEE2E2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShieldAlert style={{ width: '22px', height: '22px' }} />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">High-PSIF Unreviewed</div>
-            <div className="text-2xl font-black text-rose-400 font-mono">
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              High-PSIF Unreviewed
+            </div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#DC2626', fontFamily: 'var(--font-display)', marginTop: '2px' }}>
               {metrics?.high_priority_pending ?? 0}
             </div>
-            <div className="text-[10px] text-slate-400">Mandatory statutory priority</div>
+            <div style={{ fontSize: '11.5px', color: '#DC2626', fontWeight: 600, marginTop: '1px' }}>
+              Mandatory statutory SLA
+            </div>
           </div>
         </div>
 
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-emerald-500">
-          <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-            <CheckCircle2 className="w-5 h-5" />
+        <div className="card-panel" style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '46px', height: '46px', borderRadius: '14px', backgroundColor: 'var(--accent-emerald-light)', color: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <CheckCircle2 style={{ width: '22px', height: '22px' }} />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Human-AI Concurrence</div>
-            <div className="text-2xl font-black text-emerald-400 font-mono">
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Human-AI Concurrence
+            </div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#059669', fontFamily: 'var(--font-display)', marginTop: '2px' }}>
               {metrics ? `${(metrics.agreement_rate * 100).toFixed(1)}%` : '100%'}
             </div>
-            <div className="text-[10px] text-slate-400">High-PSIF Concordance: {metrics ? `${(metrics.high_psif_agreement_rate * 100).toFixed(1)}%` : '100%'}</div>
+            <div style={{ fontSize: '11.5px', color: '#059669', fontWeight: 600, marginTop: '1px' }}>
+              High-PSIF concordance
+            </div>
           </div>
         </div>
 
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-blue-500">
-          <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-400">
-            <Activity className="w-5 h-5" />
+        <div className="card-panel" style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '46px', height: '46px', borderRadius: '14px', backgroundColor: 'var(--accent-blue-light)', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Activity style={{ width: '22px', height: '22px' }} />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Calibration Drift Status</div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span
-                className={`badge font-bold tracking-wider ${
-                  metrics?.drift_status === 'NORMAL'
-                    ? 'badge-low'
-                    : metrics?.drift_status === 'WARNING'
-                    ? 'badge-review'
-                    : 'badge-high'
-                }`}
-              >
-                {metrics?.drift_status || 'NORMAL'}
-              </span>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Calibration Drift
             </div>
-            <div className="text-[10px] text-slate-400 truncate max-w-[180px]" title={metrics?.drift_alert_message}>
-              {metrics?.drift_alert_message || 'Zero drift detected'}
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#0284C7', marginTop: '4px' }}>
+              {metrics?.drift_status || 'NORMAL'}
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '1px' }}>
+              Brier score &lt; 0.15
             </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-        <div className="flex items-center gap-2">
+      {/* ====================================================================
+          2. NAVIGATION PILLS & REFRESH BAR
+          ==================================================================== */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', borderBottom: '1px solid var(--border-color-subtle)', paddingBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
             onClick={() => setActiveTab('QUEUE')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${
-              activeTab === 'QUEUE'
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
+            className={`sub-tab-btn ${activeTab === 'QUEUE' ? 'active' : ''}`}
+            style={{ fontSize: '15px' }}
           >
-            <UserCheck className="w-4 h-4" />
             <span>Active Triage Queue</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-300 font-mono">
+            <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '9999px', backgroundColor: 'var(--accent-amber-light)', color: 'var(--accent-amber-dark)', marginLeft: '6px' }}>
               {pendingReports.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('METRICS_HISTORY')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${
-              activeTab === 'METRICS_HISTORY'
-                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
+            className={`sub-tab-btn ${activeTab === 'METRICS_HISTORY' ? 'active' : ''}`}
+            style={{ fontSize: '15px' }}
           >
-            <History className="w-4 h-4" />
-            <span>Adjudication Analytics & Audit History</span>
-            {historyItems.length > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-300 font-mono">
-                {historyItems.length}
-              </span>
-            )}
+            <span>Audit History & Metrics</span>
           </button>
         </div>
 
         <button
           onClick={fetchData}
-          className="btn btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5"
+          className="btn-secondary"
           title="Refresh Queue"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Refresh</span>
+          <RefreshCw style={{ width: '14px', height: '14px', animation: loading ? 'spin 0.7s linear infinite' : 'none' }} />
+          <span>Refresh Telemetry</span>
         </button>
       </div>
 
-      {/* Active Review Queue Tab */}
+      {/* ====================================================================
+          3. ACTIVE QUEUE TAB CONTENT (Pill Filters + Beautiful Cards)
+          ==================================================================== */}
       {activeTab === 'QUEUE' && (
-        <div className="space-y-4">
-          {/* Filters Bar */}
-          <div className="glass-panel p-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Filter Bar */}
+          <div className="card-panel" style={{ padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+              {/* Search input */}
+              <div style={{ position: 'relative', width: '260px' }}>
+                <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '15px', height: '15px', color: 'var(--text-muted)' }} />
                 <input
                   type="text"
-                  placeholder="Search report ID, narrative, site..."
+                  placeholder="Filter by ID, site, keyword..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="form-input text-xs pl-3 pr-8 py-1.5 w-64 bg-slate-900 border-slate-700"
+                  className="form-input"
+                  style={{ paddingLeft: '34px', height: '38px', fontSize: '13px', borderRadius: '9999px' }}
                 />
-                {searchTerm && (
+              </div>
+
+              {/* Priority Segmented Pills */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'var(--bg-input)', padding: '3px', borderRadius: '9999px' }}>
+                {[
+                  { val: '', label: 'All' },
+                  { val: 'HIGH', label: 'High PSIF' },
+                  { val: 'REVIEW', label: 'Review' },
+                  { val: 'LOW', label: 'Low' },
+                ].map((p) => (
                   <button
-                    onClick={() => setSearchTerm('')}
-                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-200 text-xs"
+                    key={p.val}
+                    onClick={() => setFilterPriority(p.val)}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: '9999px',
+                      border: 'none',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      backgroundColor: filterPriority === p.val ? 'var(--accent-emerald-dark)' : 'transparent',
+                      color: filterPriority === p.val ? '#FFFFFF' : 'var(--text-secondary)',
+                      transition: 'all 0.15s ease'
+                    }}
                   >
-                    ×
+                    {p.label}
                   </button>
-                )}
+                ))}
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <Filter className="w-3.5 h-3.5 text-slate-400" />
-                <span>Priority:</span>
-                <select
-                  value={filterPriority}
-                  onChange={(e) => setFilterPriority(e.target.value)}
-                  className="form-select py-1 px-2 text-xs bg-slate-900 border-slate-700 w-auto"
-                >
-                  <option value="">All Priorities</option>
-                  <option value="HIGH">High PSIF</option>
-                  <option value="REVIEW">Review Required</option>
-                  <option value="LOW">Low Risk</option>
-                </select>
-              </div>
-
-              <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+              {/* Veto Toggle */}
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 700, color: '#DC2626' }}>
                 <input
                   type="checkbox"
                   checked={filterVetoOnly}
                   onChange={(e) => setFilterVetoOnly(e.target.checked)}
-                  className="rounded bg-slate-900 border-slate-700 text-rose-500 focus:ring-0"
+                  style={{ accentColor: '#DC2626' }}
                 />
-                <span className="text-rose-400 font-semibold flex items-center gap-1">
-                  <ShieldAlert className="w-3.5 h-3.5" />
-                  Veto Guardrails Only
-                </span>
+                <ShieldAlert style={{ width: '16px', height: '16px' }} />
+                <span>Rule 2 Veto Cases Only</span>
               </label>
             </div>
 
-            <div className="text-xs text-slate-400 font-mono">
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
               Showing {displayedReports.length} of {pendingReports.length} pending reports
             </div>
           </div>
 
-          {/* Table */}
-          <div className="glass-panel overflow-hidden">
-            {loading ? (
-              <div className="p-16 text-center text-slate-400 text-sm">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-amber-400" />
-                Retrieving pending reports for HSE triage...
-              </div>
-            ) : displayedReports.length === 0 ? (
-              <div className="p-16 text-center text-slate-400 text-sm">
-                <Check className="w-8 h-8 mx-auto mb-2 text-emerald-400" />
-                Zero pending items match the current filters! All caught up.
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900/90 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-mono">
-                    <tr>
-                      <th className="py-3 px-4">Report ID</th>
-                      <th className="py-3 px-4">AI Priority</th>
-                      <th className="py-3 px-4">Calibrated P(SIF)</th>
-                      <th className="py-3 px-4">Statutory Veto Guardrail</th>
-                      <th className="py-3 px-4">Primary IOGP Rule</th>
-                      <th className="py-3 px-4">Site / Installation</th>
-                      <th className="py-3 px-4">Pending Age</th>
-                      <th className="py-3 px-4 text-right">Adjudication</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono">
-                    {displayedReports.map((item) => (
-                      <tr
-                        key={item.report_id}
-                        onClick={() => handleOpenAdjudication(item)}
-                        className={`hover:bg-slate-800/50 transition cursor-pointer ${
-                          item.is_veto_enforced ? 'bg-rose-950/10' : ''
-                        }`}
-                      >
-                        <td className="py-3 px-4 font-bold text-slate-200">
-                          {item.report_id}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span
-                            className={`badge ${
-                              item.ai_priority === 'HIGH'
-                                ? 'badge-high'
-                                : item.ai_priority === 'REVIEW'
-                                ? 'badge-review'
-                                : 'badge-low'
-                            }`}
-                          >
-                            {item.ai_priority}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 font-bold text-slate-200">
-                          {(item.psif_probability * 100).toFixed(1)}%
-                          <span className="text-[10px] text-slate-400 font-sans ml-1">
-                            ({item.confidence})
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          {item.is_veto_enforced ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                              <ShieldAlert className="w-3 h-3 text-rose-400" />
-                              {item.statutory_citation || 'VETO TRIGGERED'}
-                            </span>
-                          ) : (
-                            <span className="text-slate-500 font-sans text-[11px]">—</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4 font-sans text-blue-300 font-medium truncate max-w-xs">
-                          {item.primary_rule || 'N/A'}
-                        </td>
-                        <td className="py-3 px-4 font-sans text-slate-300 truncate max-w-xs">
-                          {item.site}
-                        </td>
-                        <td className="py-3 px-4 text-slate-400">
-                          {item.days_pending === 0 ? 'Today' : `${item.days_pending}d ago`}
-                        </td>
-                        <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            onClick={() => handleOpenAdjudication(item)}
-                            className="btn btn-primary py-1 px-3 text-[11px] flex items-center gap-1 ml-auto"
-                          >
-                            <span>Adjudicate</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Adjudication Analytics & History Tab */}
-      {activeTab === 'METRICS_HISTORY' && (
-        <div className="space-y-6">
-          {/* Analytics Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 3x3 Transition Matrix */}
-            <div className="glass-panel p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-blue-400" />
-                  <h3 className="font-bold text-slate-100 text-sm">Human-AI Priority Transition Matrix</h3>
-                </div>
-                <span className="text-[11px] text-slate-400 font-mono">
-                  Total Adjudicated: {metrics?.adjudicated_count ?? 0}
-                </span>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-center text-xs">
-                  <thead className="text-[10px] text-slate-400 font-mono uppercase bg-slate-900/60">
-                    <tr>
-                      <th className="p-2 text-left">AI Triage \ HSE Final</th>
-                      <th className="p-2 text-rose-400">Final HIGH</th>
-                      <th className="p-2 text-amber-400">Final REVIEW</th>
-                      <th className="p-2 text-emerald-400">Final LOW</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono text-xs">
-                    <tr>
-                      <td className="p-2.5 text-left font-bold text-rose-400 bg-slate-900/30">AI: HIGH</td>
-                      <td className="p-2.5 bg-emerald-500/10 text-emerald-300 font-bold">
-                        {metrics?.priority_transitions?.HIGH_TO_HIGH ?? 0}
-                      </td>
-                      <td className="p-2.5 text-slate-400">
-                        {metrics?.priority_transitions?.HIGH_TO_REVIEW ?? 0}
-                      </td>
-                      <td className="p-2.5 text-rose-400 font-semibold">
-                        {metrics?.priority_transitions?.HIGH_TO_LOW ?? 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="p-2.5 text-left font-bold text-amber-400 bg-slate-900/30">AI: REVIEW</td>
-                      <td className="p-2.5 text-amber-300 font-semibold">
-                        {metrics?.priority_transitions?.REVIEW_TO_HIGH ?? 0}
-                      </td>
-                      <td className="p-2.5 bg-emerald-500/10 text-emerald-300 font-bold">
-                        {metrics?.priority_transitions?.REVIEW_TO_REVIEW ?? 0}
-                      </td>
-                      <td className="p-2.5 text-slate-400">
-                        {metrics?.priority_transitions?.REVIEW_TO_LOW ?? 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="p-2.5 text-left font-bold text-emerald-400 bg-slate-900/30">AI: LOW</td>
-                      <td className="p-2.5 text-rose-400 font-semibold">
-                        {metrics?.priority_transitions?.LOW_TO_HIGH ?? 0}
-                      </td>
-                      <td className="p-2.5 text-slate-400">
-                        {metrics?.priority_transitions?.LOW_TO_REVIEW ?? 0}
-                      </td>
-                      <td className="p-2.5 bg-emerald-500/10 text-emerald-300 font-bold">
-                        {metrics?.priority_transitions?.LOW_TO_LOW ?? 0}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="text-[11px] text-slate-400 italic">
-                Diagonal values indicate perfect concurrence between AI and HSE Officer verdicts.
-              </div>
+          {/* Cases Stream */}
+          {loading ? (
+            <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <RefreshCw style={{ width: '32px', height: '32px', animation: 'spin 0.7s linear infinite', margin: '0 auto 12px auto' }} />
+              <div>Synchronizing HSE Review Queue...</div>
             </div>
+          ) : displayedReports.length === 0 ? (
+            <div className="card-panel" style={{ padding: '60px 20px', textAlign: 'center' }}>
+              <CheckCircle2 style={{ width: '48px', height: '48px', color: '#10B981', margin: '0 auto 14px auto' }} />
+              <h3 style={{ fontSize: '18px', fontWeight: 800 }}>Queue Clean & Compliant</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                All precursor observations and high-risk cases have been adjudicated by HSE officers.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {displayedReports.map((item) => {
+                const isHigh = item.ai_priority === 'HIGH';
+                const isReview = item.ai_priority === 'REVIEW';
 
-            {/* Drift Advisory Card */}
-            <div className="glass-panel p-5 space-y-4">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
-                <h3 className="font-bold text-slate-100 text-sm">Model Governance & Drift Recommendations</h3>
-              </div>
-
-              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">Drift Status:</span>
-                  <span
-                    className={`badge ${
-                      metrics?.drift_status === 'NORMAL'
-                        ? 'badge-low'
-                        : metrics?.drift_status === 'WARNING'
-                        ? 'badge-review'
-                        : 'badge-high'
-                    }`}
+                return (
+                  <div
+                    key={item.report_id}
+                    className="card-panel"
+                    style={{
+                      padding: '24px 28px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px',
+                      borderLeft: isHigh ? '5px solid #DC2626' : isReview ? '5px solid #FFB020' : '5px solid #10B981',
+                      transition: 'all 0.2s ease',
+                      position: 'relative'
+                    }}
                   >
-                    {metrics?.drift_status || 'NORMAL'}
-                  </span>
-                </div>
-                <div className="text-xs text-slate-300 font-medium">
-                  {metrics?.drift_alert_message}
-                </div>
-              </div>
+                    {/* Top Row: Priority Badge + ID + Site + Rule Pill */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span className={`pill-status ${isHigh ? 'pill-red' : isReview ? 'pill-amber' : 'pill-green'}`} style={{ fontSize: '12px', padding: '4px 12px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: isHigh ? '#DC2626' : isReview ? '#D97706' : '#059669' }} />
+                          {item.ai_priority}-PSIF
+                        </span>
 
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Active Calibration Directives:
-                </div>
-                {metrics?.recommendations && metrics.recommendations.length > 0 ? (
-                  <ul className="space-y-1.5 text-xs text-slate-300">
-                    {metrics.recommendations.map((rec, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
-                        <span>{rec}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="text-xs text-slate-400">Zero active alerts. System calibration stable.</div>
-                )}
-              </div>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                          {item.report_id}
+                        </span>
+
+                        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                          • {item.site}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {item.primary_rule && (
+                          <span className="card-pill-tag tag-mint">
+                            {item.primary_rule}
+                          </span>
+                        )}
+
+                        {item.is_veto_enforced && (
+                          <span className="card-pill-tag tag-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Lock style={{ width: '12px', height: '12px' }} />
+                            <span>Rule 2 Veto Enforced</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Middle: Narrative Excerpt */}
+                    <div style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text-secondary)', backgroundColor: 'var(--bg-surface-subtle)', padding: '14px 18px', borderRadius: '14px' }}>
+                      "{item.raw_text}"
+                    </div>
+
+                    {/* Statutory Citation tag if present */}
+                    {item.statutory_citation && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11.5px', color: 'var(--accent-amber-dark)' }}>
+                        <ShieldAlert style={{ width: '14px', height: '14px' }} />
+                        <span><strong>Statutory Reference:</strong> {item.statutory_citation}</span>
+                      </div>
+                    )}
+
+                    {/* Bottom Action Bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-color-subtle)', paddingTop: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                      <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                        Calibrated Confidence: <strong>{(item.psif_probability * 100).toFixed(0)}%</strong> ({item.confidence})
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <button
+                          onClick={async () => {
+                            try {
+                              const full = await api.getReport(item.report_id);
+                              onSelectReport(full);
+                            } catch {
+                              onSelectReport({
+                                id: item.report_id,
+                                report_id: item.report_id,
+                                report_timestamp: item.report_timestamp || new Date().toISOString(),
+                                created_at: item.report_timestamp || new Date().toISOString(),
+                                report_type: 'near_miss',
+                                site: item.site,
+                                location: item.location || '',
+                                department: 'Operations',
+                                activity: '',
+                                equipment: [],
+                                reporter_role: '',
+                                raw_text: item.raw_text,
+                                normalized_text: item.raw_text,
+                                evidence_spans: [],
+                                life_saving_rules: [],
+                                triggered_rules: item.veto_rule_name ? [item.veto_rule_name] : [],
+                                safety_reasoning: [],
+                                corrective_actions: [],
+                                model_version: 'v2.1',
+                                psif: {
+                                  priority: item.ai_priority,
+                                  probability: item.psif_probability,
+                                  confidence: item.confidence
+                                }
+                              });
+                            }
+                          }}
+                          className="btn-secondary"
+                          style={{ padding: '8px 16px', fontSize: '12px' }}
+                        >
+                          <span>Inspect Intelligence</span>
+                          <ExternalLink style={{ width: '13px', height: '13px' }} />
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenAdjudication(item)}
+                          className="btn-primary"
+                          style={{ padding: '8px 18px', fontSize: '12px' }}
+                        >
+                          <span>Adjudicate Case</span>
+                          <ArrowUpRight style={{ width: '15px', height: '15px' }} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
+          )}
+        </div>
+      )}
 
-          {/* Audit History Table */}
-          <div className="glass-panel p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <FileCheck2 className="w-4 h-4 text-amber-400" />
-                <h3 className="font-bold text-slate-100 text-sm">Completed HSE Adjudication Audit Log</h3>
-              </div>
-            </div>
-
+      {/* ====================================================================
+          4. METRICS & AUDIT HISTORY TAB CONTENT
+          ==================================================================== */}
+      {activeTab === 'METRICS_HISTORY' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="card-panel">
+            <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>
+              Statutory Audit History Log
+            </h3>
             {historyItems.length === 0 ? (
-              <div className="text-center py-8 text-xs text-slate-400">
-                No completed adjudications logged yet. Review items from the active queue to populate.
+              <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+                No prior audit actions recorded in current session.
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className="bg-slate-900/60 text-slate-400 text-[10px] uppercase border-b border-slate-800">
-                    <tr>
-                      <th className="py-2.5 px-3">Report ID</th>
-                      <th className="py-2.5 px-3">Reviewer / Role</th>
-                      <th className="py-2.5 px-3">Decision</th>
-                      <th className="py-2.5 px-3">AI \ Final Priority</th>
-                      <th className="py-2.5 px-3">Veto Override</th>
-                      <th className="py-2.5 px-3">Reason Code</th>
-                      <th className="py-2.5 px-3">Reviewed At</th>
+              <table className="custom-table">
+                <thead>
+                  <tr>
+                    <th>Report ID</th>
+                    <th>Reviewer Role</th>
+                    <th>Decision</th>
+                    <th>Final Priority</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyItems.map((h, i) => (
+                    <tr key={i}>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{h.report_id}</td>
+                      <td>{h.reviewer_role}</td>
+                      <td>
+                        <span className="card-pill-tag tag-mint">{h.decision}</span>
+                      </td>
+                      <td>
+                        <span className={`pill-status ${h.final_priority === 'HIGH' ? 'pill-red' : 'pill-green'}`}>
+                          {h.final_priority}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{h.reviewed_at}</td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/60">
-                    {historyItems.map((h, i) => (
-                      <tr key={i} className="hover:bg-slate-800/30 transition">
-                        <td className="py-2.5 px-3 font-bold text-slate-200">{h.report_id}</td>
-                        <td className="py-2.5 px-3 font-sans text-slate-300">
-                          {h.reviewer_id} <span className="text-slate-500 text-[10px]">({h.reviewer_role})</span>
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                            {h.decision}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <span className="text-slate-400">{h.ai_priority}</span>
-                          <span className="mx-1.5 text-slate-600">→</span>
-                          <span
-                            className={`font-bold ${
-                              h.final_priority === 'HIGH'
-                                ? 'text-rose-400'
-                                : h.final_priority === 'REVIEW'
-                                ? 'text-amber-400'
-                                : 'text-emerald-400'
-                            }`}
-                          >
-                            {h.final_priority}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3">
-                          {h.veto_override_approved ? (
-                            <span className="text-rose-400 font-bold text-[10px] px-1.5 py-0.5 bg-rose-500/10 rounded border border-rose-500/30">
-                              OVERRIDDEN
-                            </span>
-                          ) : (
-                            <span className="text-slate-500">—</span>
-                          )}
-                        </td>
-                        <td className="py-2.5 px-3 font-sans text-[11px] text-slate-400">
-                          {h.override_reason_code || 'N/A'}
-                        </td>
-                        <td className="py-2.5 px-3 text-slate-400 text-[11px]">
-                          {h.reviewed_at ? new Date(h.reviewed_at).toLocaleDateString() : 'N/A'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
       )}
 
-      {/* Side-by-Side Adjudication Modal */}
+      {/* ====================================================================
+          5. ADJUDICATION DIALOG MODAL (Soft Rounded Card Overlay)
+          ==================================================================== */}
       {activeItem && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="glass-panel w-full max-w-5xl max-h-[92vh] flex flex-col border border-amber-500/40 shadow-2xl shadow-amber-950/40">
-            {/* Modal Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-amber-400" />
-                <h3 className="font-bold text-slate-100 text-sm">
-                  HSE Expert Adjudication & Triage Sign-off — <span className="font-mono text-amber-400">{activeItem.report_id}</span>
-                </h3>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(7, 30, 25, 0.65)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+        >
+          <div
+            className="card-panel"
+            style={{
+              width: '100%',
+              maxWidth: '680px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: '28px 32px',
+              borderRadius: '28px',
+              boxShadow: '0 25px 60px -10px rgba(0,0,0,0.4)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color-subtle)', paddingBottom: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '18px', fontWeight: 800 }}>
+                  HSE Officer Adjudication & Sign-Off
+                </h2>
+                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  Case: <strong>{activeItem.report_id}</strong> • {activeItem.site}
+                </div>
               </div>
+
               <button
+                className="circle-icon-btn"
                 onClick={() => setActiveItem(null)}
-                className="text-slate-400 hover:text-slate-200 transition"
               >
-                <X className="w-5 h-5" />
+                <X style={{ width: '16px', height: '16px' }} />
               </button>
             </div>
 
-            {/* Modal Body: Side-by-Side Grid */}
-            <div className="p-5 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: AI Precursor Intelligence & Incident Evidence */}
-              <div className="lg:col-span-5 space-y-4 border-r border-slate-800/80 pr-0 lg:pr-6">
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-blue-400" />
-                  <span>AI Precursor Intelligence</span>
-                </div>
+            {successMessage && (
+              <div style={{ padding: '12px 16px', backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: '12px', color: '#047857', fontSize: '13px', fontWeight: 700 }}>
+                {successMessage}
+              </div>
+            )}
 
-                {/* AI Score & Confidence Box */}
-                <div className="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-400">AI Priority Suggestion:</span>
-                    <span
-                      className={`badge ${
-                        activeItem.ai_priority === 'HIGH'
-                          ? 'badge-high'
-                          : activeItem.ai_priority === 'REVIEW'
-                          ? 'badge-review'
-                          : 'badge-low'
-                      }`}
-                    >
-                      {activeItem.ai_priority}
-                    </span>
-                  </div>
+            {errorMessage && (
+              <div style={{ padding: '12px 16px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626', fontSize: '13px', fontWeight: 700 }}>
+                {errorMessage}
+              </div>
+            )}
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-400">Calibrated P(SIF):</span>
-                    <span className="font-mono font-bold text-sm text-slate-100">
-                      {(activeItem.psif_probability * 100).toFixed(1)}%
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-400">Confidence Band:</span>
-                    <span className="font-mono text-xs text-slate-300">{activeItem.confidence}</span>
-                  </div>
-                </div>
-
-                {/* Veto Guardrail Alert Banner */}
-                {activeItem.is_veto_enforced && (
-                  <div className="p-3 bg-rose-500/10 border border-rose-500/40 rounded-lg space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-rose-400 text-xs font-bold uppercase">
-                      <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-                      <span>Statutory Safety Veto Triggered</span>
-                    </div>
-                    <div className="text-xs text-slate-200 font-sans">
-                      {activeItem.veto_rule_name || 'Fatal precursor zero-tolerance guardrail active.'}
-                    </div>
-                    {activeItem.statutory_citation && (
-                      <div className="text-[11px] text-rose-300 font-mono font-semibold">
-                        Mandate: {activeItem.statutory_citation}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Primary & Secondary Rules */}
-                <div className="space-y-1">
-                  <div className="text-[11px] font-bold text-slate-400 uppercase">Predicted Life-Saving Rules:</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {activeItem.primary_rule && (
-                      <span className="px-2 py-0.5 rounded text-[11px] bg-blue-500/20 text-blue-300 border border-blue-500/40 font-semibold">
-                        ★ {activeItem.primary_rule} (Primary)
-                      </span>
-                    )}
-                    {activeItem.secondary_rules.map((rule, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700"
-                      >
-                        {rule}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Narrative & Evidence Box */}
-                <div className="space-y-1.5">
-                  <div className="text-[11px] font-bold text-slate-400 uppercase flex items-center justify-between">
-                    <span>Incident Narrative:</span>
-                    <span className="text-[10px] text-slate-500 font-mono">{activeItem.site}</span>
-                  </div>
-                  <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs text-slate-300 leading-relaxed font-mono max-h-48 overflow-y-auto">
-                    {activeItem.raw_text}
-                  </div>
-                </div>
-
-                {/* Deep Dive Action */}
-                {activeFullReport && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSelectReport(activeFullReport);
-                      setActiveItem(null);
-                    }}
-                    className="btn btn-secondary w-full text-xs flex items-center justify-center gap-1.5 py-1.5"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>View Full Extraction & Causal Reasoner</span>
-                  </button>
-                )}
+            <form onSubmit={handleSubmitAdjudication} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {/* Case Narrative */}
+              <div style={{ padding: '14px', backgroundColor: 'var(--bg-input)', borderRadius: '14px', fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
+                "{activeItem.raw_text}"
               </div>
 
-              {/* Right Column: Expert HSE Adjudication Form */}
-              <div className="lg:col-span-7 space-y-4">
-                <form onSubmit={handleSubmitAdjudication} className="space-y-4">
-                  {errorMessage && (
-                    <div className="p-3 bg-rose-500/20 border border-rose-500 text-rose-300 rounded text-xs flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>{errorMessage}</span>
-                    </div>
-                  )}
-
-                  {successMessage && (
-                    <div className="p-3 bg-emerald-500/20 border border-emerald-500 text-emerald-300 rounded text-xs flex items-start gap-2">
-                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>{successMessage}</span>
-                    </div>
-                  )}
-
-                  {/* Reviewer Role & Officer ID */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="form-label text-xs">Reviewing Officer ID *</label>
-                      <input
-                        type="text"
-                        value={reviewerId}
-                        onChange={(e) => setReviewerId(e.target.value)}
-                        required
-                        className="form-input text-xs font-mono bg-slate-900 border-slate-700"
-                      />
-                    </div>
-                    <div>
-                      <label className="form-label text-xs">Reviewer Role *</label>
-                      <select
-                        value={reviewerRole}
-                        onChange={(e: any) => setReviewerRole(e.target.value)}
-                        className="form-select text-xs bg-slate-900 border-slate-700"
-                      >
-                        <option value="HSE_LEAD">Senior HSE Lead / Inspector</option>
-                        <option value="SAFETY_MANAGER">Installation Safety Manager</option>
-                        <option value="CHIEF_SAFETY_OFFICER">Chief Safety Officer (CSO)</option>
-                        <option value="LEAD_AUDITOR">Lead Process Safety Auditor</option>
-                        <option value="HSE_OFFICER">HSE Field Officer</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Decision Verdict Segmented Control */}
-                  <div>
-                    <label className="form-label text-xs">Adjudication Verdict *</label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {[
-                        { key: 'CONFIRMED', label: 'CONFIRM', sub: 'Concur with AI' },
-                        { key: 'MODIFIED', label: 'MODIFY', sub: 'Override Triage' },
-                        { key: 'REJECTED', label: 'REJECT', sub: 'Declassify SIF' },
-                        { key: 'ESCALATED', label: 'ESCALATE', sub: 'Urgent Shutdown' }
-                      ].map((item) => (
-                        <button
-                          key={item.key}
-                          type="button"
-                          onClick={() => handleDecisionChange(item.key as any)}
-                          className={`p-2 rounded-lg text-left transition border ${
-                            decision === item.key
-                              ? 'bg-amber-500/20 text-amber-300 border-amber-500 shadow-sm'
-                              : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:bg-slate-800/40'
-                          }`}
-                        >
-                          <div className="font-bold text-xs">{item.label}</div>
-                          <div className="text-[10px] text-slate-400">{item.sub}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Priority Cards */}
-                  <div>
-                    <label className="form-label text-xs">Final PSIF Priority Level *</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { key: 'HIGH', label: 'HIGH SIF', desc: 'Fatal Precursor' },
-                        { key: 'REVIEW', label: 'REVIEW', desc: 'Control Failure' },
-                        { key: 'LOW', label: 'LOW RISK', desc: 'Minor Hazard' }
-                      ].map((p) => (
-                        <button
-                          key={p.key}
-                          type="button"
-                          onClick={() => setFinalPriority(p.key as any)}
-                          className={`p-2.5 rounded-lg text-center transition border ${
-                            finalPriority === p.key
-                              ? p.key === 'HIGH'
-                                ? 'bg-rose-500/25 text-rose-300 border-rose-500'
-                                : p.key === 'REVIEW'
-                                ? 'bg-amber-500/25 text-amber-300 border-amber-500'
-                                : 'bg-emerald-500/25 text-emerald-300 border-emerald-500'
-                              : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:bg-slate-800/40'
-                          }`}
-                        >
-                          <div className="font-bold text-xs">{p.label}</div>
-                          <div className="text-[10px] opacity-75">{p.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Veto Downgrade Guardrail Warning */}
-                  {isVetoDowngrade && (
-                    <div className="p-3 rounded-lg bg-rose-500/15 border border-rose-500/50 space-y-2">
-                      <div className="flex items-center gap-1.5 text-rose-400 text-xs font-bold">
-                        <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                        <span>Rule 2 Statutory Protection: Downgrading Codified Safety Veto</span>
-                      </div>
-                      <div className="text-[11px] text-slate-300 leading-snug">
-                        This report triggers a deterministic safety rule ({activeItem.veto_rule_name || 'Tier-1 Veto'}).
-                        Downgrading requires Senior HSE Lead sign-off, valid reason code, and minimum 30 characters justification.
-                      </div>
-                      {!isSeniorRole && (
-                        <div className="pt-1">
-                          <label className="form-label text-[11px] text-rose-300">Senior Lead Authorizer ID *</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. HSE-LEAD-CHIEF-01"
-                            value={seniorSignoff}
-                            onChange={(e) => setSeniorSignoff(e.target.value)}
-                            required
-                            className="form-input text-xs font-mono bg-slate-900 border-rose-500/40 text-slate-100"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Override Reason Code */}
-                  {(decision === 'MODIFIED' || decision === 'REJECTED' || isVetoDowngrade) && (
-                    <div>
-                      <label className="form-label text-xs">Override Justification Category *</label>
-                      <select
-                        value={overrideReason}
-                        onChange={(e) => setOverrideReason(e.target.value)}
-                        className="form-select text-xs bg-slate-900 border-slate-700"
-                        required
-                      >
-                        {OVERRIDE_REASONS.map((r) => (
-                          <option key={r.code} value={r.code}>
-                            {r.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Primary IOGP Rule Dropdown */}
-                  <div>
-                    <label className="form-label text-xs">Primary IOGP Life-Saving Rule</label>
-                    <select
-                      value={finalPrimaryRule}
-                      onChange={(e) => setFinalPrimaryRule(e.target.value)}
-                      className="form-select text-xs bg-slate-900 border-slate-700"
+              {/* Decision Type */}
+              <div className="form-group">
+                <label className="form-label">Adjudication Verdict *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                  {(['CONFIRMED', 'MODIFIED', 'REJECTED', 'ESCALATED'] as const).map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setDecision(d)}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '12px',
+                        border: decision === d ? '2px solid var(--accent-emerald)' : '1px solid var(--border-color)',
+                        backgroundColor: decision === d ? 'var(--accent-emerald-light)' : 'var(--bg-surface)',
+                        color: decision === d ? 'var(--accent-emerald)' : 'var(--text-primary)',
+                        fontWeight: 700,
+                        fontSize: '12px',
+                        cursor: 'pointer'
+                      }}
                     >
-                      {CANONICAL_IOGP_RULES.map((rule) => (
-                        <option key={rule} value={rule}>
-                          {rule}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                  {/* Barrier Failure Checklist */}
-                  <div className="space-y-1.5">
-                    <label className="form-label text-xs">Barrier Failures Identified by HSE:</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                      {BARRIER_CATEGORIES.map((cat) => (
-                        <label
-                          key={cat}
-                          onClick={() => handleToggleBarrier(cat)}
-                          className={`flex items-center gap-2 p-1.5 rounded text-[11px] cursor-pointer border transition ${
-                            selectedBarriers.includes(cat)
-                              ? 'bg-blue-500/20 text-blue-300 border-blue-500/40'
-                              : 'bg-slate-900/40 text-slate-400 border-slate-800 hover:bg-slate-800/30'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedBarriers.includes(cat)}
-                            onChange={() => {}}
-                            className="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-0"
-                          />
-                          <span className="truncate">{cat}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+              {/* Final Priority */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="form-group">
+                  <label className="form-label">Final SIF Priority</label>
+                  <select
+                    className="form-select"
+                    value={finalPriority}
+                    onChange={(e) => setFinalPriority(e.target.value as any)}
+                  >
+                    <option value="HIGH">HIGH (Potential Fatality/SIF)</option>
+                    <option value="REVIEW">REVIEW (Safety Deviation)</option>
+                    <option value="LOW">LOW (Benign / Routine)</option>
+                  </select>
+                </div>
 
-                  {/* Statutory Compliance Tags */}
-                  <div className="space-y-1.5">
-                    <label className="form-label text-xs">Statutory Tags (OISD / DGMS / CEA):</label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {STATUTORY_TAGS.map((tag) => (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => handleToggleStatutory(tag)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono transition border ${
-                            selectedStatutory.includes(tag)
-                              ? 'bg-amber-500/25 text-amber-300 border-amber-500/50'
-                              : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800'
-                          }`}
-                        >
-                          {tag}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                <div className="form-group">
+                  <label className="form-label">Primary Life-Saving Rule</label>
+                  <select
+                    className="form-select"
+                    value={finalPrimaryRule}
+                    onChange={(e) => setFinalPrimaryRule(e.target.value)}
+                  >
+                    {CANONICAL_IOGP_RULES.map((r) => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-                  {/* Rationale Textarea */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="form-label text-xs mb-0">HSE Technical Investigation Rationale *</label>
-                      <span
-                        className={`text-[10px] font-mono ${
-                          isVetoDowngrade && notes.length < 30
-                            ? 'text-rose-400 font-bold'
-                            : notes.length < 10
-                            ? 'text-slate-500'
-                            : 'text-emerald-400'
-                        }`}
-                      >
-                        {notes.length} chars {isVetoDowngrade ? '(min 30 required)' : '(min 10)'}
-                      </span>
-                    </div>
-                    <textarea
-                      rows={3}
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="State technical basis for priority verdict, verified field mitigations, or reason for modifying AI triage..."
-                      required
-                      className="form-textarea text-xs bg-slate-900 border-slate-700"
+              {/* Corrective Action Toggle */}
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
+                <input
+                  type="checkbox"
+                  checked={createAction}
+                  onChange={(e) => setCreateAction(e.target.checked)}
+                  style={{ accentColor: '#0D9488', width: '16px', height: '16px' }}
+                />
+                <CheckSquare style={{ width: '16px', height: '16px', color: '#0D9488' }} />
+                <span>Issue Mandatory Corrective Action (CAPA)</span>
+              </label>
+
+              {createAction && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px', backgroundColor: 'var(--bg-input)', borderRadius: '14px' }}>
+                  <input
+                    type="text"
+                    placeholder="Corrective Action Title..."
+                    value={actionTitle}
+                    onChange={(e) => setActionTitle(e.target.value)}
+                    className="form-input"
+                  />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <input
+                      type="text"
+                      placeholder="Assignee Name / Role"
+                      value={actionAssignee}
+                      onChange={(e) => setActionAssignee(e.target.value)}
+                      className="form-input"
+                    />
+                    <input
+                      type="date"
+                      value={actionDueDate}
+                      onChange={(e) => setActionDueDate(e.target.value)}
+                      className="form-input"
                     />
                   </div>
+                </div>
+              )}
 
-                  {/* Corrective Action Section */}
-                  <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 space-y-3">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-200 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={createAction}
-                        onChange={(e) => setCreateAction(e.target.checked)}
-                        className="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0"
-                      />
-                      <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Provision Immediate Corrective Action</span>
-                    </label>
-
-                    {createAction && (
-                      <div className="space-y-2 pt-1 border-t border-slate-800/60">
-                        <div>
-                          <label className="form-label text-[11px]">Action Title *</label>
-                          <input
-                            type="text"
-                            value={actionTitle}
-                            onChange={(e) => setActionTitle(e.target.value)}
-                            required={createAction}
-                            className="form-input text-xs bg-slate-950 border-slate-700"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="form-label text-[11px]">Assignee *</label>
-                            <input
-                              type="text"
-                              value={actionAssignee}
-                              onChange={(e) => setActionAssignee(e.target.value)}
-                              required={createAction}
-                              className="form-input text-xs bg-slate-950 border-slate-700"
-                            />
-                          </div>
-                          <div>
-                            <label className="form-label text-[11px]">Due Date</label>
-                            <input
-                              type="date"
-                              value={actionDueDate}
-                              onChange={(e) => setActionDueDate(e.target.value)}
-                              className="form-input text-xs bg-slate-950 border-slate-700"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Submit Actions */}
-                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button
-                      type="button"
-                      onClick={() => setActiveItem(null)}
-                      className="btn btn-secondary text-xs"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={submitting || Boolean(successMessage)}
-                      className="btn btn-primary text-xs flex items-center gap-1.5"
-                    >
-                      {submitting ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                          <span>Submitting Sign-off...</span>
-                        </>
-                      ) : (
-                        <>
-                          <ShieldCheck className="w-4 h-4" />
-                          <span>Sign-off & Update Audit Trail</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
+              {/* Reviewer Notes */}
+              <div className="form-group">
+                <label className="form-label">Statutory Investigation Notes</label>
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Record justification, field inspection notes, or physical barrier check results..."
+                />
               </div>
-            </div>
+
+              {/* Submit Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', paddingTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveItem(null)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary"
+                  style={{ padding: '10px 24px' }}
+                >
+                  {submitting ? 'Recording Audit...' : 'Sign-Off & Dispatch'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

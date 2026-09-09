@@ -4,11 +4,11 @@ Enforces Role-Based Access Control (RBAC), input sanitization against injection,
 and security audit validation for Oil India Limited (OIL).
 """
 
-from typing import List, Optional, Callable, Dict, Any
-from enum import Enum
 import re
-import html
-from fastapi import Header, HTTPException, status, Depends
+from enum import Enum
+from typing import Any, Callable, Dict, Optional
+
+from fastapi import Depends, Header, HTTPException, status
 
 
 class UserRole(str, Enum):

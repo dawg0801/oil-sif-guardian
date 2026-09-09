@@ -3,19 +3,20 @@ OIL-SIF Guardian — Safety Triage & Information Extraction Service.
 Transforms raw narratives into calibrated safety intelligence.
 """
 
-import re
 import json
+import re
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
-from rules.safety.deterministic_rules import DeterministicSafetyRuleEngine
-from ml.extraction.safety_ner import SafetyNER, SafetyEntityCategory
+from typing import Dict, List
+
 from backend.app.schemas.prediction import (
-    SafetyTriageResponse,
-    PSIFSchema,
-    IOGPRulePredictionSchema,
     EntitiesSchema,
-    EvidenceSpanSchema
+    EvidenceSpanSchema,
+    IOGPRulePredictionSchema,
+    PSIFSchema,
+    SafetyTriageResponse,
 )
+from ml.extraction.safety_ner import SafetyEntityCategory, SafetyNER
+from rules.safety.deterministic_rules import DeterministicSafetyRuleEngine
 
 
 class SafetyTriageService:

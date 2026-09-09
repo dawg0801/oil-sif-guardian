@@ -2,8 +2,9 @@
 Pydantic schemas for TF-IDF baseline model status and comparative benchmark evaluations.
 """
 
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
+from typing import Dict, List
+
+from pydantic import BaseModel
 
 
 class BaselineModelStatusResponse(BaseModel):

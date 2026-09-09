@@ -3,7 +3,9 @@ Health Check and System Readiness Endpoint.
 """
 
 from datetime import datetime, timezone
+
 from fastapi import APIRouter
+
 from backend.app.core.config import settings
 
 router = APIRouter()

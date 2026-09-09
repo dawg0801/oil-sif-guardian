@@ -4,7 +4,8 @@ Data contracts for multi-label rule predictions, 9x9 co-occurrence matrices,
 dynamic calibration thresholds, and golden benchmark evaluation reports.
 """
 
-from typing import List, Dict, Any, Optional
+from typing import Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 

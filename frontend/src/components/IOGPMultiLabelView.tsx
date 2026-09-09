@@ -152,93 +152,172 @@ export const IOGPMultiLabelView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="card-industrial bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border-slate-800 p-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
-              <Crosshair className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-white font-heading tracking-tight">
-                  IOGP 9 Life-Saving Rules Multi-Label Classifier
-                </h1>
-                <span className="badge badge-iogp text-[10px] py-0.5 px-2 bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
-                  Phase 6 Architecture
-                </span>
-                <span className="badge text-[10px] py-0.5 px-2 bg-emerald-500/20 text-emerald-400 border-emerald-500/30 font-mono">
-                  {statusData ? `${statusData.rules_count} Rules Locked` : '9 Rules Locked'}
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 mt-1 max-w-3xl">
-                Joint barrier degradation intelligence for Oil India Limited. Classifies simultaneous primary and secondary Life-Saving Rules,
-                evaluates empirical 9x9 barrier co-occurrences, and applies calibrated dynamic thresholding.
-              </p>
-            </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
+      {/* Top Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px',
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#DC2626',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+              }}
+            >
+              <Crosshair style={{ width: '13px', height: '13px' }} />
+              IOGP 9 Life-Saving Rules Multi-Label
+            </span>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--bg-pill)',
+                color: 'var(--text-muted)',
+              }}
+            >
+              {statusData ? `${statusData.rules_count} Rules Locked` : '9 Rules Locked'}
+            </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={saveThresholdsToBackend}
-              className="btn btn-secondary text-xs flex items-center gap-1.5 px-3 py-2 border-indigo-500/30 text-indigo-300 hover:bg-indigo-950/40"
-            >
-              <Sliders className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Persist Thresholds</span>
-            </button>
-            <button
-              onClick={refreshBenchmark}
-              disabled={loadingBenchmark}
-              className="btn btn-primary text-xs flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${loadingBenchmark ? 'animate-spin' : ''}`} />
-              <span>Run Golden Benchmark</span>
-            </button>
-          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
+            Multi-Label Classifier & Co-Occurrence Matrix
+          </h1>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '6px 0 0 0', maxWidth: '740px' }}>
+            Joint barrier degradation intelligence for Oil India Limited. Classifies simultaneous primary and secondary Life-Saving Rules and evaluates empirical 9x9 barrier co-occurrences.
+          </p>
         </div>
 
-        {thresholdSavedNotice && (
-          <div className="mt-3 text-xs text-emerald-400 bg-emerald-950/40 border border-emerald-800/60 rounded px-3 py-1.5 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span>{thresholdSavedNotice}</span>
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={saveThresholdsToBackend}
+            className="btn-secondary"
+            style={{ padding: '9px 16px', fontSize: '12.5px' }}
+          >
+            <Sliders style={{ width: '14px', height: '14px' }} />
+            <span>Persist Thresholds</span>
+          </button>
+          <button
+            onClick={refreshBenchmark}
+            disabled={loadingBenchmark}
+            className="btn-primary"
+            style={{ padding: '9px 18px', fontSize: '12.5px' }}
+          >
+            <RefreshCw style={{ width: '14px', height: '14px' }} className={loadingBenchmark ? 'animate-spin' : ''} />
+            <span>Run Golden Benchmark</span>
+          </button>
+        </div>
       </div>
 
+      {thresholdSavedNotice && (
+        <div
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            color: '#059669',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+            borderRadius: '12px',
+            padding: '10px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <CheckCircle2 style={{ width: '16px', height: '16px', color: '#059669' }} />
+          <span>{thresholdSavedNotice}</span>
+        </div>
+      )}
+
       {/* Preset Scenarios Strip */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
-        <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider shrink-0 flex items-center gap-1.5 pl-1">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          Test Narratives:
+      <div
+        className="card-panel"
+        style={{
+          borderRadius: '24px',
+          padding: '18px 22px',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          overflowX: 'auto',
+        }}
+      >
+        <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Sparkles style={{ width: '13px', height: '13px', color: '#F59E0B' }} />
+          <span>Test Scenarios:</span>
         </span>
-        {SAMPLE_NARRATIVES.map((s, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSelectSample(s)}
-            className={`text-xs px-3 py-1.5 rounded-lg border whitespace-nowrap transition flex items-center gap-1.5 ${
-              incidentTitle === s.title
-                ? 'bg-indigo-500/20 border-indigo-500/60 text-indigo-200 font-semibold'
-                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-            }`}
-          >
-            <span>{idx + 1}.</span>
-            <span>{s.title}</span>
-          </button>
-        ))}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}>
+          {SAMPLE_NARRATIVES.map((s, idx) => {
+            const isSelected = incidentTitle === s.title;
+            const isNegative = s.title.includes('Negative');
+            const dotColor = isNegative ? '#059669' : '#D97706';
+
+            return (
+              <button
+                key={idx}
+                onClick={() => handleSelectSample(s)}
+                style={{
+                  fontSize: '12px',
+                  fontWeight: isSelected ? 700 : 500,
+                  padding: '7px 16px',
+                  borderRadius: '9999px',
+                  border: isSelected ? '1.5px solid #0D9488' : '1px solid var(--border-color-subtle)',
+                  backgroundColor: isSelected ? 'rgba(13, 148, 136, 0.14)' : 'var(--bg-input)',
+                  color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  boxShadow: isSelected ? '0 2px 8px rgba(13, 148, 136, 0.25)' : 'none',
+                  transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: dotColor, flexShrink: 0 }} />
+                <span>{s.title}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Interactive Inference Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
         {/* Left Column: Narrative & Prediction Summary */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="card-industrial p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-indigo-400" />
-                Raw Incident Narrative
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div
+            className="card-panel"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '12.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FileText style={{ width: '15px', height: '15px', color: 'var(--accent-emerald-dark)' }} />
+                <span>Raw Incident Narrative</span>
               </span>
-              <span className="text-[11px] font-mono text-slate-500">
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
                 {narrativeInput.length} chars
               </span>
             </div>
@@ -248,22 +327,24 @@ export const IOGPMultiLabelView: React.FC = () => {
               value={narrativeInput}
               onChange={(e) => setNarrativeInput(e.target.value)}
               placeholder="Enter incident or near-miss report narrative..."
-              className="w-full bg-slate-950/80 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono leading-relaxed resize-y"
+              className="form-textarea font-mono"
+              style={{ fontSize: '12.5px', lineHeight: 1.6 }}
             />
 
             <button
               onClick={() => runInference(narrativeInput, incidentTitle)}
               disabled={loadingPredict || narrativeInput.trim().length < 5}
-              className="w-full btn btn-primary py-2.5 text-xs font-semibold flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500"
+              className="btn-primary"
+              style={{ width: '100%', padding: '12px', justifyContent: 'center', fontSize: '13px' }}
             >
               {loadingPredict ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <RefreshCw style={{ width: '15px', height: '15px' }} className="animate-spin" />
                   <span>Evaluating Multi-Label Rules...</span>
                 </>
               ) : (
                 <>
-                  <Activity className="w-4 h-4" />
+                  <Activity style={{ width: '15px', height: '15px' }} />
                   <span>Execute Multi-Label IOGP Inference</span>
                 </>
               )}
@@ -272,31 +353,40 @@ export const IOGPMultiLabelView: React.FC = () => {
 
           {/* Inference Decision Output */}
           {prediction && (
-            <div className="card-industrial p-5 space-y-4 border-indigo-500/20 bg-gradient-to-b from-slate-900 to-slate-950">
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                  <ShieldAlert className="w-4 h-4 text-amber-400" />
-                  Multi-Label Decision Card
+            <div
+              className="card-panel"
+              style={{
+                borderRadius: '24px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border-color-subtle)' }}>
+                <span style={{ fontSize: '12.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldAlert style={{ width: '15px', height: '15px', color: '#D97706' }} />
+                  <span>Multi-Label Decision Card</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-slate-500" />
-                  {prediction.latency_ms} ms latency
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Clock style={{ width: '12px', height: '12px' }} />
+                  <span>{prediction.latency_ms} ms</span>
                 </span>
               </div>
 
               {/* Primary Rule */}
               <div>
-                <span className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold block mb-1.5">
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
                   Designated Primary Rule
                 </span>
-                <div className="p-3 rounded-lg border bg-amber-500/10 border-amber-500/30 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-xl">{RULE_ICONS[prediction.primary_rule] || '🛡️'}</span>
+                <div style={{ padding: '14px 18px', borderRadius: '16px', backgroundColor: 'rgba(245, 158, 11, 0.08)', border: '1.5px solid rgba(245, 158, 11, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ fontSize: '24px' }}>{RULE_ICONS[prediction.primary_rule] || '🛡️'}</span>
                     <div>
-                      <div className="text-sm font-bold text-amber-300 font-heading">
+                      <div style={{ fontSize: '15px', fontWeight: 800, color: '#D97706' }}>
                         {prediction.primary_rule}
                       </div>
-                      <div className="text-[11px] text-amber-400/80 font-mono">
+                      <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
                         {prediction.primary_rule === 'None'
                           ? 'Zero industrial Life-Saving Rules breached (Administrative Control)'
                           : `Dominant Precursor Driver (P = ${((prediction.rule_scores[prediction.primary_rule]?.probability || 0) * 100).toFixed(1)}%)`}
@@ -304,32 +394,45 @@ export const IOGPMultiLabelView: React.FC = () => {
                     </div>
                   </div>
                   {prediction.primary_rule !== 'None' && (
-                    <span className="badge badge-high text-[10px]">PRIMARY</span>
+                    <span style={{ padding: '4px 10px', borderRadius: '9999px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', backgroundColor: '#D97706', color: '#FFFFFF' }}>
+                      PRIMARY
+                    </span>
                   )}
                 </div>
               </div>
 
               {/* Secondary Rules */}
               <div>
-                <span className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold block mb-1.5">
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
                   Co-Occurring Secondary Rules ({prediction.secondary_rules.length})
                 </span>
                 {prediction.secondary_rules.length === 0 ? (
-                  <div className="text-xs text-slate-500 italic p-2 rounded bg-slate-950/60 border border-slate-800">
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '12px', borderRadius: '12px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color-subtle)' }}>
                     No secondary rules exceeded decision thresholds.
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {prediction.secondary_rules.map((ruleName) => {
                       const score = prediction.rule_scores[ruleName];
                       return (
                         <div
                           key={ruleName}
-                          className="px-2.5 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-500/40 text-indigo-200 text-xs flex items-center gap-2 font-mono"
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '12px',
+                            backgroundColor: 'rgba(13, 148, 136, 0.08)',
+                            border: '1px solid rgba(13, 148, 136, 0.25)',
+                            color: 'var(--text-primary)',
+                            fontSize: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontWeight: 600,
+                          }}
                         >
                           <span>{RULE_ICONS[ruleName] || '🔹'}</span>
-                          <span className="font-semibold">{ruleName}</span>
-                          <span className="text-[10px] text-indigo-400">
+                          <span>{ruleName}</span>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--accent-emerald-dark)', fontWeight: 800 }}>
                             {(score.probability * 100).toFixed(0)}%
                           </span>
                         </div>
@@ -341,21 +444,31 @@ export const IOGPMultiLabelView: React.FC = () => {
 
               {/* Co-Occurrence Tags */}
               {prediction.co_occurrence_tags.length > 0 && (
-                <div className="pt-2 border-t border-slate-800/80">
-                  <span className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold block mb-1.5 flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                    Empirical Barrier Coupling
+                <div style={{ paddingTop: '12px', borderTop: '1px solid var(--border-color-subtle)' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                    <TrendingUp style={{ width: '13px', height: '13px', color: '#059669' }} />
+                    <span>Empirical Barrier Coupling</span>
                   </span>
-                  <div className="space-y-1.5">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {prediction.co_occurrence_tags.map((tag, i) => (
                       <div
                         key={i}
-                        className="text-xs p-2 rounded bg-slate-950/80 border border-slate-800 flex items-center justify-between text-slate-300"
+                        style={{
+                          fontSize: '12px',
+                          padding: '8px 12px',
+                          borderRadius: '12px',
+                          backgroundColor: 'var(--bg-input)',
+                          border: '1px solid var(--border-color-subtle)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          color: 'var(--text-primary)',
+                        }}
                       >
                         <span>
-                          {tag.rule_a} <span className="text-slate-500">↔</span> {tag.rule_b}
+                          <strong>{tag.rule_a}</strong> <span style={{ color: 'var(--text-muted)' }}>&harr;</span> <strong>{tag.rule_b}</strong>
                         </span>
-                        <span className="badge text-[10px] bg-indigo-500/20 text-indigo-300 font-mono">
+                        <span style={{ fontSize: '10.5px', fontFamily: 'var(--font-mono)', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', backgroundColor: 'rgba(13, 148, 136, 0.1)', color: 'var(--accent-emerald-dark)' }}>
                           {tag.historical_co_occurrences} Historical Pairs
                         </span>
                       </div>
@@ -368,19 +481,28 @@ export const IOGPMultiLabelView: React.FC = () => {
         </div>
 
         {/* Right Column: 9-Rule Grid with Threshold Sliders */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="card-industrial p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <Sliders className="w-4 h-4 text-indigo-400" />
-                9 IOGP Life-Saving Rules Activation & Calibration Grid
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div
+            className="card-panel"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '12.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sliders style={{ width: '15px', height: '15px', color: 'var(--accent-emerald-dark)' }} />
+                <span>9 IOGP Life-Saving Rules Activation & Calibration Grid</span>
               </span>
-              <span className="text-[11px] text-slate-400 font-mono">
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
                 Triggered: {prediction ? prediction.triggered_rules.length : 0} / 9
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px' }}>
               {statusData?.canonical_rules.map((ruleName) => {
                 const score = prediction?.rule_scores[ruleName];
                 const prob = score ? score.probability : 0.0;
@@ -391,63 +513,87 @@ export const IOGPMultiLabelView: React.FC = () => {
                 return (
                   <div
                     key={ruleName}
-                    className={`p-3 rounded-xl border transition-all ${
-                      isPrimary
-                        ? 'bg-amber-950/20 border-amber-500/50 shadow-glow-amber'
+                    style={{
+                      padding: '16px',
+                      borderRadius: '18px',
+                      border: isPrimary
+                        ? '1.5px solid rgba(245, 158, 11, 0.7)'
                         : isTriggered
-                        ? 'bg-indigo-950/20 border-indigo-500/50'
-                        : 'bg-slate-950/60 border-slate-800/80 opacity-80'
-                    }`}
+                        ? '1.5px solid rgba(13, 148, 136, 0.6)'
+                        : '1px solid var(--border-color-subtle)',
+                      backgroundColor: isPrimary
+                        ? 'rgba(245, 158, 11, 0.08)'
+                        : isTriggered
+                        ? 'rgba(13, 148, 136, 0.07)'
+                        : 'var(--bg-input)',
+                      opacity: isPrimary || isTriggered ? 1 : 0.78,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                      boxShadow: isPrimary
+                        ? '0 4px 14px rgba(245, 158, 11, 0.15)'
+                        : isTriggered
+                        ? '0 4px 14px rgba(13, 148, 136, 0.12)'
+                        : 'none',
+                      transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}
                   >
-                    <div className="flex items-start justify-between gap-1 mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-base">{RULE_ICONS[ruleName] || '🛡️'}</span>
-                        <span className="text-xs font-bold text-white tracking-tight leading-tight">
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '20px' }}>{RULE_ICONS[ruleName] || '🛡️'}</span>
+                        <span style={{ fontSize: '12.5px', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>
                           {ruleName}
                         </span>
                       </div>
                       {isPrimary ? (
-                        <span className="badge badge-high text-[9px] py-0 px-1.5">PRIMARY</span>
+                        <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '9.5px', fontWeight: 800, backgroundColor: '#D97706', color: '#FFFFFF', boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)' }}>PRIMARY</span>
                       ) : isTriggered ? (
-                        <span className="badge text-[9px] py-0 px-1.5 bg-indigo-500/30 text-indigo-300">SECONDARY</span>
+                        <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '9.5px', fontWeight: 800, backgroundColor: 'rgba(13, 148, 136, 0.2)', color: '#0D9488', border: '1px solid rgba(13, 148, 136, 0.35)' }}>SECONDARY</span>
                       ) : (
-                        <span className="text-[9px] font-mono text-slate-500">OFF</span>
+                        <span style={{ fontSize: '9.5px', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)', padding: '2px 6px' }}>OFF</span>
                       )}
                     </div>
 
                     {/* Probability Bar */}
-                    <div className="space-y-1 mb-2.5">
-                      <div className="flex justify-between text-[11px] font-mono">
-                        <span className="text-slate-400">Activation</span>
-                        <span className={isTriggered ? 'text-indigo-300 font-bold' : 'text-slate-500'}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Activation P</span>
+                        <span style={{ fontWeight: 800, color: isPrimary ? '#D97706' : isTriggered ? '#0D9488' : 'var(--text-muted)' }}>
                           {(prob * 100).toFixed(1)}%
                         </span>
                       </div>
-                      <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden relative">
+                      <div style={{ height: '8px', width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: '9999px', overflow: 'hidden', position: 'relative', border: '1px solid var(--border-color-subtle)' }}>
                         <div
-                          className={`h-full transition-all duration-300 ${
-                            isPrimary
-                              ? 'bg-gradient-to-r from-amber-500 to-amber-400'
-                              : isTriggered
-                              ? 'bg-gradient-to-r from-indigo-500 to-indigo-400'
-                              : 'bg-slate-700'
-                          }`}
-                          style={{ width: `${Math.min(100, Math.max(2, prob * 100))}%` }}
+                          style={{
+                            height: '100%',
+                            width: `${Math.min(100, Math.max(2, prob * 100))}%`,
+                            backgroundColor: isPrimary ? '#D97706' : isTriggered ? '#0D9488' : 'var(--text-dim)',
+                            borderRadius: '9999px',
+                            transition: 'all 0.3s ease',
+                          }}
                         />
                         {/* Threshold cut-off marker */}
                         <div
-                          className="absolute top-0 bottom-0 w-0.5 bg-white shadow-sm"
-                          style={{ left: `${tau * 100}%` }}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            width: '2px',
+                            backgroundColor: 'var(--text-primary)',
+                            left: `${tau * 100}%`,
+                            boxShadow: '0 0 3px rgba(0,0,0,0.4)',
+                            zIndex: 2,
+                          }}
                           title={`Threshold tau = ${tau}`}
                         />
                       </div>
                     </div>
 
                     {/* Interactive Threshold Slider */}
-                    <div className="space-y-1 pt-1 border-t border-slate-800/60">
-                      <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                        <span>Threshold (τ)</span>
-                        <span className="text-indigo-400">{tau.toFixed(2)}</span>
+                    <div style={{ paddingTop: '8px', borderTop: '1px solid var(--border-color-subtle)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                        <span>Threshold (&tau;)</span>
+                        <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{(tau * 100).toFixed(0)}%</span>
                       </div>
                       <input
                         type="range"
@@ -456,17 +602,29 @@ export const IOGPMultiLabelView: React.FC = () => {
                         step="0.01"
                         value={tau}
                         onChange={(e) => handleThresholdChange(ruleName, parseFloat(e.target.value))}
-                        className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                        style={{ width: '100%', accentColor: '#0D9488', cursor: 'pointer' }}
                       />
                     </div>
 
                     {/* Evidence Snippets */}
                     {score && score.evidence_spans.length > 0 && (
-                      <div className="mt-2 pt-1 border-t border-slate-800/60 flex flex-wrap gap-1">
+                      <div style={{ paddingTop: '6px', borderTop: '1px solid var(--border-color-subtle)', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                         {score.evidence_spans.slice(0, 2).map((sp, idx) => (
                           <span
                             key={idx}
-                            className="text-[9px] bg-slate-900 border border-slate-700/80 rounded px-1.5 py-0.5 text-slate-300 font-mono truncate max-w-full"
+                            style={{
+                              fontSize: '9.5px',
+                              padding: '2px 6px',
+                              borderRadius: '6px',
+                              backgroundColor: 'var(--bg-surface)',
+                              border: '1px solid var(--border-color-subtle)',
+                              color: 'var(--text-secondary)',
+                              fontFamily: 'var(--font-mono)',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              maxWidth: '100%',
+                            }}
                           >
                             "{sp}"
                           </span>
@@ -482,32 +640,41 @@ export const IOGPMultiLabelView: React.FC = () => {
       </div>
 
       {/* 9x9 Empirical Co-Occurrence Heatmap & Golden Benchmark Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
         {/* 9x9 Co-Occurrence Matrix Heatmap */}
-        <div className="lg:col-span-7 card-industrial p-5 space-y-4">
-          <div className="flex items-center justify-between">
+        <div
+          className="card-panel"
+          style={{
+            borderRadius: '24px',
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-emerald-400" />
-                9x9 Empirical IOGP Barrier Co-Occurrence Matrix
+              <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Layers style={{ width: '16px', height: '16px', color: '#059669' }} />
+                <span>9x9 Empirical IOGP Barrier Co-Occurrence Matrix</span>
               </span>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                 Evaluates joint frequency of simultaneous control compromises across OIL golden benchmark reports.
               </p>
             </div>
-            <span className="badge text-[10px] bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
-              Golden Corpus Empirical Matrix
+            <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '3px 10px', borderRadius: '9999px', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#059669', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+              Empirical Corpus
             </span>
           </div>
 
           {matrixData && (
-            <div className="overflow-x-auto pb-2">
-              <table className="w-full text-center text-[10px] font-mono border-collapse">
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', textAlign: 'center', fontSize: '10.5px', fontFamily: 'var(--font-mono)', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr>
-                    <th className="p-1 text-left text-slate-500 text-[9px]">Rule</th>
+                    <th style={{ padding: '6px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '10px' }}>Rule</th>
                     {matrixData.rules.map((r, i) => (
-                      <th key={i} className="p-1 text-slate-400 font-semibold" title={r}>
+                      <th key={i} style={{ padding: '6px', color: 'var(--text-secondary)', fontWeight: 700 }} title={r}>
                         {RULE_ICONS[r] || r.slice(0, 3)}
                       </th>
                     ))}
@@ -517,10 +684,10 @@ export const IOGPMultiLabelView: React.FC = () => {
                   {matrixData.matrix.map((row, i) => {
                     const r1Name = matrixData.rules[i];
                     return (
-                      <tr key={i} className="border-t border-slate-800/40 hover:bg-slate-800/30 transition">
-                        <td className="p-1.5 text-left text-slate-300 font-semibold truncate max-w-[130px] flex items-center gap-1">
+                      <tr key={i} style={{ borderTop: '1px solid var(--border-color-subtle)' }}>
+                        <td style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           <span>{RULE_ICONS[r1Name]}</span>
-                          <span className="truncate">{r1Name}</span>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{r1Name}</span>
                         </td>
                         {row.map((count, j) => {
                           const r2Name = matrixData.rules[j];
@@ -531,19 +698,18 @@ export const IOGPMultiLabelView: React.FC = () => {
                             <td
                               key={j}
                               onClick={() => setSelectedCell({ r1: r1Name, r2: r2Name, count })}
-                              className={`p-1.5 cursor-pointer transition rounded ${
-                                isDiagonal
-                                  ? 'bg-slate-800/80 font-bold text-amber-400 border border-amber-500/30'
-                                  : count > 0
-                                  ? 'font-semibold text-slate-100 hover:scale-105'
-                                  : 'text-slate-600'
-                              }`}
                               style={{
+                                padding: '8px 4px',
+                                cursor: 'pointer',
+                                borderRadius: '6px',
+                                fontWeight: isDiagonal || count > 0 ? 800 : 400,
+                                color: isDiagonal ? '#D97706' : count > 0 ? 'var(--text-primary)' : 'var(--text-dim)',
                                 backgroundColor: isDiagonal
-                                  ? undefined
+                                  ? 'rgba(245, 158, 11, 0.12)'
                                   : count > 0
-                                  ? `rgba(79, 70, 229, ${0.15 + intensity * 0.7})`
-                                  : undefined
+                                  ? `rgba(13, 148, 136, ${0.12 + intensity * 0.55})`
+                                  : 'transparent',
+                                transition: 'all 0.15s ease',
                               }}
                               title={`${r1Name} + ${r2Name}: ${count} occurrences`}
                             >
@@ -558,17 +724,17 @@ export const IOGPMultiLabelView: React.FC = () => {
               </table>
 
               {selectedCell && (
-                <div className="mt-3 p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/40 text-xs text-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Info className="w-4 h-4 text-indigo-400 shrink-0" />
+                <div style={{ marginTop: '12px', padding: '12px 16px', borderRadius: '14px', backgroundColor: 'rgba(13, 148, 136, 0.08)', border: '1px solid rgba(13, 148, 136, 0.25)', fontSize: '12px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Info style={{ width: '16px', height: '16px', color: 'var(--accent-emerald-dark)', flexShrink: 0 }} />
                     <span>
                       <strong>{selectedCell.r1}</strong> and <strong>{selectedCell.r2}</strong> co-occur in{' '}
-                      <span className="text-amber-300 font-bold font-mono">{selectedCell.count}</span> golden evaluation incidents.
+                      <span style={{ color: '#D97706', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>{selectedCell.count}</span> golden evaluation incidents.
                     </span>
                   </div>
                   <button
                     onClick={() => setSelectedCell(null)}
-                    className="text-xs text-slate-400 hover:text-white px-2 py-0.5"
+                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontWeight: 600 }}
                   >
                     Dismiss
                   </button>
@@ -579,76 +745,85 @@ export const IOGPMultiLabelView: React.FC = () => {
         </div>
 
         {/* Golden Benchmark Scorecard */}
-        <div className="lg:col-span-5 card-industrial p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              124-Event Golden Benchmark Scorecard
+        <div
+          className="card-panel"
+          style={{
+            borderRadius: '24px',
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CheckCircle2 style={{ width: '16px', height: '16px', color: '#059669' }} />
+              <span>124-Event Golden Benchmark Scorecard</span>
             </span>
-            <span className="text-[10px] font-mono text-slate-400">
-              {benchmarkReport?.evaluated_at || 'Evaluated on Golden Dataset'}
+            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+              {benchmarkReport?.evaluated_at || 'Golden Dataset'}
             </span>
           </div>
 
           {benchmarkReport && (
-            <div className="space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* 4 KPI Metrics */}
-              <div className="grid grid-cols-2 gap-2.5">
-                <div className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800">
-                  <div className="text-[10px] text-slate-400 font-mono">Subset Accuracy (Exact)</div>
-                  <div className="text-lg font-bold text-amber-400 font-heading">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                <div style={{ padding: '12px 14px', borderRadius: '16px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color-subtle)' }}>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>Subset Accuracy</div>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#D97706', margin: '2px 0' }}>
                     {(benchmarkReport.subset_accuracy * 100).toFixed(1)}%
                   </div>
-                  <div className="text-[10px] text-slate-500">Exact 9-Rule Match</div>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>Exact 9-Rule Match</div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800">
-                  <div className="text-[10px] text-slate-400 font-mono">Hamming Loss</div>
-                  <div className="text-lg font-bold text-emerald-400 font-heading">
+                <div style={{ padding: '12px 14px', borderRadius: '16px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color-subtle)' }}>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>Hamming Loss</div>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#059669', margin: '2px 0' }}>
                     {benchmarkReport.hamming_loss.toFixed(4)}
                   </div>
-                  <div className="text-[10px] text-slate-500">Bit error rate (&lt; 0.08)</div>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>Bit error rate (&lt; 0.08)</div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800">
-                  <div className="text-[10px] text-slate-400 font-mono">Macro F1 Score</div>
-                  <div className="text-lg font-bold text-indigo-400 font-heading">
+                <div style={{ padding: '12px 14px', borderRadius: '16px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color-subtle)' }}>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>Macro F1 Score</div>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#2563EB', margin: '2px 0' }}>
                     {(benchmarkReport.macro_f1 * 100).toFixed(1)}%
                   </div>
-                  <div className="text-[10px] text-slate-500">Unweighted 9-class mean</div>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>Unweighted 9-class mean</div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800">
-                  <div className="text-[10px] text-slate-400 font-mono">Primary Rule Top-1</div>
-                  <div className="text-lg font-bold text-sky-400 font-heading">
+                <div style={{ padding: '12px 14px', borderRadius: '16px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color-subtle)' }}>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>Primary Rule Top-1</div>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#0284C7', margin: '2px 0' }}>
                     {(benchmarkReport.primary_rule_accuracy * 100).toFixed(1)}%
                   </div>
-                  <div className="text-[10px] text-slate-500">Dominant rule accuracy</div>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>Dominant rule accuracy</div>
                 </div>
               </div>
 
               {/* Per-Rule Table */}
-              <div className="overflow-x-auto max-h-56 overflow-y-auto scrollbar-thin">
-                <table className="w-full text-left text-[11px] font-mono">
-                  <thead className="bg-slate-950/90 sticky top-0 border-b border-slate-800 text-slate-400">
+              <div style={{ overflowX: 'auto', maxHeight: '240px', overflowY: 'auto' }}>
+                <table className="custom-table" style={{ fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+                  <thead>
                     <tr>
-                      <th className="py-1 px-2">Rule</th>
-                      <th className="py-1 px-1 text-right">Supp</th>
-                      <th className="py-1 px-1 text-right">Prec</th>
-                      <th className="py-1 px-1 text-right">Rec</th>
-                      <th className="py-1 px-2 text-right">F1</th>
+                      <th style={{ padding: '8px 10px' }}>Rule</th>
+                      <th style={{ padding: '8px 6px', textAlign: 'right' }}>Supp</th>
+                      <th style={{ padding: '8px 6px', textAlign: 'right' }}>Prec</th>
+                      <th style={{ padding: '8px 6px', textAlign: 'right' }}>Rec</th>
+                      <th style={{ padding: '8px 10px', textAlign: 'right' }}>F1</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/40">
+                  <tbody>
                     {Object.entries(benchmarkReport.per_rule_metrics).map(([rName, m]) => (
-                      <tr key={rName} className="hover:bg-slate-800/30">
-                        <td className="py-1 px-2 text-slate-300 truncate max-w-[120px]" title={rName}>
+                      <tr key={rName}>
+                        <td style={{ padding: '8px 10px', color: 'var(--text-primary)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px' }} title={rName}>
                           {rName}
                         </td>
-                        <td className="py-1 px-1 text-right text-slate-400">{m.support}</td>
-                        <td className="py-1 px-1 text-right text-slate-300">{(m.precision * 100).toFixed(0)}%</td>
-                        <td className="py-1 px-1 text-right text-slate-300">{(m.recall * 100).toFixed(0)}%</td>
-                        <td className="py-1 px-2 text-right font-bold text-indigo-400">{(m.f1 * 100).toFixed(0)}%</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', color: 'var(--text-muted)' }}>{m.support}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', color: 'var(--text-secondary)' }}>{(m.precision * 100).toFixed(0)}%</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', color: 'var(--text-secondary)' }}>{(m.recall * 100).toFixed(0)}%</td>
+                        <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800, color: 'var(--accent-emerald-dark)' }}>{(m.f1 * 100).toFixed(0)}%</td>
                       </tr>
                     ))}
                   </tbody>

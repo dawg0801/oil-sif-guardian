@@ -3,24 +3,25 @@ Main API Router binding all v1 endpoints.
 """
 
 from fastapi import APIRouter
+
 from backend.app.api.v1.endpoints import (
-    health,
-    reports,
-    reviews,
     actions,
+    active_learning,
     analytics,
     annotation,
-    ontology,
-    clusters,
     baseline,
-    extraction,
-    models,
-    iogp,
-    rules,
+    clusters,
     decision,
-    security,
-    active_learning,
+    extraction,
+    health,
+    iogp,
+    models,
+    ontology,
     rag,
+    reports,
+    reviews,
+    rules,
+    security,
 )
 
 api_router = APIRouter()

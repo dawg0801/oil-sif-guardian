@@ -2,10 +2,10 @@
 Tests for Phase 16 (MLOps & Governance) and Phase 17 (Enterprise Security & RBAC).
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
+from backend.app.core.security import sanitize_narrative
 from backend.app.main import app
-from backend.app.core.security import sanitize_narrative, UserRole, AuthUser
 
 client = TestClient(app)
 

@@ -3,7 +3,8 @@ OIL-SIF Guardian — Extraction & NER Schemas
 Pydantic models for safety entity extraction, BIO sequence tagging, and causal reasoning flow.
 """
 
-from typing import List, Dict, Any, Optional
+from typing import Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 

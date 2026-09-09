@@ -3,6 +3,7 @@ Integration tests for Executive Analytics, Emerging Risks, and Statutory Complia
 """
 
 from fastapi.testclient import TestClient
+
 from backend.app.main import app
 
 client = TestClient(app)

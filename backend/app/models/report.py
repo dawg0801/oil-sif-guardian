@@ -3,19 +3,12 @@ SQLAlchemy ORM Models for OIL-SIF Guardian.
 Implements the database contract defined in docs/DATA_SCHEMA.md.
 """
 
-from datetime import datetime, timezone
 import uuid
-from sqlalchemy import (
-    Column,
-    String,
-    Float,
-    Boolean,
-    DateTime,
-    Text,
-    ForeignKey,
-    Integer
-)
+from datetime import datetime, timezone
+
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
+
 from backend.app.core.database import Base
 
 

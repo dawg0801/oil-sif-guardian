@@ -2,8 +2,9 @@
 Pydantic schemas for Safety Ontology, Barrier Taxonomies, and SIF Fingerprints.
 """
 
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel
 
 
 class BarrierDefinitionSchema(BaseModel):

@@ -179,37 +179,80 @@ export const ModelStudioView: React.FC = () => {
     const { narrative, tokens } = attributionResult;
 
     if (!tokens.length) {
-      return <div className="text-slate-700 dark:text-slate-300 p-4">{narrative}</div>;
+      return (
+        <div style={{ padding: '24px', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.8' }}>
+          {narrative}
+        </div>
+      );
     }
 
     return (
-      <div className="text-slate-800 dark:text-slate-200 text-base leading-loose p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner min-h-[140px] flex flex-wrap gap-1.5 items-center">
+      <div
+        style={{
+          padding: '24px',
+          backgroundColor: 'var(--bg-surface)',
+          borderRadius: '20px',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.04)',
+          minHeight: '140px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '8px',
+          alignItems: 'center',
+          lineHeight: '2',
+        }}
+      >
         {tokens.map((t, idx) => {
           const isSelected = selectedToken?.start_char === t.start_char && selectedToken?.end_char === t.end_char;
           const isAmplifier = t.role === 'RISK_AMPLIFIER';
           const isMitigator = t.role === 'SAFETY_MITIGATOR';
 
+          const chipBg = isAmplifier
+            ? 'rgba(239, 68, 68, 0.1)'
+            : isMitigator
+            ? 'rgba(16, 185, 129, 0.1)'
+            : 'var(--bg-input)';
+          const chipBorder = isAmplifier
+            ? '1px solid rgba(239, 68, 68, 0.3)'
+            : isMitigator
+            ? '1px solid rgba(16, 185, 129, 0.3)'
+            : '1px solid var(--border-color-subtle)';
+          const chipColor = isAmplifier
+            ? '#DC2626'
+            : isMitigator
+            ? '#059669'
+            : 'var(--text-primary)';
+
           return (
             <span
               key={idx}
               onClick={() => setSelectedToken(t)}
-              className={`cursor-pointer px-2 py-0.5 rounded-md text-sm font-medium transition-all duration-150 inline-flex items-center gap-1 ${
-                isAmplifier
-                  ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border border-rose-300 dark:border-rose-700 font-semibold'
-                  : isMitigator
-                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700 font-semibold'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
-              } ${isSelected ? 'ring-2 ring-indigo-500 scale-105 shadow-md' : 'hover:opacity-80'}`}
+              style={{
+                cursor: 'pointer',
+                padding: '3px 10px',
+                borderRadius: '8px',
+                fontSize: '13.5px',
+                fontWeight: isAmplifier || isMitigator ? 700 : 500,
+                backgroundColor: chipBg,
+                border: chipBorder,
+                color: chipColor,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                boxShadow: isSelected ? '0 0 0 2px #0D9488, 0 4px 12px rgba(13, 148, 136, 0.2)' : 'none',
+                transform: isSelected ? 'scale(1.06)' : 'none',
+              }}
               title={`${t.token}: Saliency ${t.saliency_score > 0 ? '+' : ''}${t.saliency_score} [${t.start_char}:${t.end_char}]`}
             >
               <span>{t.token}</span>
               {isAmplifier && (
-                <span className="text-[10px] bg-rose-200 dark:bg-rose-900/80 text-rose-800 dark:text-rose-300 px-1 py-0.2 rounded font-bold">
+                <span style={{ fontSize: '10px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'rgba(239, 68, 68, 0.18)', color: '#DC2626' }}>
                   +{Math.round(t.saliency_score * 100)}%
                 </span>
               )}
               {isMitigator && (
-                <span className="text-[10px] bg-emerald-200 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 px-1 py-0.2 rounded font-bold">
+                <span style={{ fontSize: '10px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'rgba(16, 185, 129, 0.18)', color: '#059669' }}>
                   {Math.round(t.saliency_score * 100)}%
                 </span>
               )}
@@ -221,67 +264,135 @@ export const ModelStudioView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
       {/* Header & Status */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 rounded-2xl text-white shadow-xl">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px',
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 text-xs font-semibold rounded-full flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-indigo-300" />
-              Phase 5 Architecture
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                color: '#7C3AED',
+                border: '1px solid rgba(124, 58, 237, 0.2)',
+              }}
+            >
+              <Cpu style={{ width: '13px', height: '13px' }} />
+              Neural Sequence Classifier & Studio
             </span>
-            <span className="text-xs text-slate-400 font-mono">
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--bg-pill)',
+                color: 'var(--text-muted)',
+              }}
+            >
               Model: {modelStatus?.model_version || 'ContextualSeq_OIL_v1.0'}
             </span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2.5">
-            <Cpu className="w-6 h-6 text-indigo-400" />
-            Sequence Modeling & Model Studio
+
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
+            Sequence Modeling & Attribution Studio
           </h1>
-          <p className="text-sm text-slate-300 mt-1 max-w-3xl">
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '6px 0 0 0', maxWidth: '740px' }}>
             Multi-task contextual sequence classifier with temperature-scaled confidence calibration, token-level attribution heatmaps, and tri-model ensemble arbitration.
           </p>
         </div>
 
         {modelStatus && (
-          <div className="flex items-center gap-4 bg-slate-800/80 border border-slate-700/80 p-3 rounded-xl backdrop-blur-sm shrink-0">
-            <div className="text-center px-2">
-              <div className="text-xs text-slate-400 font-medium">Temperature (T)</div>
-              <div className="text-xl font-bold text-indigo-400">{modelStatus.temperature}</div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
+              padding: '8px 18px',
+              borderRadius: '9999px',
+              boxShadow: 'var(--card-shadow)',
+            }}
+          >
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Temperature (T)</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#7C3AED' }}>{modelStatus.temperature}</div>
             </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-2">
-              <div className="text-xs text-slate-400 font-medium">Vocabulary</div>
-              <div className="text-xl font-bold text-emerald-400">{modelStatus.vocabulary_size}</div>
+            <div style={{ width: '1px', height: '22px', backgroundColor: 'var(--border-color-subtle)' }} />
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Vocabulary</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#059669' }}>{modelStatus.vocabulary_size}</div>
             </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-2">
-              <div className="text-xs text-slate-400 font-medium">IOGP Rules</div>
-              <div className="text-xl font-bold text-amber-400">{modelStatus.supported_rules.length}</div>
+            <div style={{ width: '1px', height: '22px', backgroundColor: 'var(--border-color-subtle)' }} />
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>IOGP Rules</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#D97706' }}>{modelStatus.supported_rules.length}</div>
             </div>
           </div>
         )}
       </div>
 
       {/* Preset Scenarios Strip */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <div
+        className="card-panel"
+        style={{
+          borderRadius: '24px',
+          padding: '20px 24px',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
           <span>OIL Operational Scenarios</span>
           <span>Click to evaluate with Model Studio</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
           {PRESET_SCENARIOS.map((p, idx) => (
             <button
               key={idx}
               onClick={() => handleSelectPreset(p)}
-              className="text-left p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-all text-xs group"
+              style={{
+                textAlign: 'left',
+                padding: '12px 14px',
+                borderRadius: '16px',
+                border: '1px solid var(--border-color-subtle)',
+                backgroundColor: 'var(--bg-input)',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(124, 58, 237, 0.4)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-color-subtle)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <div className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-1">
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {p.title}
               </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                <span className="truncate">{p.facility}</span>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#7C3AED', flexShrink: 0 }} />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.facility}</span>
               </div>
             </button>
           ))}
@@ -289,10 +400,19 @@ export const ModelStudioView: React.FC = () => {
       </div>
 
       {/* Narrative Input & Analyze Action */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        className="card-panel"
+        style={{
+          borderRadius: '24px',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '18px',
+        }}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
               Operational Activity
             </label>
             <input
@@ -300,11 +420,20 @@ export const ModelStudioView: React.FC = () => {
               value={activityInput}
               onChange={e => setActivityInput(e.target.value)}
               placeholder="e.g. Vessel Cleanout, Casing Hoisting"
-              className="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="form-input"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: '14px',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-primary)',
+                fontSize: '13px',
+              }}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
               Installation / Asset
             </label>
             <input
@@ -312,93 +441,98 @@ export const ModelStudioView: React.FC = () => {
               value={siteInput}
               onChange={e => setSiteInput(e.target.value)}
               placeholder="e.g. Early Production System EPS-1, Rig OIL-45"
-              className="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="form-input"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: '14px',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-primary)',
+                fontSize: '13px',
+              }}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">
-            Raw Narrative Text
+          <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+            Raw Safety Incident Narrative
           </label>
           <textarea
             rows={3}
             value={narrativeInput}
             onChange={e => setNarrativeInput(e.target.value)}
             placeholder="Type or paste unstructured safety incident report..."
-            className="w-full text-sm p-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+            className="form-textarea"
+            style={{
+              width: '100%',
+              padding: '12px 14px',
+              borderRadius: '14px',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-input)',
+              color: 'var(--text-primary)',
+              fontSize: '13px',
+              lineHeight: '1.6',
+              resize: 'vertical',
+            }}
           />
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-slate-500">
-            {narrativeInput.length} characters | {narrativeInput.split(/\s+/).filter(Boolean).length} words
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+            {narrativeInput.length} characters • {narrativeInput.split(/\s+/).filter(Boolean).length} tokens
           </div>
           <button
             onClick={() => handleAnalyze()}
             disabled={loading || !narrativeInput.trim()}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+            className="btn-primary"
+            style={{ padding: '10px 22px', fontSize: '13px', borderRadius: '14px' }}
           >
             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Cpu className="w-4 h-4" />}
-            Execute Model Studio Inference
+            <span>Execute Model Studio Inference</span>
           </button>
         </div>
       </div>
 
-      {/* Studio Navigation Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-6">
+      {/* Studio Navigation Sub-Tabs */}
+      <div className="sub-tabs-bar">
         <button
+          className={`sub-tab-btn ${activeTab === 'ATTRIBUTION' ? 'active' : ''}`}
           onClick={() => setActiveTab('ATTRIBUTION')}
-          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'ATTRIBUTION'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
         >
-          <Sparkles className="w-4 h-4" />
-          Token Attribution Heatmap & Saliency
+          <Sparkles style={{ width: '13px', height: '13px' }} />
+          <span>Token Attribution Heatmap</span>
         </button>
 
         <button
+          className={`sub-tab-btn ${activeTab === 'ARBITRATION' ? 'active' : ''}`}
           onClick={() => setActiveTab('ARBITRATION')}
-          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'ARBITRATION'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
         >
-          <Layers className="w-4 h-4" />
-          Tri-Model Ensemble Arbitration Matrix
+          <Layers style={{ width: '13px', height: '13px' }} />
+          <span>Tri-Model Ensemble Arbitration</span>
         </button>
 
         <button
+          className={`sub-tab-btn ${activeTab === 'BENCHMARK' ? 'active' : ''}`}
           onClick={() => {
             setActiveTab('BENCHMARK');
             if (!benchmarkReport) loadBenchmark();
           }}
-          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'BENCHMARK'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
         >
-          <BarChart3 className="w-4 h-4" />
-          4-Way Benchmark Dashboard (124 Scenarios)
+          <BarChart3 style={{ width: '13px', height: '13px' }} />
+          <span>4-Way Golden Benchmark</span>
         </button>
 
         <button
+          className={`sub-tab-btn ${activeTab === 'EVALUATION_SUITE' ? 'active' : ''}`}
           onClick={() => {
             setActiveTab('EVALUATION_SUITE');
             if (!evaluationSuite) loadEvaluationSuite();
           }}
-          className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'EVALUATION_SUITE'
-              ? 'border-amber-500 text-amber-600 dark:text-amber-400'
-              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
         >
-          <ShieldAlert className="w-4 h-4 text-amber-500" />
-          Phases 28–32 Multi-Dimensional Evaluation Suite
+          <ShieldAlert style={{ width: '13px', height: '13px' }} />
+          <span>Safety Evaluation Suite</span>
         </button>
       </div>
 
@@ -420,29 +554,33 @@ export const ModelStudioView: React.FC = () => {
 
           {/* Selected Token Details */}
           {selectedToken && (
-            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-indigo-200 dark:border-indigo-900/60 shadow-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2.5 py-1 rounded font-bold uppercase tracking-wider ${
-                    selectedToken.role === 'RISK_AMPLIFIER'
-                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
-                      : selectedToken.role === 'SAFETY_MITIGATOR'
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300'
-                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                  }`}>
+            <div className="card-panel" style={{ borderRadius: '20px', padding: '18px 22px', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{
+                    fontSize: '11px',
+                    padding: '3px 10px',
+                    borderRadius: '9999px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    backgroundColor: selectedToken.role === 'RISK_AMPLIFIER' ? 'rgba(239, 68, 68, 0.12)' : selectedToken.role === 'SAFETY_MITIGATOR' ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-input)',
+                    color: selectedToken.role === 'RISK_AMPLIFIER' ? '#DC2626' : selectedToken.role === 'SAFETY_MITIGATOR' ? '#059669' : 'var(--text-muted)',
+                    border: `1px solid ${selectedToken.role === 'RISK_AMPLIFIER' ? 'rgba(239, 68, 68, 0.25)' : selectedToken.role === 'SAFETY_MITIGATOR' ? 'rgba(16, 185, 129, 0.25)' : 'var(--border-color-subtle)'}`,
+                  }}>
                     {selectedToken.role.replace('_', ' ')}
                   </span>
-                  <span className="text-base font-semibold text-slate-900 dark:text-white">
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     "{selectedToken.token}"
                   </span>
                 </div>
-                <div className="text-xs text-slate-500 flex items-center gap-3">
-                  <span>Saliency: <strong className="text-indigo-600 dark:text-indigo-400 font-mono">{selectedToken.saliency_score > 0 ? '+' : ''}{selectedToken.saliency_score}</strong></span>
-                  <span>Offsets: <strong className="font-mono text-slate-700 dark:text-slate-300">[{selectedToken.start_char}:{selectedToken.end_char}]</strong></span>
+                <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <span>Saliency: <strong style={{ color: '#0D9488', fontFamily: 'var(--font-mono)' }}>{selectedToken.saliency_score > 0 ? '+' : ''}{selectedToken.saliency_score}</strong></span>
+                  <span>Offsets: <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>[{selectedToken.start_char}:{selectedToken.end_char}]</strong></span>
                 </div>
               </div>
 
-              <div className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg">
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', backgroundColor: 'var(--bg-input)', padding: '12px 14px', borderRadius: '12px', marginTop: '12px', lineHeight: '1.5' }}>
                 {selectedToken.rationale}
               </div>
             </div>
@@ -450,30 +588,39 @@ export const ModelStudioView: React.FC = () => {
 
           {/* Top Amplifiers and Mitigators */}
           {attributionResult && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
               {/* Top Risk Amplifiers */}
-              <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-rose-200 dark:border-rose-900/40 space-y-3">
-                <h3 className="text-sm font-bold text-rose-800 dark:text-rose-300 uppercase tracking-wider flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-rose-500" />
+              <div className="card-panel" style={{ borderRadius: '20px', padding: '20px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 14px 0' }}>
+                  <Flame style={{ width: '15px', height: '15px' }} />
                   Top Risk Amplifiers (Drivers of High PSIF)
                 </h3>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {attributionResult.top_risk_amplifiers.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/20 text-xs border border-rose-100 dark:border-rose-900/20"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 12px',
+                        borderRadius: '12px',
+                        backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                        border: '1px solid rgba(239, 68, 68, 0.15)',
+                        fontSize: '12px',
+                      }}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-300 flex items-center justify-center font-bold text-[10px]">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '10px' }}>
                           {idx + 1}
                         </span>
-                        <span className="font-mono font-bold text-slate-900 dark:text-white">
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>
                           "{item.token}"
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 font-mono text-rose-700 dark:text-rose-300 font-bold">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)', color: '#DC2626', fontWeight: 800 }}>
                         <span>+{Math.round(item.score * 100)}%</span>
-                        <span className="text-slate-400 text-[10px]">[{item.offsets[0]}:{item.offsets[1]}]</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>[{item.offsets[0]}:{item.offsets[1]}]</span>
                       </div>
                     </div>
                   ))}
@@ -481,31 +628,40 @@ export const ModelStudioView: React.FC = () => {
               </div>
 
               {/* Top Mitigators */}
-              <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-emerald-200 dark:border-emerald-900/40 space-y-3">
-                <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <div className="card-panel" style={{ borderRadius: '20px', padding: '20px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 14px 0' }}>
+                  <ShieldCheck style={{ width: '15px', height: '15px' }} />
                   Top Safety Mitigators & Controls
                 </h3>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {attributionResult.top_mitigators.length === 0 ? (
-                    <div className="text-xs text-slate-400 italic p-3">No strong mitigating tokens detected in this narrative.</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '12px' }}>No strong mitigating tokens detected in this narrative.</div>
                   ) : (
                     attributionResult.top_mitigators.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-xs border border-emerald-100 dark:border-emerald-900/20"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '10px 12px',
+                          borderRadius: '12px',
+                          backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                          border: '1px solid rgba(16, 185, 129, 0.15)',
+                          fontSize: '12px',
+                        }}
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-bold text-[10px]">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '10px' }}>
                             {idx + 1}
                           </span>
-                          <span className="font-mono font-bold text-slate-900 dark:text-white">
+                          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>
                             "{item.token}"
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 font-mono text-emerald-700 dark:text-emerald-300 font-bold">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)', color: '#059669', fontWeight: 800 }}>
                           <span>{Math.round(item.score * 100)}%</span>
-                          <span className="text-slate-400 text-[10px]">[{item.offsets[0]}:{item.offsets[1]}]</span>
+                          <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>[{item.offsets[0]}:{item.offsets[1]}]</span>
                         </div>
                       </div>
                     ))
@@ -521,109 +677,134 @@ export const ModelStudioView: React.FC = () => {
       {activeTab === 'ARBITRATION' && ensembleResult && (
         <div className="space-y-6">
           {/* Final Arbitration Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 rounded-2xl border border-indigo-900 text-white shadow-xl space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-lg text-xs font-extrabold uppercase tracking-wider ${
-                  ensembleResult.final_priority === 'HIGH'
-                    ? 'bg-rose-500 text-white shadow-md'
-                    : ensembleResult.final_priority === 'REVIEW'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
-                    : 'bg-emerald-500 text-slate-950 shadow-md'
-                }`}>
-                  Final Decision: {ensembleResult.final_priority} PSIF
+          <div
+            className="card-panel"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              background: 'linear-gradient(135deg, #07382F 0%, #0d5345 100%)',
+              color: '#FFFFFF',
+              boxShadow: '0 12px 30px rgba(7, 56, 47, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '11px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  backgroundColor: ensembleResult.final_priority === 'HIGH' ? '#DC2626' : ensembleResult.final_priority === 'REVIEW' ? '#FFB020' : '#059669',
+                  color: ensembleResult.final_priority === 'REVIEW' ? '#102420' : '#FFFFFF',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                }}>
+                  Decision: {ensembleResult.final_priority} PSIF
                 </span>
-                <span className="text-xs text-slate-300 font-mono">
+                <span style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-mono)' }}>
                   Confidence: <strong>{Math.round(ensembleResult.confidence_score * 100)}%</strong>
                 </span>
               </div>
-              <div className="text-xs text-slate-400 font-mono">
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-mono)' }}>
                 Latency: {ensembleResult.latency_ms} ms
               </div>
             </div>
 
             {ensembleResult.safety_override && (
-              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-rose-500/20 border border-rose-500/40 text-xs text-rose-200">
-                <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '12px 16px', borderRadius: '14px', backgroundColor: 'rgba(239, 68, 68, 0.25)', border: '1px solid rgba(239, 68, 68, 0.5)', fontSize: '12px', color: '#FECACA' }}>
+                <ShieldAlert style={{ width: '16px', height: '16px', color: '#FCA5A5', flexShrink: 0, marginTop: '2px' }} />
                 <span>
                   <strong>Deterministic Safety Guardrail Veto Active:</strong> {ensembleResult.override_reason}
                 </span>
               </div>
             )}
 
-            <div className="text-sm text-slate-200 bg-slate-800/60 p-3.5 rounded-lg border border-slate-700/60 font-mono">
+            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.95)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '14px 16px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', lineHeight: '1.6' }}>
               {ensembleResult.arbitration_summary}
             </div>
           </div>
 
           {/* 3-Way Model Comparison Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
             {/* Card 1: Deterministic Safety Rules */}
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  1. Deterministic Rule Engine
+            <div className="card-panel" style={{ borderRadius: '20px', padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  1. Rule Engine
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${
-                  ensembleResult.rule_engine_decision.priority === 'HIGH'
-                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
-                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                }`}>
+                <span style={{
+                  fontSize: '10.5px',
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  fontWeight: 800,
+                  backgroundColor: ensembleResult.rule_engine_decision.priority === 'HIGH' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-input)',
+                  color: ensembleResult.rule_engine_decision.priority === 'HIGH' ? '#DC2626' : 'var(--text-muted)',
+                }}>
                   {ensembleResult.rule_engine_decision.priority}
                 </span>
               </div>
 
-              <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                <div>Safety Rule: <strong>{ensembleResult.rule_engine_decision.triggered_rules.length > 0 ? ensembleResult.rule_engine_decision.triggered_rules[0] : 'None Triggered'}</strong></div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div>Rule: <strong>{ensembleResult.rule_engine_decision.triggered_rules.length > 0 ? ensembleResult.rule_engine_decision.triggered_rules[0] : 'None Triggered'}</strong></div>
                 <div>Guardrail Veto: <strong>{ensembleResult.rule_engine_decision.priority === 'HIGH' ? 'ACTIVE' : 'INACTIVE'}</strong></div>
               </div>
             </div>
 
             {/* Card 2: Statistical TF-IDF Baseline */}
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  2. Statistical TF-IDF Baseline
+            <div className="card-panel" style={{ borderRadius: '20px', padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  2. TF-IDF Baseline
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${
-                  ensembleResult.tfidf_decision.priority === 'HIGH'
-                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
-                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                }`}>
+                <span style={{
+                  fontSize: '10.5px',
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  fontWeight: 800,
+                  backgroundColor: ensembleResult.tfidf_decision.priority === 'HIGH' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-input)',
+                  color: ensembleResult.tfidf_decision.priority === 'HIGH' ? '#DC2626' : 'var(--text-muted)',
+                }}>
                   {ensembleResult.tfidf_decision.priority}
                 </span>
               </div>
 
-              <div className="space-y-1.5 text-xs font-mono">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
                 {Object.entries(ensembleResult.tfidf_decision.probabilities).map(([cat, prob]) => (
-                  <div key={cat} className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                  <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
                     <span>{cat}:</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{Math.round(prob * 100)}%</span>
+                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{Math.round(prob * 100)}%</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Card 3: Contextual Sequence Classifier */}
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  3. Contextual Sequence Model
+            <div className="card-panel" style={{ borderRadius: '20px', padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  3. Contextual Model
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${
-                  ensembleResult.contextual_decision.priority === 'HIGH'
-                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
-                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                }`}>
+                <span style={{
+                  fontSize: '10.5px',
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  fontWeight: 800,
+                  backgroundColor: ensembleResult.contextual_decision.priority === 'HIGH' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-input)',
+                  color: ensembleResult.contextual_decision.priority === 'HIGH' ? '#DC2626' : 'var(--text-muted)',
+                }}>
                   {ensembleResult.contextual_decision.priority}
                 </span>
               </div>
 
-              <div className="space-y-1.5 text-xs font-mono">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
                 {Object.entries(ensembleResult.contextual_decision.calibrated_probabilities).map(([cat, prob]) => (
-                  <div key={cat} className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                  <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
                     <span>{cat}:</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{Math.round(prob * 100)}%</span>
+                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{Math.round(prob * 100)}%</span>
                   </div>
                 ))}
               </div>
@@ -632,28 +813,37 @@ export const ModelStudioView: React.FC = () => {
 
           {/* Assigned IOGP Life-Saving Rules */}
           {ensembleResult.final_iogp_rules.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <div className="card-panel" style={{ borderRadius: '20px', padding: '20px' }}>
+              <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 14px 0' }}>
+                <ShieldCheck style={{ width: '16px', height: '16px', color: '#059669' }} />
                 Assigned IOGP Life-Saving Rules (Ensemble Multi-Label)
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
                 {ensembleResult.final_iogp_rules.map((rule, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 space-y-1 text-xs"
+                    style={{
+                      padding: '12px 14px',
+                      borderRadius: '14px',
+                      border: '1px solid var(--border-color-subtle)',
+                      backgroundColor: 'var(--bg-input)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      fontSize: '12px',
+                    }}
                   >
-                    <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                    <div style={{ fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>{rule.rule_name}</span>
                       {rule.is_primary && (
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 font-bold">
+                        <span style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '9999px', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#D97706', fontWeight: 800 }}>
                           PRIMARY
                         </span>
                       )}
                     </div>
-                    <div className="text-slate-500 flex items-center justify-between text-[11px]">
+                    <div style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
                       <span>Source: {rule.source.replace('_', ' ')}</span>
-                      <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
+                      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#0D9488' }}>
                         {Math.round(rule.probability * 100)}%
                       </span>
                     </div>
@@ -668,46 +858,47 @@ export const ModelStudioView: React.FC = () => {
       {/* TAB 3: BENCHMARK DASHBOARD */}
       {activeTab === 'BENCHMARK' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+          <div className="card-panel" style={{ borderRadius: '20px', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
             <div>
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 4-Way Model Benchmark Evaluation
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                 Evaluated against all 124 expert-adjudicated scenarios in the Golden Evaluation Dataset.
               </p>
             </div>
             <button
               onClick={loadBenchmark}
               disabled={benchmarkLoading}
-              className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all shadow-sm"
+              className="btn-primary"
+              style={{ fontSize: '12px', padding: '8px 16px', borderRadius: '12px' }}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${benchmarkLoading ? 'animate-spin' : ''}`} />
-              Re-run Benchmark Evaluation
+              <span>Re-run Benchmark</span>
             </button>
           </div>
 
           {benchmarkReport && (
             <div className="space-y-6">
               {/* Comparative Table */}
-              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                  Comparative Performance Metrics
+              <div className="card-panel" style={{ borderRadius: '20px', overflow: 'hidden', padding: 0 }}>
+                <div style={{ padding: '14px 20px', backgroundColor: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)', fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Comparative Architecture Performance
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-700">
+                    <thead style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--text-secondary)', fontWeight: 700, borderBottom: '1px solid var(--border-color)' }}>
                       <tr>
-                        <th className="p-3">Model Architecture</th>
-                        <th className="p-3 text-center">High-PSIF Recall</th>
-                        <th className="p-3 text-center">High-PSIF Precision</th>
-                        <th className="p-3 text-center">High-PSIF F1</th>
-                        <th className="p-3 text-center">Overall Accuracy</th>
-                        <th className="p-3 text-center">IOGP Match</th>
-                        <th className="p-3 text-center">Latency</th>
+                        <th className="p-3.5">Model Architecture</th>
+                        <th className="p-3.5 text-center">High-PSIF Recall</th>
+                        <th className="p-3.5 text-center">High-PSIF Precision</th>
+                        <th className="p-3.5 text-center">High-PSIF F1</th>
+                        <th className="p-3.5 text-center">Overall Accuracy</th>
+                        <th className="p-3.5 text-center">IOGP Match</th>
+                        <th className="p-3.5 text-center">Latency</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    <tbody className="divide-y" style={{ borderColor: 'var(--border-color-subtle)' }}>
                       {[
                         benchmarkReport.deterministic_rule_engine,
                         benchmarkReport.tfidf_baseline,
@@ -718,30 +909,33 @@ export const ModelStudioView: React.FC = () => {
                         return (
                           <tr
                             key={idx}
-                            className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 ${
-                              isEnsemble ? 'bg-indigo-50/40 dark:bg-indigo-950/20 font-bold' : ''
-                            }`}
+                            style={{
+                              backgroundColor: isEnsemble ? 'rgba(13, 148, 136, 0.06)' : 'transparent',
+                              fontWeight: isEnsemble ? 800 : 500,
+                            }}
                           >
-                            <td className="p-3 text-slate-900 dark:text-white flex items-center gap-2">
-                              {isEnsemble && <Sparkles className="w-3.5 h-3.5 text-indigo-500" />}
-                              <span>{item.model_name}</span>
+                            <td className="p-3.5" style={{ color: 'var(--text-primary)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                {isEnsemble && <Sparkles style={{ width: '14px', height: '14px', color: '#0D9488' }} />}
+                                <span>{item.model_name}</span>
+                              </div>
                             </td>
-                            <td className="p-3 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            <td className="p-3.5 text-center font-mono font-bold" style={{ color: '#059669' }}>
                               {Math.round(item.high_psif_recall * 100)}%
                             </td>
-                            <td className="p-3 text-center font-mono">
+                            <td className="p-3.5 text-center font-mono" style={{ color: 'var(--text-secondary)' }}>
                               {Math.round(item.high_psif_precision * 100)}%
                             </td>
-                            <td className="p-3 text-center font-mono">
+                            <td className="p-3.5 text-center font-mono" style={{ color: 'var(--text-secondary)' }}>
                               {item.high_psif_f1.toFixed(3)}
                             </td>
-                            <td className="p-3 text-center font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                            <td className="p-3.5 text-center font-mono font-bold" style={{ color: '#0D9488' }}>
                               {Math.round(item.overall_accuracy * 100)}%
                             </td>
-                            <td className="p-3 text-center font-mono">
+                            <td className="p-3.5 text-center font-mono" style={{ color: 'var(--text-secondary)' }}>
                               {Math.round(item.iogp_rule_match_rate * 100)}%
                             </td>
-                            <td className="p-3 text-center font-mono text-slate-500">
+                            <td className="p-3.5 text-center font-mono" style={{ color: 'var(--text-muted)' }}>
                               {item.average_latency_ms} ms
                             </td>
                           </tr>
@@ -753,19 +947,29 @@ export const ModelStudioView: React.FC = () => {
               </div>
 
               {/* Key Findings */}
-              <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
-                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <div className="card-panel" style={{ borderRadius: '20px', padding: '20px' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 14px 0' }}>
+                  <CheckCircle2 style={{ width: '16px', height: '16px', color: '#059669' }} />
                   Key Benchmark Findings & Safety Insights
                 </h3>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {benchmarkReport.key_findings.map((finding, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2.5"
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        backgroundColor: 'var(--bg-input)',
+                        border: '1px solid var(--border-color-subtle)',
+                        fontSize: '12px',
+                        color: 'var(--text-primary)',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                      }}
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
-                      <span>{finding}</span>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#0D9488', marginTop: '6px', flexShrink: 0 }} />
+                      <span style={{ lineHeight: '1.5' }}>{finding}</span>
                     </div>
                   ))}
                 </div>
@@ -779,115 +983,129 @@ export const ModelStudioView: React.FC = () => {
       {activeTab === 'EVALUATION_SUITE' && (
         <div className="space-y-6">
           {/* Header Banner */}
-          <div className="card-cyber p-6 border-l-4 border-l-amber-500 bg-slate-900/90">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div
+            className="card-panel"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              borderLeft: '4px solid #D97706',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="badge badge-iogp text-[10px] py-0.5 px-2 font-mono">PHASES 28–32 BENCHMARK</span>
-                  <span className="text-xs text-amber-400 font-semibold flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Mandated Rigorous Safety Evaluation Suite
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '10.5px', fontWeight: 800, padding: '3px 9px', borderRadius: '9999px', backgroundColor: 'rgba(217, 119, 6, 0.12)', color: '#D97706', fontFamily: 'var(--font-mono)' }}>
+                    PHASES 28–32 BENCHMARK
+                  </span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <ShieldCheck style={{ width: '14px', height: '14px' }} /> Mandated Rigorous Safety Evaluation Suite
                   </span>
                 </div>
-                <h2 className="text-lg font-bold text-white mt-1">
+                <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: '6px 0 0 0' }}>
                   Empirical Multi-Dimensional Safety Validation
                 </h2>
-                <p className="text-xs text-slate-400 max-w-3xl mt-1 leading-relaxed">
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '4px 0 0 0', maxWidth: '780px', lineHeight: 1.5 }}>
                   Rigorous evaluation spanning: 4 Model Baselines (Phase 28), False-Negative Failure Taxonomy (Phase 29),
                   Time-Aware Prospective Splits (Phase 30), Cross-Site Generalization (Phase 31), and Controlled Human Validation (Phase 32).
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={loadEvaluationSuite}
-                  disabled={evalLoading}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${evalLoading ? 'animate-spin' : ''}`} />
-                  <span>Refresh Evaluation</span>
-                </button>
-              </div>
+              <button
+                onClick={loadEvaluationSuite}
+                disabled={evalLoading}
+                className="btn-secondary"
+                style={{ padding: '8px 16px', fontSize: '12px', borderRadius: '12px' }}
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${evalLoading ? 'animate-spin' : ''}`} />
+                <span>Refresh Evaluation</span>
+              </button>
             </div>
           </div>
 
           {evalLoading || !evaluationSuite ? (
-            <div className="card-cyber p-12 text-center text-slate-400">
-              <RefreshCw className="w-8 h-8 animate-spin mx-auto text-amber-500 mb-3" />
-              <p className="text-sm font-medium text-slate-300">Computing 5-dimension evaluation metrics across all models...</p>
+            <div className="card-panel" style={{ borderRadius: '24px', padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-3" style={{ color: '#D97706' }} />
+              <p style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>Computing 5-dimension evaluation metrics across all models...</p>
             </div>
           ) : (
             <div className="space-y-6">
               {/* DIMENSION 1: PHASE 28 BASELINE COMPARISON */}
-              <div className="card-cyber p-6 border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-indigo-400" />
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+              <div className="card-panel" style={{ borderRadius: '24px', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <BarChart3 style={{ width: '16px', height: '16px', color: '#7C3AED' }} />
+                    <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
                       Phase 28 — Model Architecture Baselines & Calibration
                     </h3>
                   </div>
-                  <span className="text-[11px] text-emerald-400 font-mono font-semibold">
+                  <span style={{ fontSize: '11px', color: '#059669', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
                     100% Critical Recall Required by Rule 2
                   </span>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono border-b border-slate-800">
+                    <thead style={{ backgroundColor: 'var(--bg-input)', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', fontWeight: 700 }}>
                       <tr>
                         <th className="p-3">Model Architecture</th>
-                        <th className="p-3">PSIF Recall</th>
-                        <th className="p-3">PR-AUC</th>
-                        <th className="p-3">Precision</th>
-                        <th className="p-3">F1 Score</th>
-                        <th className="p-3">ECE Calibration</th>
-                        <th className="p-3">Safety Veto Overrides</th>
-                        <th className="p-3">Critical Recall</th>
+                        <th className="p-3 text-center">PSIF Recall</th>
+                        <th className="p-3 text-center">PR-AUC</th>
+                        <th className="p-3 text-center">Precision</th>
+                        <th className="p-3 text-center">F1 Score</th>
+                        <th className="p-3 text-center">ECE Calibration</th>
+                        <th className="p-3 text-center">Safety Veto Overrides</th>
+                        <th className="p-3 text-center">Critical Recall</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 font-sans">
+                    <tbody className="divide-y" style={{ borderColor: 'var(--border-color-subtle)' }}>
                       {evaluationSuite.baselines.map((b: any, idx: number) => {
                         const isHybrid = b.model_name.includes('Hybrid');
                         return (
                           <tr
                             key={idx}
-                            className={`transition ${
-                              isHybrid
-                                ? 'bg-amber-500/10 font-semibold border-l-4 border-l-amber-500'
-                                : 'hover:bg-slate-800/30'
-                            }`}
+                            style={{
+                              backgroundColor: isHybrid ? 'rgba(217, 119, 6, 0.06)' : 'transparent',
+                              fontWeight: isHybrid ? 700 : 500,
+                              borderLeft: isHybrid ? '4px solid #D97706' : 'none',
+                            }}
                           >
-                            <td className="p-3 text-slate-200">
-                              <div className="flex items-center gap-2">
-                                {isHybrid && <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+                            <td className="p-3" style={{ color: 'var(--text-primary)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {isHybrid && <ShieldAlert style={{ width: '14px', height: '14px', color: '#D97706', flexShrink: 0 }} />}
                                 <span>{b.model_name}</span>
                               </div>
                             </td>
-                            <td className="p-3 font-mono text-emerald-400">
+                            <td className="p-3 text-center font-mono font-bold" style={{ color: '#059669' }}>
                               {(b.psif_metrics.recall * 100).toFixed(1)}%
                             </td>
-                            <td className="p-3 font-mono text-indigo-400">
+                            <td className="p-3 text-center font-mono" style={{ color: '#7C3AED' }}>
                               {(b.psif_metrics.pr_auc * 100).toFixed(1)}%
                             </td>
-                            <td className="p-3 font-mono text-slate-300">
+                            <td className="p-3 text-center font-mono" style={{ color: 'var(--text-secondary)' }}>
                               {(b.psif_metrics.precision * 100).toFixed(1)}%
                             </td>
-                            <td className="p-3 font-mono text-slate-300">
+                            <td className="p-3 text-center font-mono" style={{ color: 'var(--text-secondary)' }}>
                               {(b.psif_metrics.f1 * 100).toFixed(1)}%
                             </td>
-                            <td className="p-3 font-mono text-slate-400">
+                            <td className="p-3 text-center font-mono" style={{ color: 'var(--text-muted)' }}>
                               {b.psif_metrics.expected_calibration_error.toFixed(3)}
                             </td>
-                            <td className="p-3 font-mono text-amber-400">
+                            <td className="p-3 text-center font-mono font-bold" style={{ color: '#D97706' }}>
                               {b.safety_veto_override_count > 0 ? `+${b.safety_veto_override_count}` : '0'}
                             </td>
-                            <td className="p-3 font-mono font-bold">
+                            <td className="p-3 text-center font-mono font-bold">
                               <span
-                                className={`px-2 py-0.5 rounded ${
-                                  b.safety_recall_at_critical_threshold >= 0.99
-                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                                    : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                                }`}
+                                style={{
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '11px',
+                                  backgroundColor: b.safety_recall_at_critical_threshold >= 0.99 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                                  color: b.safety_recall_at_critical_threshold >= 0.99 ? '#059669' : '#DC2626',
+                                  border: `1px solid ${b.safety_recall_at_critical_threshold >= 0.99 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                                }}
                               >
                                 {(b.safety_recall_at_critical_threshold * 100).toFixed(1)}%
                               </span>
@@ -900,44 +1118,57 @@ export const ModelStudioView: React.FC = () => {
                 </div>
               </div>
 
-              {/* DIMENSION 2: PHASE 29 FALSE-NEGATIVE REVIEW & ROOT-CAUSE ANALYSIS */}
-              <div className="card-cyber p-6 border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-rose-400" />
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+              {/* DIMENSION 2: PHASE 29 FALSE-NEGATIVE REVIEW */}
+              <div className="card-panel" style={{ borderRadius: '24px', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <AlertTriangle style={{ width: '16px', height: '16px', color: '#DC2626' }} />
+                    <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
                       Phase 29 — Mandatory Safety False-Negative Failure Taxonomy
                     </h3>
                   </div>
-                  <span className="text-[11px] text-slate-400">
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     Inspecting True-PSIF / Predicted-Non-PSIF cases & remediation
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px' }}>
                   {evaluationSuite.false_negative_review.categories.map((cat: any, idx: number) => (
-                    <div key={idx} className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs font-bold text-rose-400">
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '16px',
+                        borderRadius: '16px',
+                        backgroundColor: 'var(--bg-input)',
+                        border: '1px solid var(--border-color-subtle)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 800, color: '#DC2626' }}>
                           {cat.category}
                         </span>
-                        <span className="badge badge-high text-[10px]">Taxonomy Analysis</span>
+                        <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '9999px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#DC2626' }}>
+                          Taxonomy Analysis
+                        </span>
                       </div>
 
-                      <p className="text-xs text-slate-300 font-medium">{cat.description}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0, fontWeight: 600 }}>{cat.description}</p>
 
-                      <div className="p-2.5 rounded-lg bg-slate-900/80 text-[11px] text-slate-400 italic border border-slate-800">
+                      <div style={{ padding: '10px 12px', borderRadius: '12px', backgroundColor: 'var(--bg-surface)', fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic', border: '1px solid var(--border-color-subtle)', lineHeight: 1.4 }}>
                         "{cat.sample_narrative}"
                       </div>
 
-                      <div className="text-[11px] space-y-1 pt-1">
+                      <div style={{ fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '4px' }}>
                         <div>
-                          <strong className="text-slate-400">Root Cause: </strong>
-                          <span className="text-slate-300">{cat.root_cause}</span>
+                          <strong style={{ color: 'var(--text-muted)' }}>Root Cause: </strong>
+                          <span style={{ color: 'var(--text-secondary)' }}>{cat.root_cause}</span>
                         </div>
                         <div>
-                          <strong className="text-emerald-400">Remediation Applied: </strong>
-                          <span className="text-emerald-300">{cat.remediation_applied}</span>
+                          <strong style={{ color: '#059669' }}>Remediation Applied: </strong>
+                          <span style={{ color: '#059669', fontWeight: 600 }}>{cat.remediation_applied}</span>
                         </div>
                       </div>
                     </div>
@@ -946,35 +1177,43 @@ export const ModelStudioView: React.FC = () => {
               </div>
 
               {/* DIMENSIONS 3 & 4: TEMPORAL EVALUATION & CROSS-SITE GENERALIZATION */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
                 {/* Temporal Evaluation */}
-                <div className="card-cyber p-6 border border-slate-800 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-cyan-400" />
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                <div className="card-panel" style={{ borderRadius: '24px', padding: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <Clock style={{ width: '16px', height: '16px', color: '#0284C7' }} />
+                    <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
                       Phase 30 — Temporal Evaluation Splits
                     </h3>
                   </div>
 
-                  <div className="space-y-3">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {evaluationSuite.temporal_evaluation.time_aware_splits.map((split: any, idx: number) => (
-                      <div key={idx} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-slate-200">{split.split_name}</span>
-                          <span className="font-mono text-[10px] text-slate-400">{split.period}</span>
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '12px 14px',
+                          borderRadius: '14px',
+                          backgroundColor: 'var(--bg-input)',
+                          border: '1px solid var(--border-color-subtle)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                          <span style={{ fontWeight: 700, fontSize: '12px', color: 'var(--text-primary)' }}>{split.split_name}</span>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'var(--text-muted)' }}>{split.period}</span>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 text-[11px] pt-1 font-mono">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
                           <div>
-                            <span className="text-slate-500">Recall: </span>
-                            <span className="text-emerald-400 font-bold">{(split.recall * 100).toFixed(1)}%</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Recall: </span>
+                            <span style={{ color: '#059669', fontWeight: 800 }}>{(split.recall * 100).toFixed(1)}%</span>
                           </div>
                           <div>
-                            <span className="text-slate-500">Precision: </span>
-                            <span className="text-indigo-400 font-bold">{(split.precision * 100).toFixed(1)}%</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Precision: </span>
+                            <span style={{ color: '#7C3AED', fontWeight: 800 }}>{(split.precision * 100).toFixed(1)}%</span>
                           </div>
                           <div>
-                            <span className="text-slate-500">Drift Index: </span>
-                            <span className="text-amber-400 font-bold">{split.drift_index.toFixed(3)}</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Drift: </span>
+                            <span style={{ color: '#D97706', fontWeight: 800 }}>{split.drift_index.toFixed(3)}</span>
                           </div>
                         </div>
                       </div>
@@ -983,26 +1222,34 @@ export const ModelStudioView: React.FC = () => {
                 </div>
 
                 {/* Cross-Site Generalization */}
-                <div className="card-cyber p-6 border border-slate-800 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Compass className="w-4 h-4 text-purple-400" />
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                <div className="card-panel" style={{ borderRadius: '24px', padding: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <Compass style={{ width: '16px', height: '16px', color: '#7C3AED' }} />
+                    <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
                       Phase 31 — Cross-Site Generalization
                     </h3>
                   </div>
 
-                  <div className="space-y-3">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {evaluationSuite.generalization_testing.cross_site_tests.map((site: any, idx: number) => (
-                      <div key={idx} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-purple-300">
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '12px 14px',
+                          borderRadius: '14px',
+                          backgroundColor: 'var(--bg-input)',
+                          border: '1px solid var(--border-color-subtle)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ fontWeight: 700, fontSize: '12px', color: '#7C3AED' }}>
                             Held-Out Site: {site.held_out_test_site}
                           </span>
-                          <span className="font-mono text-[11px] text-emerald-400 font-bold">
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#059669', fontWeight: 800 }}>
                             {(site.held_out_recall * 100).toFixed(1)}% Recall
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-400">{site.domain_shift_notes}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>{site.domain_shift_notes}</p>
                       </div>
                     ))}
                   </div>
@@ -1010,96 +1257,98 @@ export const ModelStudioView: React.FC = () => {
               </div>
 
               {/* DIMENSION 5: PHASE 32 CONTROLLED HUMAN VALIDATION STUDY */}
-              <div className="card-cyber p-6 border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-amber-400" />
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+              <div className="card-panel" style={{ borderRadius: '24px', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Users style={{ width: '16px', height: '16px', color: '#D97706' }} />
+                    <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
                       Phase 32 — Controlled Human Validation Study (With vs Without AI)
                     </h3>
                   </div>
-                  <span className="badge badge-low text-[10px]">Empirically Measured Protocol</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '9999px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: '#059669' }}>
+                    Empirically Measured Protocol
+                  </span>
                 </div>
 
                 {/* Operational Gains Highlights */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-center">
-                    <span className="text-[11px] font-semibold text-emerald-400 uppercase">Triage Time Reduction</span>
-                    <div className="text-2xl font-extrabold text-emerald-300 mt-1 font-mono">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '16px' }}>
+                  <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.25)', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', textTransform: 'uppercase' }}>Triage Time Reduction</span>
+                    <div style={{ fontSize: '26px', fontWeight: 900, color: '#059669', margin: '4px 0', fontFamily: 'var(--font-mono)' }}>
                       -{evaluationSuite.human_validation_study.operational_gains.triage_time_reduction_percent}%
                     </div>
-                    <span className="text-[10px] text-slate-400 mt-1 block">
+                    <span style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>
                       40 min manual &rarr; 17 min AI-assisted
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-center">
-                    <span className="text-[11px] font-semibold text-indigo-400 uppercase">Reviewer Agreement Gain</span>
-                    <div className="text-2xl font-extrabold text-indigo-300 mt-1 font-mono">
+                  <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(124, 58, 237, 0.08)', border: '1px solid rgba(124, 58, 237, 0.25)', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase' }}>Reviewer Agreement Gain</span>
+                    <div style={{ fontSize: '26px', fontWeight: 900, color: '#7C3AED', margin: '4px 0', fontFamily: 'var(--font-mono)' }}>
                       +{evaluationSuite.human_validation_study.operational_gains.agreement_increase_percent}%
                     </div>
-                    <span className="text-[10px] text-slate-400 mt-1 block">
+                    <span style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>
                       Cohen's &kappa; from 0.58 &rarr; 0.89 consensus
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center">
-                    <span className="text-[11px] font-semibold text-amber-400 uppercase">Precursor Miss Prevention</span>
-                    <div className="text-2xl font-extrabold text-amber-300 mt-1 font-mono">
+                  <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(217, 119, 6, 0.08)', border: '1px solid rgba(217, 119, 6, 0.25)', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#D97706', textTransform: 'uppercase' }}>Precursor Miss Prevention</span>
+                    <div style={{ fontSize: '26px', fontWeight: 900, color: '#D97706', margin: '4px 0', fontFamily: 'var(--font-mono)' }}>
                       {evaluationSuite.human_validation_study.operational_gains.missed_fatal_precursors_prevented}
                     </div>
-                    <span className="text-[10px] text-slate-400 mt-1 block">
+                    <span style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>
                       Fatal near-misses caught before closure
                     </span>
                   </div>
                 </div>
 
                 {/* Side by side comparison */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                  <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2 text-xs">
-                    <h4 className="font-bold text-rose-400 uppercase">Standard Triage (Without AI)</h4>
-                    <div className="space-y-1.5 text-slate-300">
-                      <div className="flex justify-between">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color-subtle)', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <h4 style={{ fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', margin: 0, fontSize: '11.5px' }}>Standard Triage (Without AI)</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-secondary)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Average Triage Time:</span>
-                        <span className="font-mono text-white">{evaluationSuite.human_validation_study.without_ai.avg_triage_time_min} min</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>{evaluationSuite.human_validation_study.without_ai.avg_triage_time_min} min</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Inter-Reviewer Agreement (&kappa;):</span>
-                        <span className="font-mono text-amber-400">{evaluationSuite.human_validation_study.without_ai.inter_reviewer_agreement_cohen_kappa}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#D97706' }}>{evaluationSuite.human_validation_study.without_ai.inter_reviewer_agreement_cohen_kappa}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Reviewer Confidence:</span>
-                        <span className="font-mono text-white">{evaluationSuite.human_validation_study.without_ai.reviewer_confidence_score_out_of_5} / 5.0</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>{evaluationSuite.human_validation_study.without_ai.reviewer_confidence_score_out_of_5} / 5.0</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Missed High-PSIF Precursors:</span>
-                        <span className="font-mono text-rose-400 font-bold">{evaluationSuite.human_validation_study.without_ai.false_negative_count} missed</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#DC2626' }}>{evaluationSuite.human_validation_study.without_ai.false_negative_count} missed</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-950/60 border border-emerald-500/30 space-y-2 text-xs">
-                    <h4 className="font-bold text-emerald-400 uppercase">OIL-SIF Guardian Assisted Triage (With AI)</h4>
-                    <div className="space-y-1.5 text-slate-300">
-                      <div className="flex justify-between">
+                  <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.3)', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <h4 style={{ fontWeight: 800, color: '#059669', textTransform: 'uppercase', margin: 0, fontSize: '11.5px' }}>OIL-SIF Guardian Assisted Triage (With AI)</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-secondary)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Average Triage Time:</span>
-                        <span className="font-mono text-emerald-400 font-bold">{evaluationSuite.human_validation_study.with_ai.avg_triage_time_min} min</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#059669' }}>{evaluationSuite.human_validation_study.with_ai.avg_triage_time_min} min</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Inter-Reviewer Agreement (&kappa;):</span>
-                        <span className="font-mono text-emerald-400 font-bold">{evaluationSuite.human_validation_study.with_ai.inter_reviewer_agreement_cohen_kappa}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#059669' }}>{evaluationSuite.human_validation_study.with_ai.inter_reviewer_agreement_cohen_kappa}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Reviewer Confidence:</span>
-                        <span className="font-mono text-white">{evaluationSuite.human_validation_study.with_ai.reviewer_confidence_score_out_of_5} / 5.0</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>{evaluationSuite.human_validation_study.with_ai.reviewer_confidence_score_out_of_5} / 5.0</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Missed High-PSIF Precursors:</span>
-                        <span className="font-mono text-emerald-400 font-bold">{evaluationSuite.human_validation_study.with_ai.false_negative_count} (Zero Miss)</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#059669' }}>{evaluationSuite.human_validation_study.with_ai.false_negative_count} (Zero Miss)</span>
                       </div>
-                      <div className="flex justify-between pt-1 border-t border-slate-800">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px', borderTop: '1px solid var(--border-color-subtle)' }}>
                         <span>Explanation Saliency Rating:</span>
-                        <span className="font-mono text-cyan-400">{evaluationSuite.human_validation_study.with_ai.explanation_usefulness_score_out_of_5} / 5.0</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#0D9488' }}>{evaluationSuite.human_validation_study.with_ai.explanation_usefulness_score_out_of_5} / 5.0</span>
                       </div>
                     </div>
                   </div>

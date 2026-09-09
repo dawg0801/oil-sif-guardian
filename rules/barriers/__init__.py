@@ -3,11 +3,11 @@ OIL-SIF Guardian — Barrier Taxonomy Package
 """
 
 from .barrier_taxonomy import (
-    BarrierCategory,
-    BarrierState,
-    BarrierDefinition,
     BarrierAnalysisResult,
     BarrierAnalyzer,
+    BarrierCategory,
+    BarrierDefinition,
+    BarrierState,
     barrier_analyzer,
 )
 

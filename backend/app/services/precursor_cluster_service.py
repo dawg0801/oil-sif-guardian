@@ -4,11 +4,10 @@ Extracts standardized 5-tuple fingerprints [ACTIVITY]|[ENERGY]|[HAZARD]|[BARRIER
 clusters historical precursors across OIL operating assets, and builds network graph topologies.
 """
 
-from typing import List, Dict, Any, Optional, Set, Tuple
-import re
-import json
 from dataclasses import dataclass
-from rules.barriers.barrier_taxonomy import barrier_analyzer, BarrierState, BarrierCategory
+from typing import Any, Dict, List, Set
+
+from rules.barriers.barrier_taxonomy import BarrierCategory, BarrierState, barrier_analyzer
 from rules.safety.deterministic_rules import DeterministicSafetyRuleEngine
 
 

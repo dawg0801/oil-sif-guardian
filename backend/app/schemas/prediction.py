@@ -3,6 +3,7 @@ Pydantic Schemas for PSIF Predictions, IOGP Rules, Entities, and Explainability.
 """
 
 from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 

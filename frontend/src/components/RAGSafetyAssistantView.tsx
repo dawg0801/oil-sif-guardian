@@ -14,7 +14,8 @@ import {
   ExternalLink,
   HelpCircle,
   Clock,
-  Layers
+  Layers,
+  Check
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -67,6 +68,7 @@ export const RAGSafetyAssistantView: React.FC = () => {
     category: string;
     citations: string;
   }>>([]);
+  const [standardsSearch, setStandardsSearch] = useState('');
 
   useEffect(() => {
     loadStandards();
@@ -114,95 +116,181 @@ export const RAGSafetyAssistantView: React.FC = () => {
     }
   };
 
+  const filteredStandards = standards.filter(
+    (s) =>
+      s.standard.toLowerCase().includes(standardsSearch.toLowerCase()) ||
+      s.title.toLowerCase().includes(standardsSearch.toLowerCase()) ||
+      s.category.toLowerCase().includes(standardsSearch.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6 animate-fade-in" style={{ paddingBottom: '3rem' }}>
-      {/* Header Banner */}
-      <div className="card-nexa p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
+      {/* ====================================================================
+          MASTER HEADER
+          ==================================================================== */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px',
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="badge-iogp flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              Phase 21 & 22 Grounded Intelligence
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                color: '#0D9488',
+                border: '1px solid rgba(13, 148, 136, 0.2)',
+              }}
+            >
+              <Sparkles style={{ width: '13px', height: '13px', color: '#D97706' }} />
+              Authoritative Grounded Intelligence
             </span>
-            <span className="badge-high flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" />
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                color: '#047857',
+              }}
+            >
+              <ShieldCheck style={{ width: '12px', height: '12px' }} />
               Prompt Injection Shield Active
             </span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
             Authoritative Safety RAG Assistant
           </h1>
-          <p className="text-sm text-muted text-pretty max-w-2xl mt-1">
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '6px 0 0 0', maxWidth: '720px' }}>
             Retrieval-Augmented Generation (RAG) querying approved Oil India Limited SOPs, OISD standards,
             and IOGP Life-Saving Rules. Grounded citations with zero autonomous safety decisions.
           </p>
         </div>
 
         {/* Tab Controls */}
-        <div className="flex items-center gap-1 bg-surface-subtle p-1 rounded-lg border border-border">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'var(--bg-input)',
+            padding: '4px',
+            borderRadius: '9999px',
+            border: '1px solid var(--border-color-subtle)',
+            gap: '4px',
+          }}
+        >
           <button
             onClick={() => setActiveSubTab('qa')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-              activeSubTab === 'qa'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-muted hover:text-foreground'
-            }`}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: activeSubTab === 'qa' ? 'var(--accent-emerald-dark)' : 'transparent',
+              color: activeSubTab === 'qa' ? '#FFFFFF' : 'var(--text-secondary)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
           >
             Standards Q&A
           </button>
           <button
             onClick={() => setActiveSubTab('synthesizer')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-              activeSubTab === 'synthesizer'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-muted hover:text-foreground'
-            }`}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: activeSubTab === 'synthesizer' ? 'var(--accent-emerald-dark)' : 'transparent',
+              color: activeSubTab === 'synthesizer' ? '#FFFFFF' : 'var(--text-secondary)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
           >
             Investigation Synthesizer
           </button>
           <button
             onClick={() => setActiveSubTab('standards')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-              activeSubTab === 'standards'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-muted hover:text-foreground'
-            }`}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: activeSubTab === 'standards' ? 'var(--accent-emerald-dark)' : 'transparent',
+              color: activeSubTab === 'standards' ? '#FFFFFF' : 'var(--text-secondary)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
           >
             Standards Library ({standards.length})
           </button>
         </div>
       </div>
 
-      {/* SubTab 1: Standards Q&A */}
+      {/* ====================================================================
+          SUB-TAB 1: STANDARDS Q&A
+          ==================================================================== */}
       {activeSubTab === 'qa' && (
-        <div className="space-y-6">
-          <div className="card-nexa p-6 space-y-4">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <Search className="w-4 h-4 text-primary" />
-              Query Approved Safety Standards & SOPs
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Query Input Box */}
+          <div className="card-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Search style={{ width: '16px', height: '16px', color: '#0D9488' }} />
+              <span>Query Approved Safety Standards & SOPs</span>
             </h2>
-            <div className="flex gap-2">
+
+            <div style={{ display: 'flex', gap: '10px' }}>
               <input
                 type="text"
                 value={qaQuery}
                 onChange={(e) => setQaQuery(e.target.value)}
                 placeholder="Ask any question regarding OISD-105, Confined Space, LOTO, Hot Work, or Lifting..."
-                className="input-nexa flex-1 font-mono text-xs"
+                className="form-input"
+                style={{ flex: 1, height: '44px', fontSize: '13px' }}
                 onKeyDown={(e) => e.key === 'Enter' && handleAskQA()}
               />
               <button
                 onClick={() => handleAskQA()}
                 disabled={qaLoading}
-                className="btn-nexa-primary flex items-center gap-2"
+                className="btn-primary"
+                style={{ height: '44px', padding: '0 20px', flexShrink: 0 }}
               >
-                {qaLoading ? 'Retrieving...' : 'Ask Assistant'}
-                <ArrowRight className="w-4 h-4" />
+                {qaLoading ? (
+                  <>
+                    <Clock style={{ width: '15px', height: '15px' }} className="animate-spin" />
+                    <span>Retrieving...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Ask Assistant</span>
+                    <ArrowRight style={{ width: '15px', height: '15px' }} />
+                  </>
+                )}
               </button>
             </div>
 
-            {/* Quick Pills */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="text-xs text-muted font-medium">Quick Prompts:</span>
+            {/* Quick Prompts Pills */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', paddingTop: '4px' }}>
+              <span style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--text-muted)' }}>Quick Prompts:</span>
               {[
                 'Confined space atmospheric testing limits',
                 'OISD-105 permit revalidation shift duration',
@@ -216,7 +304,25 @@ export const RAGSafetyAssistantView: React.FC = () => {
                     setQaQuery(pill);
                     handleAskQA(pill);
                   }}
-                  className="px-2.5 py-1 text-xs rounded-full bg-surface-subtle hover:bg-border text-muted hover:text-foreground transition-all border border-border"
+                  style={{
+                    padding: '5px 12px',
+                    borderRadius: '9999px',
+                    border: '1px solid var(--border-color-subtle)',
+                    backgroundColor: 'var(--bg-input)',
+                    color: 'var(--text-secondary)',
+                    fontSize: '11.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(13, 148, 136, 0.1)';
+                    e.currentTarget.style.color = '#0D9488';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-input)';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }}
                 >
                   {pill}
                 </button>
@@ -226,45 +332,106 @@ export const RAGSafetyAssistantView: React.FC = () => {
 
           {/* Q&A Result */}
           {qaResult && (
-            <div className="card-nexa p-6 space-y-4 border-l-4 border-l-primary">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="badge-low flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+            <div
+              className="card-panel"
+              style={{
+                padding: '24px',
+                borderLeft: '4px solid #0D9488',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '18px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      padding: '3px 10px',
+                      borderRadius: '9999px',
+                      backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                      color: '#059669',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                    }}
+                  >
+                    <CheckCircle2 style={{ width: '13px', height: '13px' }} />
                     Authoritative Citations Grounded
                   </span>
                   {qaResult.prompt_injection_detected && (
-                    <span className="badge-high flex items-center gap-1">
-                      <ShieldAlert className="w-3.5 h-3.5" />
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        padding: '3px 10px',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                        color: '#DC2626',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                      }}
+                    >
+                      <ShieldAlert style={{ width: '13px', height: '13px' }} />
                       Adversarial Prompt Filtered
                     </span>
                   )}
                 </div>
-                <span className="text-xs font-mono text-muted">
-                  Standards Cited: {qaResult.grounded_standards.join(', ')}
+
+                <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                  Standards Cited: <strong>{qaResult.grounded_standards.join(', ')}</strong>
                 </span>
               </div>
 
-              <div className="prose prose-sm dark:prose-invert max-w-none text-foreground whitespace-pre-wrap leading-relaxed text-sm bg-surface-subtle p-4 rounded-lg border border-border">
+              {/* Answer Content */}
+              <div
+                style={{
+                  backgroundColor: 'var(--bg-input)',
+                  padding: '18px 20px',
+                  borderRadius: '14px',
+                  border: '1px solid var(--border-color-subtle)',
+                  fontSize: '13.5px',
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.6,
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
                 {qaResult.answer}
               </div>
 
               {/* Citations Grid */}
-              <div className="space-y-2 pt-2">
-                <h3 className="text-xs font-bold text-muted uppercase tracking-wider">
-                  Verifiable Statutory Citations
+              <div>
+                <h3 style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                  Verifiable Statutory Citations ({qaResult.citations.length})
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' }}>
                   {qaResult.citations.map((c, idx) => (
-                    <div key={idx} className="p-3 bg-surface rounded-lg border border-border space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-primary">{c.standard}</span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-subtle text-muted">
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '14px',
+                        borderRadius: '12px',
+                        backgroundColor: 'var(--bg-surface)',
+                        border: '1px solid var(--border-color)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 800, color: '#0D9488' }}>{c.standard}</span>
+                        <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'var(--bg-input)', color: 'var(--text-muted)' }}>
                           {c.section}
                         </span>
                       </div>
-                      <p className="text-xs font-semibold text-foreground">{c.title}</p>
-                      <p className="text-[11px] text-muted font-mono">{c.citation_text}</p>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>
+                        {c.title}
+                      </div>
+                      <p style={{ fontSize: '11px', color: 'var(--text-secondary)', margin: '4px 0 0 0', lineHeight: 1.4 }}>
+                        {c.citation_text}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -274,79 +441,132 @@ export const RAGSafetyAssistantView: React.FC = () => {
         </div>
       )}
 
-      {/* SubTab 2: Investigation Synthesizer */}
+      {/* ====================================================================
+          SUB-TAB 2: INVESTIGATION SYNTHESIZER
+          ==================================================================== */}
       {activeSubTab === 'synthesizer' && (
-        <div className="space-y-6">
-          <div className="card-nexa p-6 space-y-4">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" />
-              Executive Investigation Brief Synthesizer
-            </h2>
-            <p className="text-xs text-muted">
-              Transforms newly ingested incident narratives into an executive investigation dossier
-              mapping observed barrier failures to statutory OISD/OIL mandates with actionable remedial citations.
-            </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="card-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(13, 148, 136, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0D9488' }}>
+                <FileText style={{ width: '18px', height: '18px' }} />
+              </div>
+              <div>
+                <h2 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                  Executive Investigation Brief Synthesizer
+                </h2>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
+                  Transforms newly ingested incident narratives into an executive investigation dossier
+                  mapping observed barrier failures to statutory OISD/OIL mandates.
+                </p>
+              </div>
+            </div>
+
             <textarea
               value={synthNarrative}
               onChange={(e) => setSynthNarrative(e.target.value)}
               rows={3}
-              className="input-nexa w-full font-mono text-xs"
+              className="form-textarea"
+              style={{ fontSize: '12.5px', lineHeight: 1.5 }}
               placeholder="Paste incident narrative..."
             />
+
             <button
               onClick={handleSynthesizeBrief}
               disabled={synthLoading}
-              className="btn-nexa-primary flex items-center gap-2"
+              className="btn-primary"
+              style={{ alignSelf: 'flex-start', padding: '10px 20px', fontSize: '12.5px' }}
             >
-              {synthLoading ? 'Synthesizing Brief...' : 'Synthesize Grounded Investigation Brief'}
-              <Sparkles className="w-4 h-4 text-amber-300" />
+              {synthLoading ? (
+                <>
+                  <Clock style={{ width: '15px', height: '15px' }} className="animate-spin" />
+                  <span>Synthesizing Brief...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles style={{ width: '15px', height: '15px', color: '#FFB020' }} />
+                  <span>Synthesize Grounded Investigation Brief</span>
+                </>
+              )}
             </button>
           </div>
 
-          {/* Synthesizer Result */}
+          {/* Synthesizer Result Dossier */}
           {briefResult && (
-            <div className="card-nexa p-6 space-y-6">
-              {/* Top Banner */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-border pb-4">
+            <div className="card-panel" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              {/* Dossier Top Banner */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color-subtle)', paddingBottom: '14px' }}>
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">Executive Incident Intelligence Dossier</h3>
-                  <p className="text-xs text-muted">{briefResult.risk_profile}</p>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                    Executive Incident Intelligence Dossier
+                  </h3>
+                  <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
+                    {briefResult.risk_profile}
+                  </p>
                 </div>
-                <span className="badge-high self-start md:self-auto">
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    padding: '4px 12px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                    color: '#DC2626',
+                    border: '1px solid rgba(239, 68, 68, 0.25)',
+                  }}
+                >
                   {briefResult.grounding_status}
                 </span>
               </div>
 
               {/* Executive Summary */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">Executive Synthesis</h4>
-                <p className="text-sm text-foreground bg-surface-subtle p-4 rounded-lg border border-border leading-relaxed">
+              <div>
+                <h4 style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                  Executive Synthesis
+                </h4>
+                <div
+                  style={{
+                    backgroundColor: 'var(--bg-input)',
+                    padding: '16px 18px',
+                    borderRadius: '12px',
+                    border: '1px solid var(--border-color-subtle)',
+                    fontSize: '13px',
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.6,
+                  }}
+                >
                   {briefResult.executive_summary}
-                </p>
+                </div>
               </div>
 
               {/* Barrier Breakdown Table */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">
+              <div>
+                <h4 style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '8px' }}>
                   Observed Defenses vs Statutory Mandates
                 </h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-left border-collapse">
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
                     <thead>
-                      <tr className="border-b border-border text-muted bg-surface-subtle">
-                        <th className="py-2.5 px-3 font-semibold">Observed Control Failure</th>
-                        <th className="py-2.5 px-3 font-semibold">Applicable Life-Saving Rule</th>
-                        <th className="py-2.5 px-3 font-semibold">Statutory Standard Mandate</th>
+                      <tr style={{ backgroundColor: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '10.5px', textTransform: 'uppercase' }}>
+                        <th style={{ padding: '10px 14px' }}>Observed Control Failure</th>
+                        <th style={{ padding: '10px 14px' }}>Applicable Life-Saving Rule</th>
+                        <th style={{ padding: '10px 14px' }}>Statutory Standard Mandate</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border">
+                    <tbody>
                       {briefResult.barrier_breakdown.map((b, idx) => (
-                        <tr key={idx} className="hover:bg-surface-subtle/50 transition-colors">
-                          <td className="py-2.5 px-3 font-semibold text-rose-500">{b.observed_failure}</td>
-                          <td className="py-2.5 px-3">
-                            <span className="badge-iogp text-[11px]">{b.applicable_rule}</span>
+                        <tr key={idx} style={{ borderBottom: '1px solid var(--border-color-subtle)' }}>
+                          <td style={{ padding: '10px 14px', fontWeight: 700, color: '#B91C1C' }}>
+                            {b.observed_failure}
                           </td>
-                          <td className="py-2.5 px-3 text-muted">{b.statutory_mandate}</td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 8px', borderRadius: '6px', backgroundColor: 'rgba(13, 148, 136, 0.1)', color: '#0D9488' }}>
+                              {b.applicable_rule}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
+                            {b.statutory_mandate}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -355,17 +575,45 @@ export const RAGSafetyAssistantView: React.FC = () => {
               </div>
 
               {/* Remedial Recommendations */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">
+              <div>
+                <h4 style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '8px' }}>
                   Grounded Remedial Recommendations
                 </h4>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {briefResult.remedial_recommendations.map((rec, idx) => (
-                    <div key={idx} className="p-3 bg-surface-subtle rounded-lg border border-border flex items-start gap-3">
-                      <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: '10px',
+                        backgroundColor: 'var(--bg-surface)',
+                        border: '1px solid var(--border-color)',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                        fontSize: '12.5px',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          backgroundColor: 'rgba(13, 148, 136, 0.12)',
+                          color: '#0D9488',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          flexShrink: 0,
+                          marginTop: '1px',
+                        }}
+                      >
                         {idx + 1}
                       </span>
-                      <p className="text-xs text-foreground leading-relaxed">{rec}</p>
+                      <span style={{ lineHeight: 1.45 }}>{rec}</span>
                     </div>
                   ))}
                 </div>
@@ -375,20 +623,84 @@ export const RAGSafetyAssistantView: React.FC = () => {
         </div>
       )}
 
-      {/* SubTab 3: Standards Library */}
+      {/* ====================================================================
+          SUB-TAB 3: STANDARDS LIBRARY
+          ==================================================================== */}
       {activeSubTab === 'standards' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {standards.map((s, idx) => (
-              <div key={idx} className="card-nexa p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-primary font-mono">{s.standard}</span>
-                  <span className="badge-iogp text-[10px]">{s.category}</span>
-                </div>
-                <h3 className="text-sm font-bold text-foreground">{s.title}</h3>
-                <p className="text-xs text-muted font-mono">{s.section}</p>
-                <div className="p-3 bg-surface-subtle rounded-lg border border-border text-[11px] text-muted leading-relaxed">
-                  {s.citations}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Search bar */}
+          <div className="card-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+            <div style={{ position: 'relative', width: '320px' }}>
+              <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                value={standardsSearch}
+                onChange={(e) => setStandardsSearch(e.target.value)}
+                placeholder="Search standards library..."
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  backgroundColor: 'var(--bg-input)',
+                  border: '1px solid var(--border-color-subtle)',
+                  borderRadius: '9999px',
+                  padding: '0 16px 0 34px',
+                  fontSize: '12px',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                }}
+              />
+            </div>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+              Showing {filteredStandards.length} of {standards.length} Approved Safety Standards
+            </span>
+          </div>
+
+          {/* Standards Bento Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '18px' }}>
+            {filteredStandards.map((s, idx) => (
+              <div
+                key={idx}
+                className="bento-card"
+                style={{
+                  padding: '22px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '14px',
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: '1px solid var(--border-color-subtle)' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#0D9488' }}>
+                      {s.standard}
+                    </span>
+                    <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', backgroundColor: 'var(--bg-input)', color: 'var(--text-muted)' }}>
+                      {s.category}
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '10px 0 4px 0' }}>
+                    {s.title}
+                  </h3>
+                  <div style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                    {s.section}
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: '12px',
+                      padding: '12px 14px',
+                      borderRadius: '10px',
+                      backgroundColor: 'var(--bg-input)',
+                      border: '1px solid var(--border-color-subtle)',
+                      fontSize: '11.5px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {s.citations}
+                  </div>
                 </div>
               </div>
             ))}

@@ -3,7 +3,8 @@ Database Connection and Session Management via SQLAlchemy.
 """
 
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
+
 from backend.app.core.config import settings
 
 # Engine configuration with thread check disabled for SQLite

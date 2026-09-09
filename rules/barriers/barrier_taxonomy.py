@@ -4,10 +4,10 @@ Codifies Hardware (Engineered), Administrative (Procedural), and Human Action (B
 barriers and evaluates barrier health degradation according to IOGP and Swiss Cheese models.
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
 import re
+from dataclasses import dataclass
+from enum import Enum
+from typing import Dict, List
 
 
 class BarrierCategory(str, Enum):

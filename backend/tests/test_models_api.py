@@ -2,8 +2,8 @@
 API Integration tests for Contextual Sequence Model, Attribution, and Ensemble Endpoints.
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from backend.app.main import app
 
 client = TestClient(app)

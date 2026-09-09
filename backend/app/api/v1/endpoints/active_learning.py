@@ -3,14 +3,14 @@ API Endpoints for Active Learning Prioritization & Guided Annotation (Phase 20).
 """
 
 from typing import List, Optional
-from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
-from backend.app.models.report import ReportModel, PredictionModel, AuditEventModel
-from ml.active_learning.sampler import active_learning_sampler, ActiveLearningCandidate
+from backend.app.models.report import AuditEventModel, ReportModel
+from ml.active_learning.sampler import ActiveLearningCandidate, active_learning_sampler
 
 router = APIRouter()
 

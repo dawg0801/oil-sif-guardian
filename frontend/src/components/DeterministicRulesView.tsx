@@ -22,7 +22,9 @@ import {
   Lock,
   Compass,
   Sliders,
-  Info
+  Info,
+  Check,
+  ExternalLink
 } from 'lucide-react';
 import { api } from '../services/api';
 import {
@@ -71,30 +73,34 @@ const PRESET_SCENARIOS = [
   }
 ];
 
-const SEVERITY_COLORS: Record<string, { bg: string; text: string; border: string; badge: string }> = {
+const SEVERITY_CONFIG: Record<string, { bg: string; text: string; border: string; badgeBg: string; badgeText: string }> = {
   ZERO_TOLERANCE_FATAL: {
-    bg: 'bg-red-950/40',
-    text: 'text-red-300',
-    border: 'border-red-500/50',
-    badge: 'bg-red-500/20 text-red-300 border-red-500/40'
+    bg: 'rgba(239, 68, 68, 0.06)',
+    text: '#DC2626',
+    border: 'rgba(239, 68, 68, 0.25)',
+    badgeBg: 'rgba(239, 68, 68, 0.12)',
+    badgeText: '#B91C1C'
   },
   CRITICAL_CONTROL_COMPROMISED: {
-    bg: 'bg-amber-950/40',
-    text: 'text-amber-300',
-    border: 'border-amber-500/50',
-    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+    bg: 'rgba(245, 158, 11, 0.06)',
+    text: '#D97706',
+    border: 'rgba(245, 158, 11, 0.25)',
+    badgeBg: 'rgba(245, 158, 11, 0.12)',
+    badgeText: '#B45309'
   },
   PROCEDURAL_DEVIATION: {
-    bg: 'bg-yellow-950/30',
-    text: 'text-yellow-300',
-    border: 'border-yellow-500/40',
-    badge: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40'
+    bg: 'rgba(147, 51, 234, 0.06)',
+    text: '#9333EA',
+    border: 'rgba(147, 51, 234, 0.22)',
+    badgeBg: 'rgba(147, 51, 234, 0.12)',
+    badgeText: '#7E22CE'
   },
   BENIGN_ADMINISTRATIVE: {
-    bg: 'bg-emerald-950/40',
-    text: 'text-emerald-300',
-    border: 'border-emerald-500/50',
-    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+    bg: 'rgba(16, 185, 129, 0.06)',
+    text: '#059669',
+    border: 'rgba(16, 185, 129, 0.22)',
+    badgeBg: 'rgba(16, 185, 129, 0.12)',
+    badgeText: '#047857'
   }
 };
 
@@ -108,6 +114,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   'Bypassing Safety Controls': '⚙️',
   'Driving': '🚚',
   'Work Authorization': '📋',
+  'Toxic Atmosphere': '☣️',
   'None': '📄'
 };
 
@@ -168,9 +175,18 @@ export const DeterministicRulesView: React.FC = () => {
     }
   };
 
-  const selectPreset = (preset: typeof PRESET_SCENARIOS[0]) => {
+  const selectPreset = async (preset: typeof PRESET_SCENARIOS[0]) => {
     setTitleInput(preset.title);
     setNarrativeInput(preset.narrative);
+    setEvaluating(true);
+    try {
+      const res = await api.evaluateRules(preset.narrative, preset.title);
+      setEvalResult(res);
+    } catch (err) {
+      console.error('Failed to evaluate preset scenario:', err);
+    } finally {
+      setEvaluating(false);
+    }
   };
 
   const filteredRules = (catalog?.rules || []).filter(rule => {
@@ -185,388 +201,562 @@ export const DeterministicRulesView: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Top Banner & Architectural Overview */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 p-6 shadow-2xl backdrop-blur-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400">
-                <AlertOctagon className="w-6 h-6 animate-pulse" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-3">
-                  Codified Deterministic Safety Rule Engine
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/30">
-                    Zero-Tolerance Veto
-                  </span>
-                </h1>
-                <p className="text-sm text-slate-400 mt-1">
-                  Engineered guardrails codified against Indian statutory standards (OISD-105, OISD-141, OISD-145, DGMS OMR-2017 & PNGRB) with 100% High-PSIF recall guarantee.
-                </p>
-              </div>
-            </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
+      {/* ====================================================================
+          MASTER HEADER
+          ==================================================================== */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px',
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#DC2626',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+              }}
+            >
+              <AlertOctagon style={{ width: '13px', height: '13px' }} />
+              Zero-Tolerance Deterministic Guardrails
+            </span>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--bg-pill)',
+                color: 'var(--text-muted)',
+              }}
+            >
+              OISD-105 & DGMS Standard
+            </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setActiveSubTab('inspector')}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all ${
-                activeSubTab === 'inspector'
-                  ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                  : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300 border border-slate-700/50'
-              }`}
-            >
-              Live Veto Inspector
-            </button>
-            <button
-              onClick={() => setActiveSubTab('catalog')}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all ${
-                activeSubTab === 'catalog'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                  : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300 border border-slate-700/50'
-              }`}
-            >
-              Rulebook Catalog ({catalog?.total_rules || 37})
-            </button>
-            <button
-              onClick={() => setActiveSubTab('stats')}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all ${
-                activeSubTab === 'stats'
-                  ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
-                  : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300 border border-slate-700/50'
-              }`}
-            >
-              Golden Benchmark Stats
-            </button>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
+            Deterministic Safety Rules & Veto Engine
+          </h1>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '6px 0 0 0', maxWidth: '720px' }}>
+            Hardcoded stop-work guardrails executing sub-millisecond safety evaluations with zero cloud dependency.
+          </p>
+        </div>
+
+        {/* SubTab Navigation Pills */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'var(--bg-input)',
+            padding: '4px',
+            borderRadius: '9999px',
+            border: '1px solid var(--border-color-subtle)',
+            gap: '4px',
+          }}
+        >
+          <button
+            onClick={() => setActiveSubTab('inspector')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: activeSubTab === 'inspector' ? 'var(--accent-emerald-dark)' : 'transparent',
+              color: activeSubTab === 'inspector' ? '#FFFFFF' : 'var(--text-secondary)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Live Veto Inspector
+          </button>
+          <button
+            onClick={() => setActiveSubTab('catalog')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: activeSubTab === 'catalog' ? 'var(--accent-emerald-dark)' : 'transparent',
+              color: activeSubTab === 'catalog' ? '#FFFFFF' : 'var(--text-secondary)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Rulebook Catalog ({catalog?.total_rules || 37})
+          </button>
+          <button
+            onClick={() => setActiveSubTab('stats')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: activeSubTab === 'stats' ? 'var(--accent-emerald-dark)' : 'transparent',
+              color: activeSubTab === 'stats' ? '#FFFFFF' : 'var(--text-secondary)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Golden Benchmark
+          </button>
+        </div>
+      </div>
+
+      {/* ====================================================================
+          KPI STATS BENTO GRID (4 Pillars)
+          ==================================================================== */}
+      <div className="stats-kpi-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))' }}>
+        {/* High PSIF Recall */}
+        <div className="kpi-card" style={{ borderRadius: '24px' }}>
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: '#047857' }}>
+              High-PSIF Recall
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }}>
+              <ShieldCheck style={{ width: '17px', height: '17px' }} />
+            </div>
+          </div>
+          <div className="kpi-card-value" style={{ color: '#047857' }}>
+            100.0%
+          </div>
+          <div className="kpi-card-desc">
+            <span>80 / 80 Fatal Events Captured</span>
           </div>
         </div>
 
-        {/* 4 Architectural KPI Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <div className="rounded-xl bg-slate-900/80 border border-emerald-500/30 p-4 relative overflow-hidden">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">High-PSIF Recall</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+        {/* Codified Safety Rules */}
+        <div className="kpi-card" style={{ borderRadius: '24px' }}>
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: 'var(--text-secondary)' }}>
+              Codified Safety Rules
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', color: '#DC2626' }}>
+              <BookOpen style={{ width: '17px', height: '17px' }} />
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-emerald-300">100.0%</span>
-              <span className="text-xs text-emerald-400/80 font-mono">80 / 80 Fatal Events</span>
-            </div>
-            <p className="text-[11px] text-slate-500 mt-1">Rule 2 Engineering Guarantee</p>
           </div>
-
-          <div className="rounded-xl bg-slate-900/80 border border-red-500/30 p-4 relative overflow-hidden">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">Codified Safety Rules</span>
-              <BookOpen className="w-4 h-4 text-red-400" />
-            </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-white">{catalog?.total_rules || 37}</span>
-              <span className="text-xs text-red-300 font-mono">OISD / DGMS Aligned</span>
-            </div>
-            <p className="text-[11px] text-slate-500 mt-1">9 IOGP Domains + Toxic Gas</p>
+          <div className="kpi-card-value">
+            {catalog?.total_rules || 37}
           </div>
-
-          <div className="rounded-xl bg-slate-900/80 border border-indigo-500/30 p-4 relative overflow-hidden">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">Execution Latency</span>
-              <Zap className="w-4 h-4 text-indigo-400" />
-            </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-indigo-300">
-                {evalResult ? `${evalResult.latency_ms.toFixed(2)} ms` : '< 0.5 ms'}
-              </span>
-              <span className="text-xs text-indigo-400/80 font-mono">Pure Python CPU</span>
-            </div>
-            <p className="text-[11px] text-slate-500 mt-1">Zero cloud dependency</p>
+          <div className="kpi-card-desc">
+            <span>OISD / DGMS / IOGP Aligned</span>
           </div>
+        </div>
 
-          <div className="rounded-xl bg-slate-900/80 border border-amber-500/30 p-4 relative overflow-hidden">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">Statutory Governance</span>
-              <Scale className="w-4 h-4 text-amber-400" />
+        {/* Execution Latency */}
+        <div className="kpi-card" style={{ borderRadius: '24px' }}>
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: '#7C3AED' }}>
+              Execution Latency
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(124, 58, 237, 0.08)', color: '#7C3AED' }}>
+              <Zap style={{ width: '17px', height: '17px' }} />
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-amber-300">Mandatory</span>
-              <span className="text-xs text-amber-400/80 font-mono">Stop-Work Order</span>
+          </div>
+          <div className="kpi-card-value" style={{ color: '#7C3AED' }}>
+            {evalResult ? `${evalResult.latency_ms.toFixed(2)} ms` : '< 0.5 ms'}
+          </div>
+          <div className="kpi-card-desc">
+            <span>Pure Python CPU • Zero Cloud Wait</span>
+          </div>
+        </div>
+
+        {/* Statutory Governance */}
+        <div className="kpi-card" style={{ borderRadius: '24px' }}>
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: '#B45309' }}>
+              Statutory Veto
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#D97706' }}>
+              <Scale style={{ width: '17px', height: '17px' }} />
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">Strict human-in-the-loop veto</p>
+          </div>
+          <div className="kpi-card-value" style={{ color: '#B45309' }}>
+            Mandatory
+          </div>
+          <div className="kpi-card-desc">
+            <span>Strict Human-in-the-Loop Override</span>
           </div>
         </div>
       </div>
 
-      {/* SUB-TAB 1: LIVE VETO INSPECTOR */}
+      {/* ====================================================================
+          SUB-TAB 1: LIVE VETO INSPECTOR
+          ==================================================================== */}
       {activeSubTab === 'inspector' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Narrative Input & Presets (5 Cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 shadow-xl">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-indigo-400" />
-                  Incident Narrative Input
-                </h2>
-                <span className="text-xs text-slate-500">Live Evaluation</span>
-              </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 460px) 1fr', gap: '24px', alignItems: 'start' }}>
+          {/* Left Column: Narrative Input & Presets */}
+          <div className="card-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h2 style={{ fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FileText style={{ width: '16px', height: '16px', color: '#0D9488' }} />
+                <span>Incident Scenario Input</span>
+              </h2>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>Live Evaluation</span>
+            </div>
 
-              {/* Presets Bar */}
-              <div className="mb-3">
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1.5 uppercase">
-                  Select Oilfield Scenario Preset:
-                </label>
-                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
-                  {PRESET_SCENARIOS.map((p, idx) => (
+            {/* Presets Bar */}
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
+                Select Oilfield Scenario Preset:
+              </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '220px', overflowY: 'auto', paddingRight: '4px' }}>
+                {PRESET_SCENARIOS.map((p, idx) => {
+                  const isSelected = titleInput === p.title;
+                  return (
                     <button
                       key={idx}
                       onClick={() => selectPreset(p)}
-                      className={`text-left px-2.5 py-1 rounded-lg text-xs transition-all border ${
-                        titleInput === p.title
-                          ? 'bg-indigo-600/30 border-indigo-500/60 text-indigo-200 font-medium'
-                          : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                      }`}
+                      style={{
+                        textAlign: 'left',
+                        padding: '10px 12px',
+                        borderRadius: '12px',
+                        border: isSelected ? '1.5px solid var(--accent-emerald-dark)' : '1px solid var(--border-color-subtle)',
+                        backgroundColor: isSelected ? 'rgba(13, 148, 136, 0.08)' : 'var(--bg-input)',
+                        color: isSelected ? 'var(--accent-emerald-dark)' : 'var(--text-primary)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '8px',
+                      }}
                     >
-                      {p.title}
+                      <div>
+                        <div style={{ fontSize: '12px', fontWeight: isSelected ? 800 : 600 }}>{p.title}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                          {CATEGORY_ICONS[p.category] || '⚠️'} {p.category}
+                        </div>
+                      </div>
+                      {isSelected && <Check style={{ width: '14px', height: '14px', color: '#0D9488', flexShrink: 0 }} />}
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-
-              {/* Title Input */}
-              <div className="mb-3">
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1 uppercase">
-                  Headline / Task Activity:
-                </label>
-                <input
-                  type="text"
-                  value={titleInput}
-                  onChange={(e) => setTitleInput(e.target.value)}
-                  placeholder="e.g. Tank Maintenance Entry Without Gas Test"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
-                />
-              </div>
-
-              {/* Narrative Textarea */}
-              <div className="mb-4">
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1 uppercase">
-                  Narrative Text (Unstructured):
-                </label>
-                <textarea
-                  rows={6}
-                  value={narrativeInput}
-                  onChange={(e) => setNarrativeInput(e.target.value)}
-                  placeholder="Paste industrial incident narrative, near miss report, or worker observation..."
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors leading-relaxed font-sans"
-                />
-              </div>
-
-              <button
-                onClick={handleEvaluate}
-                disabled={evaluating || !narrativeInput.trim()}
-                className="w-full py-3 rounded-xl font-bold text-sm tracking-wide text-white bg-gradient-to-r from-red-600 to-indigo-600 hover:from-red-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2"
-              >
-                {evaluating ? (
-                  <>
-                    <Clock className="w-4 h-4 animate-spin" />
-                    Executing Rulebook Guardrails...
-                  </>
-                ) : (
-                  <>
-                    <ShieldAlert className="w-4 h-4" />
-                    Evaluate Safety Guardrails
-                  </>
-                )}
-              </button>
             </div>
 
-            {/* Quick Summary Card */}
-            {evalResult && (
-              <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-emerald-400" />
-                  Engine Classification Snapshot
-                </h3>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                    <span className="text-slate-400">Deterministic High-PSIF:</span>
-                    <span className={`font-bold ${evalResult.mandatory_high_psif ? 'text-red-400' : 'text-emerald-400'}`}>
-                      {evalResult.mandatory_high_psif ? 'YES (MANDATORY VETO)' : 'NO'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                    <span className="text-slate-400">Stop-Work Order:</span>
-                    <span className={`font-bold ${evalResult.stop_work_required ? 'text-red-400' : 'text-slate-400'}`}>
-                      {evalResult.stop_work_required ? 'REQUIRED IMMEDIATELY' : 'NOT REQUIRED'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                    <span className="text-slate-400">Severity Tier:</span>
-                    <span className="font-mono font-semibold text-amber-300">{evalResult.severity_level}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                    <span className="text-slate-400">Negative Control (Benign):</span>
-                    <span className={`font-bold ${evalResult.is_benign ? 'text-emerald-400' : 'text-slate-400'}`}>
-                      {evalResult.is_benign ? 'TRUE (SUPPRESSED)' : 'FALSE'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1.5">
-                    <span className="text-slate-400">Evaluation Latency:</span>
-                    <span className="font-mono text-indigo-300">{evalResult.latency_ms.toFixed(3)} ms</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Title Input */}
+            <div className="form-group">
+              <label className="form-label">Headline / Task Activity:</label>
+              <input
+                type="text"
+                value={titleInput}
+                onChange={(e) => setTitleInput(e.target.value)}
+                placeholder="e.g. Tank Maintenance Entry Without Gas Test"
+                className="form-input"
+              />
+            </div>
+
+            {/* Narrative Textarea */}
+            <div className="form-group">
+              <label className="form-label">Incident Narrative (Unstructured):</label>
+              <textarea
+                rows={5}
+                value={narrativeInput}
+                onChange={(e) => setNarrativeInput(e.target.value)}
+                placeholder="Paste industrial incident narrative, near miss report, or worker observation..."
+                className="form-textarea"
+                style={{ lineHeight: 1.5 }}
+              />
+            </div>
+
+            {/* Run Button */}
+            <button
+              onClick={handleEvaluate}
+              disabled={evaluating || !narrativeInput.trim()}
+              className="btn-primary"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '12px 20px',
+                fontSize: '13px',
+                background: 'linear-gradient(135deg, #07382F 0%, #0E4E42 100%)',
+              }}
+            >
+              {evaluating ? (
+                <>
+                  <Clock style={{ width: '16px', height: '16px' }} className="animate-spin" />
+                  <span>Executing Rulebook Guardrails...</span>
+                </>
+              ) : (
+                <>
+                  <ShieldAlert style={{ width: '16px', height: '16px' }} />
+                  <span>Evaluate Deterministic Safety Guardrails</span>
+                </>
+              )}
+            </button>
           </div>
 
-          {/* Right Column: Veto Decision & Detailed Guardrail Breakdown (7 Cols) */}
-          <div className="lg:col-span-7 space-y-4">
+          {/* Right Column: Live Evaluation Results */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {evalResult ? (
               <>
-                {/* EMERGENCY STOP WORK VETO BANNER */}
-                {evalResult.stop_work_required ? (
-                  <div className="rounded-2xl bg-gradient-to-r from-red-950/80 via-red-900/50 to-slate-900 border-2 border-red-500/70 p-5 shadow-2xl shadow-red-900/30">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 rounded-xl bg-red-600/30 border border-red-500/60 text-red-400 flex-shrink-0 animate-bounce">
-                        <AlertOctagon className="w-7 h-7" />
+                {/* VETO ALERT BANNER */}
+                {evalResult.mandatory_high_psif ? (
+                  <div
+                    className="card-panel"
+                    style={{
+                      padding: '24px',
+                      background: 'linear-gradient(135deg, rgba(254, 226, 226, 0.95) 0%, rgba(255, 241, 242, 0.95) 100%)',
+                      border: '1.5px solid rgba(239, 68, 68, 0.35)',
+                      borderRadius: '24px',
+                      boxShadow: '0 8px 24px rgba(239, 68, 68, 0.12)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                      <div
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '14px',
+                          backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#DC2626',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <AlertOctagon style={{ width: '24px', height: '24px' }} className="animate-pulse" />
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider bg-red-600 text-white">
-                            EMERGENCY STOP-WORK VETO ENFORCED
+
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 900,
+                              padding: '3px 10px',
+                              borderRadius: '9999px',
+                              backgroundColor: '#DC2626',
+                              color: '#FFFFFF',
+                              letterSpacing: '0.06em',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            MANDATORY STOP-WORK VETO TRIGGERED
                           </span>
-                          <span className="text-xs font-mono text-red-300">
-                            ZERO-TOLERANCE PRECURSOR DETECTED
+                          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#B91C1C' }}>
+                            {evalResult.triggered_rules.length} Statutory Guardrails Tripped
                           </span>
                         </div>
-                        <h3 className="text-lg font-black text-white">
-                          Mandatory High-PSIF Classification Active
+
+                        <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#991B1B', margin: '8px 0 6px 0', lineHeight: 1.3 }}>
+                          Statutory High-PSIF Classification Enforced Under Law
                         </h3>
-                        <p className="text-xs text-red-200/90 leading-relaxed">
-                          This incident satisfies zero-tolerance criteria for life-threatening precursor conditions. Deterministic safety guardrail overrules statistical thresholds. Immediate task suspension and site evacuation order mandated.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : evalResult.is_benign ? (
-                  <div className="rounded-2xl bg-emerald-950/40 border border-emerald-500/50 p-5 shadow-xl">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex-shrink-0">
-                        <ShieldCheck className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                          Negative Control Filtered
-                        </span>
-                        <h3 className="text-base font-bold text-white mt-1">
-                          Routine Administrative / Non-Industrial Activity
-                        </h3>
-                        <p className="text-xs text-emerald-200/80 mt-0.5">
-                          Identified as non-hazardous administrative or housekeeping event possessing zero fatal precursor potential. Escalation suppressed.
+                        <p style={{ fontSize: '12.5px', color: '#7F1D1D', margin: 0, lineHeight: 1.5 }}>
+                          This operation breaches codified non-negotiable safety rules. AI confidence probability
+                          cannot downgrade this incident. Immediate physical suspension of work and barrier audit required.
                         </p>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-5">
-                    <div className="flex items-center gap-3 text-slate-300">
-                      <CheckCircle2 className="w-5 h-5 text-indigo-400" />
+                  <div
+                    className="card-panel"
+                    style={{
+                      padding: '24px',
+                      background: 'linear-gradient(135deg, rgba(209, 250, 229, 0.95) 0%, rgba(240, 253, 250, 0.95) 100%)',
+                      border: '1.5px solid rgba(16, 185, 129, 0.35)',
+                      borderRadius: '24px',
+                      boxShadow: '0 8px 24px rgba(16, 185, 129, 0.1)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div
+                        style={{
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '12px',
+                          backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#059669',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <ShieldCheck style={{ width: '24px', height: '24px' }} />
+                      </div>
                       <div>
-                        <h4 className="text-sm font-bold text-white">No Zero-Tolerance Fatal Precursors Triggered</h4>
-                        <p className="text-xs text-slate-400">Standard ML multi-label classification thresholds apply.</p>
+                        <div style={{ fontSize: '11px', fontWeight: 800, color: '#047857', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          Deterministic Safety Pass
+                        </div>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: '#065F46', margin: '2px 0' }}>
+                          Zero Life-Saving Statutory Violations Tripped
+                        </div>
+                        <p style={{ fontSize: '12px', color: '#047857', margin: 0 }}>
+                          Standard permit-to-work protocols remain applicable. Negative control suppression validated.
+                        </p>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Triggered Rule Details Cards */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
-                    <span>Triggered Codified Guardrails ({evalResult.triggered_rule_details.length})</span>
-                    <span className="text-xs font-mono text-slate-500">
-                      Statutory Citations
+                {/* Triggered Rules Bento List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <h3 style={{ fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', margin: 0 }}>
+                      Enforced Codified Safeguards ({evalResult.triggered_rules.length})
+                    </h3>
+                    <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                      Evaluated in <strong>{evalResult.latency_ms.toFixed(2)} ms</strong>
                     </span>
-                  </h3>
+                  </div>
 
-                  {evalResult.triggered_rule_details.length === 0 ? (
-                    <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-6 text-center text-slate-500 text-xs">
-                      No specific codified rules were triggered for this narrative.
+                  {(evalResult.triggered_rule_details || []).length === 0 ? (
+                    <div className="card-panel" style={{ padding: '36px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <CheckCircle2 style={{ width: '28px', height: '28px', color: '#10B981', margin: '0 auto 8px auto' }} />
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        Clean Bill of Statutory Health
+                      </div>
+                      <p style={{ fontSize: '11.5px', margin: '2px 0 0 0' }}>
+                        No fatal precursor patterns identified in narrative.
+                      </p>
                     </div>
                   ) : (
-                    evalResult.triggered_rule_details.map((rule, idx) => {
-                      const sevConfig = SEVERITY_COLORS[rule.severity] || SEVERITY_COLORS.PROCEDURAL_DEVIATION;
+                    (evalResult.triggered_rule_details || []).map((rule: TriggeredRuleDetailData, idx: number) => {
+                      const sevConfig = SEVERITY_CONFIG[rule.severity] || SEVERITY_CONFIG.PROCEDURAL_DEVIATION;
                       const icon = CATEGORY_ICONS[rule.iogp_category] || '⚠️';
+                      const isExpanded = expandedRuleId === rule.rule_id;
 
                       return (
                         <div
                           key={idx}
-                          className={`rounded-2xl border ${sevConfig.border} ${sevConfig.bg} p-5 shadow-lg transition-all`}
+                          className="bento-card"
+                          style={{
+                            padding: '20px',
+                            background: 'var(--bg-surface)',
+                            border: `1px solid ${sevConfig.border}`,
+                            borderRadius: '20px',
+                            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                          }}
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">{icon}</span>
+                          {/* Card Top Row */}
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <span style={{ fontSize: '20px' }}>{icon}</span>
                               <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-mono text-xs font-bold text-white">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span style={{ fontSize: '12px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#0D9488' }}>
                                     {rule.rule_id}
                                   </span>
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${sevConfig.badge}`}>
+                                  <span
+                                    style={{
+                                      fontSize: '9.5px',
+                                      fontWeight: 800,
+                                      padding: '2px 8px',
+                                      borderRadius: '9999px',
+                                      textTransform: 'uppercase',
+                                      backgroundColor: sevConfig.badgeBg,
+                                      color: sevConfig.badgeText,
+                                    }}
+                                  >
                                     {rule.severity.replace(/_/g, ' ')}
                                   </span>
                                 </div>
-                                <h4 className="text-sm font-bold text-white mt-0.5">
+                                <h4 style={{ fontSize: '14.5px', fontWeight: 800, color: 'var(--text-primary)', margin: '4px 0 0 0' }}>
                                   {rule.rule_name}
                                 </h4>
                               </div>
                             </div>
-                            <span className="text-[11px] font-medium text-slate-400 bg-slate-950/60 px-2.5 py-1 rounded-lg border border-slate-800">
+
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                color: 'var(--text-muted)',
+                                backgroundColor: 'var(--bg-input)',
+                                padding: '4px 10px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-color-subtle)',
+                              }}
+                            >
                               {rule.iogp_category}
                             </span>
                           </div>
 
-                          {/* Failure Mechanism & Statutory Standard */}
-                          <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                            <div className="bg-slate-950/60 rounded-xl p-3 border border-slate-800/80">
-                              <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">
+                          {/* Failure Mechanism & Standard Bento Rows */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px', fontSize: '12px' }}>
+                            <div style={{ backgroundColor: 'var(--bg-input)', padding: '10px 12px', borderRadius: '12px', border: '1px solid var(--border-color-subtle)' }}>
+                              <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '3px' }}>
                                 Regulatory Standard:
                               </span>
-                              <span className="font-semibold text-amber-300/90">
+                              <span style={{ fontWeight: 700, color: '#B45309' }}>
                                 {rule.regulatory_standard}
                               </span>
                             </div>
-                            <div className="bg-slate-950/60 rounded-xl p-3 border border-slate-800/80">
-                              <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">
+
+                            <div style={{ backgroundColor: 'var(--bg-input)', padding: '10px 12px', borderRadius: '12px', border: '1px solid var(--border-color-subtle)' }}>
+                              <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '3px' }}>
                                 Failure Mechanism:
                               </span>
-                              <span className="text-slate-300">
+                              <span style={{ color: 'var(--text-secondary)' }}>
                                 {rule.failure_mechanism}
                               </span>
                             </div>
                           </div>
 
-                          {/* Stop Work Action Protocol */}
-                          <div className="mt-3 bg-red-950/40 rounded-xl p-3 border border-red-500/30 text-xs">
-                            <div className="flex items-center gap-1.5 text-red-300 font-bold mb-1 uppercase tracking-wider text-[10px]">
-                              <AlertTriangle className="w-3.5 h-3.5" />
-                              Mandated Stop-Work Action:
+                          {/* Mandated Stop Work Action Protocol */}
+                          <div
+                            style={{
+                              marginTop: '12px',
+                              padding: '12px 14px',
+                              borderRadius: '12px',
+                              backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                              border: '1px solid rgba(239, 68, 68, 0.25)',
+                              fontSize: '12px',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#B91C1C', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', marginBottom: '3px' }}>
+                              <AlertTriangle style={{ width: '13px', height: '13px' }} />
+                              <span>Mandated Stop-Work Action:</span>
                             </div>
-                            <p className="text-red-200 text-xs leading-relaxed font-medium">
+                            <p style={{ margin: 0, color: '#7F1D1D', fontWeight: 600, lineHeight: 1.45 }}>
                               {rule.stop_work_action}
                             </p>
                           </div>
 
-                          {/* Prescribed Safeguards */}
+                          {/* Prescribed Safeguards Toggle */}
                           {rule.prescribed_safeguards && rule.prescribed_safeguards.length > 0 && (
-                            <div className="mt-3">
-                              <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1.5">
+                            <div style={{ marginTop: '12px' }}>
+                              <div style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>
                                 Mandated Control Barriers:
-                              </span>
-                              <div className="flex flex-wrap gap-1.5">
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                                 {rule.prescribed_safeguards.map((sg, sIdx) => (
                                   <span
                                     key={sIdx}
-                                    className="px-2 py-0.5 rounded-md text-[11px] bg-slate-950/80 border border-slate-700/60 text-slate-300"
+                                    style={{
+                                      fontSize: '11px',
+                                      fontWeight: 600,
+                                      padding: '3px 9px',
+                                      borderRadius: '6px',
+                                      backgroundColor: 'var(--bg-input)',
+                                      color: 'var(--text-primary)',
+                                      border: '1px solid var(--border-color-subtle)',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '4px',
+                                    }}
                                   >
-                                    ✓ {sg}
+                                    <Check style={{ width: '11px', height: '11px', color: '#10B981' }} />
+                                    <span>{sg}</span>
                                   </span>
                                 ))}
                               </div>
@@ -580,39 +770,46 @@ export const DeterministicRulesView: React.FC = () => {
 
                 {/* Statutory Audit Trail Timeline */}
                 {evalResult.audit_trail && evalResult.audit_trail.length > 0 && (
-                  <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 shadow-xl">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                      <Scale className="w-4 h-4 text-amber-400" />
-                      Statutory Enforcement Audit Trail
+                  <div className="card-panel" style={{ padding: '20px' }}>
+                    <h3 style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-primary)', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Scale style={{ width: '15px', height: '15px', color: '#D97706' }} />
+                      <span>Statutory Enforcement Audit Trail</span>
                     </h3>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs text-slate-300">
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12px' }}>
                         <thead>
-                          <tr className="border-b border-slate-800 text-slate-500 uppercase text-[10px]">
-                            <th className="pb-2">Rule ID</th>
-                            <th className="pb-2">Rule Name</th>
-                            <th className="pb-2">Severity</th>
-                            <th className="pb-2">Enforcement Status</th>
+                          <tr style={{ borderBottom: '1px solid var(--border-color-subtle)', color: 'var(--text-muted)', fontSize: '10.5px', textTransform: 'uppercase' }}>
+                            <th style={{ paddingBottom: '8px' }}>Rule ID</th>
+                            <th style={{ paddingBottom: '8px' }}>Rule Name</th>
+                            <th style={{ paddingBottom: '8px' }}>Severity</th>
+                            <th style={{ paddingBottom: '8px' }}>Enforcement Status</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800/60">
+                        <tbody>
                           {evalResult.audit_trail.map((item, idx) => (
-                            <tr key={idx} className="hover:bg-slate-800/30">
-                              <td className="py-2.5 font-mono font-bold text-white">{item.rule_id}</td>
-                              <td className="py-2.5 max-w-xs truncate">{item.rule_name}</td>
-                              <td className="py-2.5">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                  item.severity === 'ZERO_TOLERANCE_FATAL'
-                                    ? 'bg-red-500/20 text-red-300'
-                                    : 'bg-emerald-500/20 text-emerald-300'
-                                }`}>
+                            <tr key={idx} style={{ borderBottom: '1px solid var(--border-color-subtle)' }}>
+                              <td style={{ padding: '8px 0', fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#0D9488' }}>
+                                {item.rule_id}
+                              </td>
+                              <td style={{ padding: '8px 8px 8px 0', color: 'var(--text-primary)', fontWeight: 600 }}>
+                                {item.rule_name}
+                              </td>
+                              <td style={{ padding: '8px 0' }}>
+                                <span
+                                  style={{
+                                    fontSize: '9.5px',
+                                    fontWeight: 800,
+                                    padding: '2px 7px',
+                                    borderRadius: '9999px',
+                                    backgroundColor: item.severity === 'ZERO_TOLERANCE_FATAL' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
+                                    color: item.severity === 'ZERO_TOLERANCE_FATAL' ? '#B91C1C' : '#047857',
+                                  }}
+                                >
                                   {item.severity}
                                 </span>
                               </td>
-                              <td className="py-2.5">
-                                <span className="font-mono text-indigo-300 font-semibold">
-                                  {item.action_status}
-                                </span>
+                              <td style={{ padding: '8px 0', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent-emerald-dark)' }}>
+                                {item.action_status}
                               </td>
                             </tr>
                           ))}
@@ -623,146 +820,253 @@ export const DeterministicRulesView: React.FC = () => {
                 )}
               </>
             ) : (
-              <div className="h-64 flex items-center justify-center rounded-2xl bg-slate-900/50 border border-slate-800 text-slate-500 text-sm">
-                Click "Evaluate Safety Guardrails" to run deterministic analysis.
+              <div className="card-panel" style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <Clock style={{ width: '32px', height: '32px', margin: '0 auto 12px auto', color: '#0D9488' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  Ready to Evaluate Safety Guardrails
+                </div>
+                <p style={{ fontSize: '12px', marginTop: '4px' }}>
+                  Select an oilfield scenario preset or input raw incident observations to run the rulebook.
+                </p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* SUB-TAB 2: CODIFIED RULEBOOK CATALOG */}
+      {/* ====================================================================
+          SUB-TAB 2: CODIFIED RULEBOOK CATALOG
+          ==================================================================== */}
       {activeSubTab === 'catalog' && (
-        <div className="space-y-4">
-          {/* Filter Bar */}
-          <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by rule ID (e.g. RULE-CS-001), keywords, or standard (e.g. OISD-105)..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
-              />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Controls: Search + Severity + Categories */}
+          <div className="card-panel" style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              {/* Search Bar */}
+              <div style={{ position: 'relative', width: '320px' }}>
+                <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search rules, keywords, OISD standards..."
+                  style={{
+                    width: '100%',
+                    height: '38px',
+                    backgroundColor: 'var(--bg-input)',
+                    border: '1px solid var(--border-color-subtle)',
+                    borderRadius: '9999px',
+                    padding: '0 16px 0 34px',
+                    fontSize: '12px',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              {/* Severity Filter */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                  Severity:
+                </span>
+                <select
+                  value={selectedSeverity}
+                  onChange={(e) => setSelectedSeverity(e.target.value)}
+                  className="form-select"
+                  style={{ height: '36px', fontSize: '12px', padding: '0 28px 0 12px' }}
+                >
+                  <option value="All">All Severities</option>
+                  <option value="ZERO_TOLERANCE_FATAL">Zero Tolerance Fatal</option>
+                  <option value="CRITICAL_CONTROL_COMPROMISED">Critical Control Compromised</option>
+                  <option value="PROCEDURAL_DEVIATION">Procedural Deviation</option>
+                  <option value="BENIGN_ADMINISTRATIVE">Benign Administrative</option>
+                </select>
+              </div>
             </div>
 
-            {/* Severity Filter */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-semibold uppercase">Severity:</span>
-              <select
-                value={selectedSeverity}
-                onChange={(e) => setSelectedSeverity(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
-              >
-                <option value="All">All Severities</option>
-                <option value="ZERO_TOLERANCE_FATAL">Zero Tolerance Fatal</option>
-                <option value="CRITICAL_CONTROL_COMPROMISED">Critical Control Compromised</option>
-                <option value="PROCEDURAL_DEVIATION">Procedural Deviation</option>
-                <option value="BENIGN_ADMINISTRATIVE">Benign Administrative</option>
-              </select>
+            {/* Category Filter Pills */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {['All', ...(catalog?.categories || [])].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    border: selectedCategory === cat ? '1px solid var(--accent-emerald-dark)' : '1px solid var(--border-color-subtle)',
+                    backgroundColor: selectedCategory === cat ? 'var(--accent-emerald-dark)' : 'var(--bg-surface)',
+                    color: selectedCategory === cat ? '#FFFFFF' : 'var(--text-secondary)',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {cat !== 'All' && CATEGORY_ICONS[cat] && `${CATEGORY_ICONS[cat]} `}
+                  {cat}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-            {['All', ...(catalog?.categories || [])].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs whitespace-nowrap font-medium transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                }`}
-              >
-                {cat !== 'All' && CATEGORY_ICONS[cat] && `${CATEGORY_ICONS[cat]} `}
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Rules Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Rules Bento Grid (Modern 2-col interactive cards) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '20px' }}>
             {filteredRules.map((rule) => {
               const isExpanded = expandedRuleId === rule.rule_id;
-              const sevConfig = SEVERITY_COLORS[rule.severity] || SEVERITY_COLORS.PROCEDURAL_DEVIATION;
+              const sevConfig = SEVERITY_CONFIG[rule.severity] || SEVERITY_CONFIG.PROCEDURAL_DEVIATION;
               const icon = CATEGORY_ICONS[rule.iogp_category] || '⚠️';
 
               return (
                 <div
                   key={rule.rule_id}
-                  className={`rounded-2xl border ${sevConfig.border} bg-slate-900/90 p-5 shadow-lg transition-all flex flex-col justify-between`}
+                  className="bento-card"
+                  style={{
+                    padding: '22px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '14px',
+                    border: `1px solid ${isExpanded ? 'rgba(13, 148, 136, 0.4)' : sevConfig.border}`,
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
                 >
                   <div>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{icon}</span>
+                    {/* Header: Icon, Rule ID, Severity Chip */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ fontSize: '22px' }}>{icon}</span>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs font-black text-indigo-300">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '11.5px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#0D9488' }}>
                               {rule.rule_id}
                             </span>
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${sevConfig.badge}`}>
+                            <span
+                              style={{
+                                fontSize: '9.5px',
+                                fontWeight: 800,
+                                padding: '2px 8px',
+                                borderRadius: '9999px',
+                                textTransform: 'uppercase',
+                                backgroundColor: sevConfig.badgeBg,
+                                color: sevConfig.badgeText,
+                              }}
+                            >
                               {rule.severity.replace(/_/g, ' ')}
                             </span>
                           </div>
-                          <h4 className="text-sm font-bold text-white mt-1">
+                          <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: 1.35 }}>
                             {rule.rule_name}
                           </h4>
                         </div>
                       </div>
-                      <span className="text-[10px] font-medium text-slate-400 bg-slate-950 px-2 py-1 rounded border border-slate-800">
+
+                      <span
+                        style={{
+                          fontSize: '10.5px',
+                          fontWeight: 700,
+                          color: 'var(--text-muted)',
+                          backgroundColor: 'var(--bg-input)',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         {rule.iogp_category}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-300 mt-3 leading-relaxed">
+                    {/* Rule Description */}
+                    <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '12px 0 0 0' }}>
                       {rule.description}
                     </p>
 
-                    <div className="mt-3 bg-slate-950/80 rounded-xl p-2.5 border border-slate-800/80">
-                      <span className="text-[10px] font-bold uppercase text-slate-500 block">
+                    {/* Statutory Standard Pill */}
+                    <div
+                      style={{
+                        marginTop: '12px',
+                        backgroundColor: 'var(--bg-input)',
+                        padding: '8px 12px',
+                        borderRadius: '10px',
+                        border: '1px solid var(--border-color-subtle)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
                         Statutory Mandate:
                       </span>
-                      <span className="text-xs font-semibold text-amber-300">
+                      <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#B45309' }}>
                         {rule.regulatory_standard}
                       </span>
                     </div>
 
+                    {/* Expandable Details Accordion */}
                     {isExpanded && (
-                      <div className="mt-3 space-y-3 pt-3 border-t border-slate-800/80">
-                        <div className="bg-red-950/30 rounded-xl p-3 border border-red-500/30 text-xs">
-                          <span className="text-[10px] font-bold uppercase text-red-400 block mb-1">
-                            Stop-Work Protocol:
+                      <div
+                        style={{
+                          marginTop: '14px',
+                          paddingTop: '14px',
+                          borderTop: '1px solid var(--border-color-subtle)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '12px',
+                        }}
+                      >
+                        {/* Stop Work Protocol */}
+                        <div
+                          style={{
+                            backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                            padding: '10px 12px',
+                            borderRadius: '10px',
+                            border: '1px solid rgba(239, 68, 68, 0.25)',
+                            fontSize: '12px',
+                          }}
+                        >
+                          <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: '#B91C1C', display: 'block', marginBottom: '2px' }}>
+                            Mandated Stop-Work Protocol:
                           </span>
-                          <p className="text-red-200 leading-relaxed font-medium">
+                          <p style={{ margin: 0, color: '#7F1D1D', fontWeight: 600, lineHeight: 1.4 }}>
                             {rule.stop_work_action}
                           </p>
                         </div>
 
+                        {/* Failure Mechanism */}
                         <div>
-                          <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">
-                            Failure Mechanism:
+                          <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>
+                            Underlying Failure Mechanism:
                           </span>
-                          <p className="text-xs text-slate-300">
+                          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
                             {rule.failure_mechanism}
                           </p>
                         </div>
 
+                        {/* Prescribed Safeguards */}
                         {rule.prescribed_safeguards && rule.prescribed_safeguards.length > 0 && (
                           <div>
-                            <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1.5">
+                            <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
                               Mandated Safeguards:
                             </span>
-                            <div className="flex flex-wrap gap-1.5">
-                              {rule.prescribed_safeguards.map((sg, idx) => (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                              {rule.prescribed_safeguards.map((sg, sIdx) => (
                                 <span
-                                  key={idx}
-                                  className="px-2 py-0.5 rounded text-[11px] bg-slate-950 border border-slate-800 text-slate-300"
+                                  key={sIdx}
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: 600,
+                                    padding: '3px 8px',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'var(--bg-input)',
+                                    color: 'var(--text-primary)',
+                                    border: '1px solid var(--border-color-subtle)',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                  }}
                                 >
-                                  ✓ {sg}
+                                  <Check style={{ width: '10px', height: '10px', color: '#10B981' }} />
+                                  <span>{sg}</span>
                                 </span>
                               ))}
                             </div>
@@ -772,106 +1076,127 @@ export const DeterministicRulesView: React.FC = () => {
                     )}
                   </div>
 
+                  {/* Toggle Button */}
                   <button
                     onClick={() => setExpandedRuleId(isExpanded ? null : rule.rule_id)}
-                    className="mt-4 pt-2 border-t border-slate-800 text-xs text-indigo-400 hover:text-indigo-300 flex items-center justify-between font-semibold"
+                    style={{
+                      marginTop: '6px',
+                      paddingTop: '10px',
+                      borderTop: '1px solid var(--border-color-subtle)',
+                      background: 'transparent',
+                      borderLeft: 'none',
+                      borderRight: 'none',
+                      borderBottom: 'none',
+                      color: 'var(--accent-emerald-dark)',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                    }}
                   >
-                    <span>{isExpanded ? 'Hide Details' : 'View Full Statutory Details'}</span>
-                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    <span>{isExpanded ? 'Hide Statutory Details' : 'View Full Statutory Details'}</span>
+                    {isExpanded ? <ChevronUp style={{ width: '14px', height: '14px' }} /> : <ChevronDown style={{ width: '14px', height: '14px' }} />}
                   </button>
                 </div>
               );
             })}
           </div>
-
-          {filteredRules.length === 0 && (
-            <div className="p-8 text-center text-slate-500 text-sm rounded-2xl bg-slate-900 border border-slate-800">
-              No codified rules match the selected filter criteria.
-            </div>
-          )}
         </div>
       )}
 
-      {/* SUB-TAB 3: GOLDEN BENCHMARK PERFORMANCE & STATS */}
+      {/* ====================================================================
+          SUB-TAB 3: GOLDEN BENCHMARK STATS
+          ==================================================================== */}
       {activeSubTab === 'stats' && stats && (
-        <div className="space-y-6">
-          {/* Summary Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="rounded-2xl bg-slate-900/90 border border-emerald-500/40 p-5 shadow-xl">
-              <span className="text-xs font-bold uppercase text-slate-400">High-PSIF Recall</span>
-              <div className="text-3xl font-black text-emerald-400 mt-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Top 4 Stats Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(209, 250, 229, 0.7) 0%, rgba(255, 255, 255, 0.95) 100%)', border: '1px solid rgba(16, 185, 129, 0.22)' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#047857' }}>High-PSIF Recall</span>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: '#047857', marginTop: '8px' }}>
                 {(stats.high_psif_recall * 100).toFixed(1)}%
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                 {stats.high_psif_count} / {stats.high_psif_count} true fatal precursors detected
               </p>
             </div>
 
-            <div className="rounded-2xl bg-slate-900/90 border border-red-500/40 p-5 shadow-xl">
-              <span className="text-xs font-bold uppercase text-slate-400">Zero-Tolerance Vetoes</span>
-              <div className="text-3xl font-black text-red-400 mt-2">
+            <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(254, 226, 226, 0.7) 0%, rgba(255, 255, 255, 0.95) 100%)', border: '1px solid rgba(239, 68, 68, 0.22)' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#B91C1C' }}>Zero-Tolerance Vetoes</span>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: '#B91C1C', marginTop: '8px' }}>
                 {stats.zero_tolerance_vetoes}
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                 Enforced across 124 benchmark events
               </p>
             </div>
 
-            <div className="rounded-2xl bg-slate-900/90 border border-indigo-500/40 p-5 shadow-xl">
-              <span className="text-xs font-bold uppercase text-slate-400">Negative Control Filtered</span>
-              <div className="text-3xl font-black text-indigo-400 mt-2">
+            <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(243, 232, 255, 0.7) 0%, rgba(255, 255, 255, 0.95) 100%)', border: '1px solid rgba(147, 51, 234, 0.2)' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#7E22CE' }}>Negative Control Filtered</span>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: '#7E22CE', marginTop: '8px' }}>
                 {stats.benign_suppressions}
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                 Benign administrative records suppressed
               </p>
             </div>
 
-            <div className="rounded-2xl bg-slate-900/90 border border-amber-500/40 p-5 shadow-xl">
-              <span className="text-xs font-bold uppercase text-slate-400">Total Scenarios Tested</span>
-              <div className="text-3xl font-black text-amber-400 mt-2">
+            <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.7) 0%, rgba(255, 255, 255, 0.95) 100%)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#B45309' }}>Scenarios Tested</span>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: '#B45309', marginTop: '8px' }}>
                 {stats.total_evaluated}
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                 124-event golden benchmark evaluation
               </p>
             </div>
           </div>
 
-          {/* Top Triggered Rules in Benchmark Table */}
-          <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl">
-            <h3 className="text-base font-bold text-white mb-4 flex items-center justify-between">
+          {/* Top Triggered Rules in Benchmark */}
+          <div className="card-panel" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span>Top Triggered Codified Rules in Golden Benchmark</span>
-              <span className="text-xs text-slate-400 font-normal">Prevalence Breakdown</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Prevalence Breakdown</span>
             </h3>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
                 <thead>
-                  <tr className="border-b border-slate-800 text-slate-500 uppercase text-[10px]">
-                    <th className="pb-3">Rule ID</th>
-                    <th className="pb-3">Rule Name</th>
-                    <th className="pb-3">Category</th>
-                    <th className="pb-3 text-center">Triggers</th>
-                    <th className="pb-3 text-center">Prevalence %</th>
-                    <th className="pb-3">Regulatory Standard</th>
+                  <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-input)', color: 'var(--text-muted)', fontSize: '10.5px', textTransform: 'uppercase' }}>
+                    <th style={{ padding: '12px 16px' }}>Rule ID</th>
+                    <th style={{ padding: '12px 16px' }}>Rule Name</th>
+                    <th style={{ padding: '12px 16px' }}>Category</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'center' }}>Triggers</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'center' }}>Prevalence %</th>
+                    <th style={{ padding: '12px 16px' }}>Regulatory Standard</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody>
                   {stats.top_triggered_rules.map((rule, idx) => (
-                    <tr key={idx} className="hover:bg-slate-800/30">
-                      <td className="py-3 font-mono font-bold text-indigo-300">{rule.rule_id}</td>
-                      <td className="py-3 font-medium text-white max-w-xs">{rule.rule_name}</td>
-                      <td className="py-3">
-                        <span className="bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-[11px]">
+                    <tr key={idx} style={{ borderBottom: '1px solid var(--border-color-subtle)' }}>
+                      <td style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#0D9488' }}>
+                        {rule.rule_id}
+                      </td>
+                      <td style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--text-primary)', maxWidth: '280px' }}>
+                        {rule.rule_name}
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <span style={{ backgroundColor: 'var(--bg-input)', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
                           {rule.iogp_category}
                         </span>
                       </td>
-                      <td className="py-3 text-center font-bold text-amber-300">{rule.trigger_count}</td>
-                      <td className="py-3 text-center font-mono text-emerald-300">
+                      <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 800, color: '#D97706' }}>
+                        {rule.trigger_count}
+                      </td>
+                      <td style={{ padding: '12px 16px', textAlign: 'center', fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#047857' }}>
                         {rule.benchmark_prevalence_pct.toFixed(1)}%
                       </td>
-                      <td className="py-3 text-slate-400">{rule.regulatory_standard}</td>
+                      <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>
+                        {rule.regulatory_standard}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -880,18 +1205,29 @@ export const DeterministicRulesView: React.FC = () => {
           </div>
 
           {/* Category Trigger Distribution */}
-          <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl">
-            <h3 className="text-base font-bold text-white mb-4">
+          <div className="card-panel" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 16px 0' }}>
               IOGP Domain Precursor Distribution Across Golden Set
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
               {Object.entries(stats.category_distribution).map(([cat, count]) => (
-                <div key={cat} className="rounded-xl bg-slate-950 p-3 border border-slate-800/80">
-                  <div className="text-xs font-semibold text-slate-400 truncate">
-                    {CATEGORY_ICONS[cat] || '⚠️'} {cat}
+                <div
+                  key={cat}
+                  style={{
+                    backgroundColor: 'var(--bg-input)',
+                    padding: '14px',
+                    borderRadius: '14px',
+                    border: '1px solid var(--border-color-subtle)',
+                  }}
+                >
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>{CATEGORY_ICONS[cat] || '⚠️'}</span>
+                    <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{cat}</span>
                   </div>
-                  <div className="text-xl font-black text-white mt-1">{count}</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">
+                  <div style={{ fontSize: '22px', fontWeight: 900, color: 'var(--text-primary)', marginTop: '6px' }}>
+                    {count}
+                  </div>
+                  <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
                     {((count / stats.total_evaluated) * 100).toFixed(1)}% prevalence
                   </div>
                 </div>

@@ -15,7 +15,11 @@ import {
   X,
   ExternalLink,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  LayoutGrid,
+  List,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { api } from '../services/api';
 import { CorrectiveAction, ReportListItem } from '../types';
@@ -35,9 +39,10 @@ export const CorrectiveActionsView: React.FC = () => {
   const [stats, setStats] = useState<ActionStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Filters
+  // Filters & View Mode
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
   // Create Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -205,237 +210,704 @@ export const CorrectiveActionsView: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-blue-500">
-          <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-400">
-            <ClipboardList className="w-5 h-5" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
+      {/* ====================================================================
+          MASTER HEADER (Consistent with Dribbble-inspired UI)
+          ==================================================================== */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px',
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                color: '#0D9488',
+                border: '1px solid rgba(13, 148, 136, 0.2)',
+              }}
+            >
+              <ShieldCheck style={{ width: '13px', height: '13px' }} />
+              Remedial Lifecycle Controls
+            </span>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--bg-pill)',
+                color: 'var(--text-muted)',
+              }}
+            >
+              Oil India Enterprise Standard
+            </span>
           </div>
-          <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Actions</div>
-            <div className="text-2xl font-black text-slate-100 font-mono">{stats?.total_actions ?? 0}</div>
-            <div className="text-[10px] text-slate-400">Enterprise remedial tasks</div>
-          </div>
+
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
+            Corrective Actions & Remedial Tracking
+          </h1>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '6px 0 0 0', maxWidth: '680px' }}>
+            Engineering directives, barrier reinstatements, and post-closure recurrence surveillance across Oil India assets.
+          </p>
         </div>
 
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-amber-500">
-          <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-400">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Open Tasks</div>
-            <div className="text-2xl font-black text-amber-400 font-mono">{stats?.open_count ?? 0}</div>
-            <div className="text-[10px] text-slate-400">Awaiting field execution</div>
-          </div>
-        </div>
+        {/* Top Header Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            onClick={fetchData}
+            className="btn-secondary"
+            style={{ padding: '9px 16px', fontSize: '12.5px' }}
+            title="Refresh Actions Log"
+          >
+            <RefreshCw style={{ width: '14px', height: '14px' }} className={loading ? 'animate-spin' : ''} />
+            <span>Refresh</span>
+          </button>
 
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-purple-500">
-          <div className="p-2.5 rounded-lg bg-purple-500/10 text-purple-400">
-            <AlertCircle className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">In Progress</div>
-            <div className="text-2xl font-black text-purple-400 font-mono">{stats?.in_progress_count ?? 0}</div>
-            <div className="text-[10px] text-slate-400">Field works underway</div>
-          </div>
+          <button
+            onClick={handleOpenCreate}
+            className="btn-primary"
+            style={{ padding: '9px 18px', fontSize: '12.5px' }}
+          >
+            <Plus style={{ width: '16px', height: '16px' }} />
+            <span>Issue Corrective Action</span>
+          </button>
         </div>
+      </div>
 
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-emerald-500">
-          <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Verified Closed</div>
-            <div className="text-2xl font-black text-emerald-400 font-mono">{stats?.verified_closed_count ?? 0}</div>
-            <div className="text-[10px] text-slate-400">
-              Closure Rate: {stats ? `${(stats.closure_rate * 100).toFixed(1)}%` : '0%'}
+      {/* ====================================================================
+          KPI STATS BENTO GRID (5 Pillars)
+          ==================================================================== */}
+      <div className="stats-kpi-grid">
+        {/* Total Actions */}
+        <div className="kpi-card">
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: 'var(--text-secondary)' }}>
+              Total Actions
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(37, 99, 235, 0.08)', color: '#2563EB' }}>
+              <ClipboardList style={{ width: '17px', height: '17px' }} />
             </div>
           </div>
+          <div className="kpi-card-value">
+            {stats?.total_actions ?? 0}
+          </div>
+          <div className="kpi-card-desc">
+            <span>Enterprise remedial controls</span>
+          </div>
         </div>
 
-        <div className="glass-panel p-4 flex items-center gap-3 border-l-4 border-l-rose-500">
-          <div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-400">
-            <AlertTriangle className="w-5 h-5" />
+        {/* Open Tasks */}
+        <div className="kpi-card">
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: '#B45309' }}>
+              Open Tasks
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#D97706' }}>
+              <Clock style={{ width: '17px', height: '17px' }} />
+            </div>
           </div>
-          <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Overdue Actions</div>
-            <div className="text-2xl font-black text-rose-400 font-mono">{stats?.overdue_count ?? 0}</div>
-            <div className="text-[10px] text-slate-400">Past compliance due date</div>
+          <div className="kpi-card-value" style={{ color: stats?.open_count ? '#B45309' : 'var(--text-primary)' }}>
+            {stats?.open_count ?? 0}
+          </div>
+          <div className="kpi-card-desc">
+            <span>Awaiting field execution</span>
+          </div>
+        </div>
+
+        {/* In Progress */}
+        <div className="kpi-card">
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: '#7C3AED' }}>
+              In Progress
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(124, 58, 237, 0.08)', color: '#7C3AED' }}>
+              <AlertCircle style={{ width: '17px', height: '17px' }} />
+            </div>
+          </div>
+          <div className="kpi-card-value" style={{ color: stats?.in_progress_count ? '#7C3AED' : 'var(--text-primary)' }}>
+            {stats?.in_progress_count ?? 0}
+          </div>
+          <div className="kpi-card-desc">
+            <span>Field works underway</span>
+          </div>
+        </div>
+
+        {/* Verified Closed */}
+        <div className="kpi-card">
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: '#047857' }}>
+              Verified Closed
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }}>
+              <ShieldCheck style={{ width: '17px', height: '17px' }} />
+            </div>
+          </div>
+          <div className="kpi-card-value" style={{ color: '#047857' }}>
+            {stats?.verified_closed_count ?? 0}
+          </div>
+          <div className="kpi-card-desc">
+            <span>Closure Rate: <strong>{stats ? `${(stats.closure_rate * 100).toFixed(1)}%` : '0%'}</strong></span>
+          </div>
+        </div>
+
+        {/* Overdue */}
+        <div className="kpi-card">
+          <div className="kpi-card-header">
+            <span className="kpi-card-label" style={{ color: '#DC2626' }}>
+              Overdue Actions
+            </span>
+            <div className="kpi-card-icon-pill" style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', color: '#DC2626' }}>
+              <AlertTriangle style={{ width: '17px', height: '17px' }} />
+            </div>
+          </div>
+          <div className="kpi-card-value" style={{ color: stats?.overdue_count ? '#DC2626' : 'var(--text-primary)' }}>
+            {stats?.overdue_count ?? 0}
+          </div>
+          <div className="kpi-card-desc">
+            <span>{stats?.overdue_count ? 'Requires immediate escalation' : 'Zero overdue items'}</span>
           </div>
         </div>
       </div>
 
-      {/* Phase 19: Precursor Recurrence & Barrier Degradation Banner */}
+      {/* ====================================================================
+          PRECURSOR RECURRENCE & BARRIER DEGRADATION INTELLIGENCE
+          ==================================================================== */}
       {recurrenceData && (
-        <div className="card-nexa p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-l-4 border-l-amber-500 bg-amber-500/5">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-400">
-              <RefreshCw className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                  Phase 19 Precursor Recurrence Intelligence
-                </span>
-                {recurrenceData.barrier_degradation_alarm ? (
-                  <span className="badge-high text-[10px]">Barrier Degradation Alarm</span>
-                ) : (
-                  <span className="badge-low text-[10px]">No Systematic Recurrence</span>
-                )}
+        <div
+          className="card-panel"
+          style={{
+            padding: '20px 24px',
+            background: 'linear-gradient(135deg, rgba(255, 251, 235, 0.8) 0%, var(--bg-surface) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#D97706',
+                }}
+              >
+                <RefreshCw style={{ width: '18px', height: '18px' }} />
               </div>
-              <p className="text-xs text-muted mt-0.5">
-                Measures whether identical precursor patterns reappear after action closure across Oil India installations ({recurrenceData.time_window_days}-day window).
-              </p>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#B45309' }}>
+                    Precursor Recurrence Surveillance
+                  </span>
+                  {recurrenceData.barrier_degradation_alarm ? (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        color: '#B91C1C',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                      }}
+                    >
+                      Barrier Degradation Alarm
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        color: '#047857',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                      }}
+                    >
+                      No Systematic Recurrence
+                    </span>
+                  )}
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '3px 0 0 0' }}>
+                  Monitors whether identical precursor patterns reoccur post-action-closure within a {recurrenceData.time_window_days}-day surveillance window.
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-6 font-mono text-xs">
-            <div>
-              <span className="text-muted block text-[10px]">Closed Actions:</span>
-              <span className="font-bold text-foreground text-sm">{recurrenceData.total_closed_actions}</span>
-            </div>
-            <div>
-              <span className="text-muted block text-[10px]">With Recurrence:</span>
-              <span className="font-bold text-amber-400 text-sm">{recurrenceData.actions_with_recurrence}</span>
-            </div>
-            <div>
-              <span className="text-muted block text-[10px]">Recurrence Rate:</span>
-              <span className="font-bold text-foreground text-sm">{(recurrenceData.recurrence_rate * 100).toFixed(1)}%</span>
+
+            {/* Micro Metrics */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block' }}>
+                  Closed Actions
+                </span>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  {recurrenceData.total_closed_actions}
+                </span>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block' }}>
+                  Recurrences
+                </span>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: '#D97706' }}>
+                  {recurrenceData.actions_with_recurrence}
+                </span>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block' }}>
+                  Recurrence Rate
+                </span>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  {(recurrenceData.recurrence_rate * 100).toFixed(1)}%
+                </span>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Control & Filter Bar */}
-      <div className="glass-panel p-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative">
+      {/* ====================================================================
+          CONTROL & FILTER BAR (Pills & Search)
+          ==================================================================== */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px',
+        }}
+      >
+        {/* Status Filter Pills */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {[
+            { id: '', label: 'All Actions', count: stats?.total_actions ?? 0 },
+            { id: 'OPEN', label: 'Open', count: stats?.open_count ?? 0 },
+            { id: 'IN_PROGRESS', label: 'In Progress', count: stats?.in_progress_count ?? 0 },
+            { id: 'VERIFIED_CLOSED', label: 'Verified Closed', count: stats?.verified_closed_count ?? 0 },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setFilterStatus(tab.id)}
+              style={{
+                padding: '7px 14px',
+                borderRadius: '9999px',
+                border: filterStatus === tab.id ? '1px solid var(--accent-emerald-dark)' : '1px solid var(--border-color)',
+                backgroundColor: filterStatus === tab.id ? 'var(--accent-emerald-dark)' : 'var(--bg-surface)',
+                color: filterStatus === tab.id ? '#FFFFFF' : 'var(--text-secondary)',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <span>{tab.label}</span>
+              <span
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  padding: '1px 6px',
+                  borderRadius: '9999px',
+                  backgroundColor: filterStatus === tab.id ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-input)',
+                  color: filterStatus === tab.id ? '#FFFFFF' : 'var(--text-muted)',
+                }}
+              >
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Right Search & View Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          {/* Search Box */}
+          <div style={{ position: 'relative', width: '260px' }}>
+            <Search
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '14px',
+                height: '14px',
+                color: 'var(--text-muted)',
+              }}
+            />
             <input
               type="text"
-              placeholder="Search Action ID, report, title..."
+              placeholder="Search actions, reports, assignee..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="form-input text-xs pl-3 pr-8 py-1.5 w-64 bg-slate-900 border-slate-700"
+              style={{
+                width: '100%',
+                height: '36px',
+                backgroundColor: 'var(--bg-input)',
+                border: '1px solid var(--border-color-subtle)',
+                borderRadius: '9999px',
+                padding: '0 30px 0 34px',
+                fontSize: '12px',
+                color: 'var(--text-primary)',
+                outline: 'none',
+              }}
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-200 text-xs"
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                }}
               >
                 ×
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Status:</span>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="form-select py-1 px-2 text-xs bg-slate-900 border-slate-700 w-auto"
+          {/* View Mode Toggle */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'var(--bg-input)',
+              padding: '3px',
+              borderRadius: '9999px',
+              border: '1px solid var(--border-color-subtle)',
+            }}
+          >
+            <button
+              onClick={() => setViewMode('cards')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '5px 10px',
+                borderRadius: '9999px',
+                border: 'none',
+                backgroundColor: viewMode === 'cards' ? 'var(--bg-surface)' : 'transparent',
+                color: viewMode === 'cards' ? 'var(--text-primary)' : 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: 700,
+                boxShadow: viewMode === 'cards' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              }}
             >
-              <option value="">All Statuses</option>
-              <option value="OPEN">Open Only</option>
-              <option value="IN_PROGRESS">In Progress Only</option>
-              <option value="VERIFIED_CLOSED">Verified Closed Only</option>
-            </select>
+              <LayoutGrid style={{ width: '13px', height: '13px' }} />
+              <span>Cards</span>
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '5px 10px',
+                borderRadius: '9999px',
+                border: 'none',
+                backgroundColor: viewMode === 'table' ? 'var(--bg-surface)' : 'transparent',
+                color: viewMode === 'table' ? 'var(--text-primary)' : 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: 700,
+                boxShadow: viewMode === 'table' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              }}
+            >
+              <List style={{ width: '13px', height: '13px' }} />
+              <span>Table</span>
+            </button>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={fetchData}
-            className="btn btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5"
-            title="Refresh Actions"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
-
-          <button
-            onClick={handleOpenCreate}
-            className="btn btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Corrective Action</span>
-          </button>
         </div>
       </div>
 
-      {/* Actions Table */}
-      <div className="glass-panel overflow-hidden">
-        {loading ? (
-          <div className="p-16 text-center text-slate-400 text-sm">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-amber-400" />
-            Loading enterprise corrective action log...
+      {/* ====================================================================
+          MAIN ACTIONS CONTENT (Cards or Table)
+          ==================================================================== */}
+      {loading ? (
+        <div className="card-panel" style={{ padding: '60px 20px', textAlign: 'center' }}>
+          <RefreshCw style={{ width: '28px', height: '28px', margin: '0 auto 12px auto', color: '#0D9488' }} className="animate-spin" />
+          <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            Loading Enterprise Corrective Actions...
           </div>
-        ) : displayedActions.length === 0 ? (
-          <div className="p-16 text-center text-slate-400 text-sm">
-            <Check className="w-8 h-8 mx-auto mb-2 text-emerald-400" />
-            Zero actions matching the selected filter criteria.
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+            Synchronizing barrier verification records and field commitments
+          </p>
+        </div>
+      ) : displayedActions.length === 0 ? (
+        <div className="card-panel" style={{ padding: '60px 20px', textAlign: 'center' }}>
+          <CheckCircle2 style={{ width: '36px', height: '36px', margin: '0 auto 12px auto', color: '#10B981' }} />
+          <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            All Set! Zero Pending Actions
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-slate-900/90 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
-                <tr>
-                  <th className="py-3 px-4">Action ID</th>
-                  <th className="py-3 px-4">Report Ref</th>
-                  <th className="py-3 px-4 font-sans">Action Description</th>
-                  <th className="py-3 px-4 font-sans">Assignee</th>
-                  <th className="py-3 px-4">Target Due Date</th>
-                  <th className="py-3 px-4">Current Status</th>
-                  <th className="py-3 px-4 text-right">Lifecycle</th>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+            No corrective actions match the selected filter criteria.
+          </p>
+        </div>
+      ) : viewMode === 'cards' ? (
+        /* Bento Action Cards Grid */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '20px' }}>
+          {displayedActions.map((act) => {
+            const isOverdue =
+              act.status !== 'VERIFIED_CLOSED' && act.due_date && act.due_date < todayStr;
+            const isClosed = act.status === 'VERIFIED_CLOSED';
+            const isProg = act.status === 'IN_PROGRESS';
+
+            return (
+              <div
+                key={act.action_id}
+                className="bento-card"
+                style={{
+                  padding: '22px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '16px',
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Top Row: Action ID, Report Ref, Status Pill */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          fontFamily: 'var(--font-mono)',
+                          color: '#0D9488',
+                          backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        {act.action_id}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          fontFamily: 'var(--font-mono)',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
+                        {act.report_id}
+                      </span>
+                    </div>
+
+                    {/* Status Pill */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {isOverdue && (
+                        <span
+                          style={{
+                            fontSize: '9.5px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                            color: '#DC2626',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                          }}
+                        >
+                          OVERDUE
+                        </span>
+                      )}
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          padding: '3px 10px',
+                          borderRadius: '9999px',
+                          textTransform: 'uppercase',
+                          backgroundColor: isClosed
+                            ? 'rgba(16, 185, 129, 0.12)'
+                            : isProg
+                            ? 'rgba(147, 51, 234, 0.12)'
+                            : 'rgba(245, 158, 11, 0.12)',
+                          color: isClosed ? '#059669' : isProg ? '#9333EA' : '#D97706',
+                          border: `1px solid ${
+                            isClosed
+                              ? 'rgba(16, 185, 129, 0.25)'
+                              : isProg
+                              ? 'rgba(147, 51, 234, 0.25)'
+                              : 'rgba(245, 158, 11, 0.25)'
+                          }`,
+                        }}
+                      >
+                        {act.status.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Title & Scope */}
+                  <h3
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      color: 'var(--text-primary)',
+                      lineHeight: 1.35,
+                      margin: '0 0 8px 0',
+                    }}
+                  >
+                    {act.title}
+                  </h3>
+
+                  {act.notes && (
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.5,
+                        margin: 0,
+                        backgroundColor: 'var(--bg-input)',
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                        border: '1px solid var(--border-color-subtle)',
+                      }}
+                    >
+                      {act.notes}
+                    </p>
+                  )}
+                </div>
+
+                {/* Metadata & Footer Button */}
+                <div style={{ borderTop: '1px solid var(--border-color-subtle)', paddingTop: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <User style={{ width: '13px', height: '13px', color: '#0D9488' }} />
+                      <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{act.assigned_to}</span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Calendar style={{ width: '13px', height: '13px', color: isOverdue ? '#DC2626' : 'var(--text-muted)' }} />
+                      <span style={{ fontWeight: isOverdue ? 800 : 600, color: isOverdue ? '#DC2626' : 'var(--text-secondary)' }}>
+                        {act.due_date || 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleOpenStatusModal(act)}
+                    className="btn-secondary"
+                    style={{ width: '100%', justifyContent: 'center', padding: '8px 14px', fontSize: '12px' }}
+                  >
+                    <span>Manage Lifecycle & Verification</span>
+                    <ChevronRight style={{ width: '14px', height: '14px' }} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Compact Modern Table View */
+        <div className="card-panel" style={{ padding: '0', overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
+              <thead>
+                <tr style={{ backgroundColor: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <th style={{ padding: '12px 18px' }}>Action ID</th>
+                  <th style={{ padding: '12px 18px' }}>Report Ref</th>
+                  <th style={{ padding: '12px 18px' }}>Remedial Scope</th>
+                  <th style={{ padding: '12px 18px' }}>Assignee</th>
+                  <th style={{ padding: '12px 18px' }}>Due Date</th>
+                  <th style={{ padding: '12px 18px' }}>Status</th>
+                  <th style={{ padding: '12px 18px', textAlign: 'right' }}>Manage</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody>
                 {displayedActions.map((act) => {
                   const isOverdue =
                     act.status !== 'VERIFIED_CLOSED' && act.due_date && act.due_date < todayStr;
                   return (
-                    <tr key={act.action_id} className="hover:bg-slate-800/40 transition">
-                      <td className="py-3 px-4 font-bold text-amber-400">{act.action_id}</td>
-                      <td className="py-3 px-4 text-blue-400 font-semibold">{act.report_id}</td>
-                      <td className="py-3 px-4 font-sans text-slate-200 max-w-sm">
-                        <div className="font-semibold text-xs text-slate-100">{act.title}</div>
+                    <tr
+                      key={act.action_id}
+                      style={{ borderBottom: '1px solid var(--border-color-subtle)', transition: 'background-color 0.15s ease' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-pill)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      <td style={{ padding: '12px 18px', fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#0D9488' }}>
+                        {act.action_id}
+                      </td>
+                      <td style={{ padding: '12px 18px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-muted)' }}>
+                        {act.report_id}
+                      </td>
+                      <td style={{ padding: '12px 18px', maxWidth: '340px' }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{act.title}</div>
                         {act.notes && (
-                          <div className="text-[11px] text-slate-400 truncate max-w-xs">{act.notes}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                            {act.notes}
+                          </div>
                         )}
                       </td>
-                      <td className="py-3 px-4 font-sans text-slate-300">{act.assigned_to}</td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-1.5">
-                          <span className={isOverdue ? 'text-rose-400 font-bold' : 'text-slate-300'}>
+                      <td style={{ padding: '12px 18px', color: 'var(--text-secondary)' }}>{act.assigned_to}</td>
+                      <td style={{ padding: '12px 18px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: isOverdue ? 800 : 600, color: isOverdue ? '#DC2626' : 'var(--text-secondary)' }}>
                             {act.due_date || 'N/A'}
                           </span>
                           {isOverdue && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                            <span style={{ fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#DC2626' }}>
                               OVERDUE
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td style={{ padding: '12px 18px' }}>
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                            act.status === 'VERIFIED_CLOSED'
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            padding: '3px 8px',
+                            borderRadius: '9999px',
+                            textTransform: 'uppercase',
+                            backgroundColor: act.status === 'VERIFIED_CLOSED'
+                              ? 'rgba(16, 185, 129, 0.12)'
                               : act.status === 'IN_PROGRESS'
-                              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                              : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                          }`}
+                              ? 'rgba(147, 51, 234, 0.12)'
+                              : 'rgba(245, 158, 11, 0.12)',
+                            color: act.status === 'VERIFIED_CLOSED' ? '#059669' : act.status === 'IN_PROGRESS' ? '#9333EA' : '#D97706',
+                          }}
                         >
-                          {act.status}
+                          {act.status.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td style={{ padding: '12px 18px', textAlign: 'right' }}>
                         <button
                           onClick={() => handleOpenStatusModal(act)}
-                          className="btn btn-secondary py-1 px-2.5 text-[11px] flex items-center gap-1 ml-auto"
+                          className="btn-secondary"
+                          style={{ padding: '5px 12px', fontSize: '11px', marginLeft: 'auto' }}
                         >
                           <span>Manage</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
+                          <ChevronRight style={{ width: '12px', height: '12px' }} />
                         </button>
                       </td>
                     </tr>
@@ -444,33 +916,69 @@ export const CorrectiveActionsView: React.FC = () => {
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Create Modal */}
+      {/* ====================================================================
+          CREATE ACTION MODAL (Clean floating modern style)
+          ==================================================================== */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-panel w-full max-w-lg p-5 space-y-4 border border-amber-500/40 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <Plus className="w-5 h-5 text-amber-400" />
-                <h3 className="font-bold text-slate-100 text-sm">Issue Enterprise Corrective Action</h3>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(7, 56, 47, 0.4)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
+          <div
+            className="card-panel"
+            style={{
+              width: '100%',
+              maxWidth: '560px',
+              padding: '28px',
+              borderRadius: '24px',
+              boxShadow: 'var(--card-shadow-floating)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(13, 148, 136, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0D9488' }}>
+                  <Plus style={{ width: '18px', height: '18px' }} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                    Issue Enterprise Corrective Action
+                  </h3>
+                  <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: 0 }}>
+                    Assign statutory remedial tasks and barrier restoration scope
+                  </p>
+                </div>
               </div>
+
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="text-slate-400 hover:text-slate-200"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
               >
-                <X className="w-5 h-5" />
+                <X style={{ width: '20px', height: '20px' }} />
               </button>
             </div>
 
-            <form onSubmit={handleCreateSubmit} className="space-y-3.5">
-              <div>
-                <label className="form-label text-xs">Originating Incident Report *</label>
+            {/* Form */}
+            <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Originating Incident Report *</label>
                 <select
                   value={selectedReportId}
                   onChange={(e) => setSelectedReportId(e.target.value)}
-                  className="form-select text-xs bg-slate-900 border-slate-700"
+                  className="form-select"
                   required
                 >
                   {reports.map((r) => (
@@ -481,64 +989,68 @@ export const CorrectiveActionsView: React.FC = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="form-label text-xs">Action Title & Remedial Scope *</label>
+              <div className="form-group">
+                <label className="form-label">Action Title & Remedial Scope *</label>
                 <input
                   type="text"
                   placeholder="e.g. Conduct ultrasonic wall thickness test & install certified blind"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  className="form-input text-xs bg-slate-900 border-slate-700"
+                  className="form-input"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="form-label text-xs">Assigned Responsibility *</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label className="form-label">Assigned Responsibility *</label>
                   <input
                     type="text"
                     value={assignedTo}
                     onChange={(e) => setAssignedTo(e.target.value)}
                     required
-                    className="form-input text-xs bg-slate-900 border-slate-700"
+                    className="form-input"
                   />
                 </div>
-                <div>
-                  <label className="form-label text-xs">Target Due Date *</label>
+
+                <div className="form-group">
+                  <label className="form-label">Target Due Date *</label>
                   <input
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
                     required
-                    className="form-input text-xs bg-slate-900 border-slate-700"
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="form-label text-xs">Remedial Engineering Directives</label>
+              <div className="form-group">
+                <label className="form-label">Remedial Engineering Directives</label>
                 <textarea
                   rows={3}
                   placeholder="Specific requirements, testing standard (e.g. API 510 / OISD-118 LOTO)..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="form-textarea text-xs bg-slate-900 border-slate-700"
+                  className="form-textarea"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              {/* Modal Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid var(--border-color-subtle)' }}>
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="btn btn-secondary text-xs"
+                  className="btn-secondary"
+                  style={{ padding: '8px 16px', fontSize: '12.5px' }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="btn btn-primary text-xs flex items-center gap-1.5"
+                  className="btn-primary"
+                  style={{ padding: '8px 18px', fontSize: '12.5px' }}
                 >
                   {submitting ? 'Creating...' : 'Issue Corrective Action'}
                 </button>
@@ -548,52 +1060,121 @@ export const CorrectiveActionsView: React.FC = () => {
         </div>
       )}
 
-      {/* Status Transition Modal */}
+      {/* ====================================================================
+          STATUS UPDATE & BARRIER VERIFICATION MODAL
+          ==================================================================== */}
       {activeAction && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-panel w-full max-w-md p-5 space-y-4 border border-blue-500/40 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-400" />
-                <h3 className="font-bold text-slate-100 text-sm">
-                  Update Action Lifecycle — {activeAction.action_id}
-                </h3>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(7, 56, 47, 0.4)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
+          <div
+            className="card-panel"
+            style={{
+              width: '100%',
+              maxWidth: '520px',
+              padding: '28px',
+              borderRadius: '24px',
+              boxShadow: 'var(--card-shadow-floating)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
+                  <ShieldCheck style={{ width: '18px', height: '18px' }} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                    Manage Lifecycle — {activeAction.action_id}
+                  </h3>
+                  <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: 0 }}>
+                    Report: {activeAction.report_id}
+                  </p>
+                </div>
               </div>
+
               <button
                 onClick={() => setActiveAction(null)}
-                className="text-slate-400 hover:text-slate-200"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
               >
-                <X className="w-5 h-5" />
+                <X style={{ width: '20px', height: '20px' }} />
               </button>
             </div>
 
-            <div className="text-xs text-slate-300 font-sans p-3 bg-slate-900/60 rounded border border-slate-800">
-              <div className="font-bold text-slate-100 mb-1">{activeAction.title}</div>
-              <div className="text-slate-400">Report: {activeAction.report_id} | Assignee: {activeAction.assigned_to}</div>
+            {/* Action Summary Pill */}
+            <div
+              style={{
+                backgroundColor: 'var(--bg-input)',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                marginBottom: '16px',
+                border: '1px solid var(--border-color-subtle)',
+              }}
+            >
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                {activeAction.title}
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                Assigned: {activeAction.assigned_to} • Due: {activeAction.due_date || 'N/A'}
+              </div>
             </div>
 
-            <form onSubmit={handleUpdateStatus} className="space-y-3">
-              <div>
-                <label className="form-label text-xs">New Action Status *</label>
-                <div className="grid grid-cols-3 gap-2">
+            {/* Form */}
+            <form onSubmit={handleUpdateStatus} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Update Action Status *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                   {[
                     { key: 'OPEN', label: 'OPEN' },
                     { key: 'IN_PROGRESS', label: 'IN PROGRESS' },
-                    { key: 'VERIFIED_CLOSED', label: 'VERIFIED CLOSED' }
+                    { key: 'VERIFIED_CLOSED', label: 'VERIFIED CLOSED' },
                   ].map((s) => (
                     <button
                       key={s.key}
                       type="button"
                       onClick={() => setNewStatus(s.key as any)}
-                      className={`py-2 px-2 rounded text-center text-xs font-bold transition border ${
-                        newStatus === s.key
+                      style={{
+                        padding: '9px 4px',
+                        borderRadius: '10px',
+                        textAlign: 'center',
+                        fontSize: '11.5px',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        border: newStatus === s.key ? '2px solid' : '1px solid var(--border-color)',
+                        borderColor: newStatus === s.key
                           ? s.key === 'VERIFIED_CLOSED'
-                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500'
+                            ? '#10B981'
                             : s.key === 'IN_PROGRESS'
-                            ? 'bg-purple-500/20 text-purple-300 border-purple-500'
-                            : 'bg-amber-500/20 text-amber-300 border-amber-500'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800'
-                      }`}
+                            ? '#9333EA'
+                            : '#F59E0B'
+                          : 'var(--border-color)',
+                        backgroundColor: newStatus === s.key
+                          ? s.key === 'VERIFIED_CLOSED'
+                            ? 'rgba(16, 185, 129, 0.12)'
+                            : s.key === 'IN_PROGRESS'
+                            ? 'rgba(147, 51, 234, 0.12)'
+                            : 'rgba(245, 158, 11, 0.12)'
+                          : 'var(--bg-surface)',
+                        color: newStatus === s.key
+                          ? s.key === 'VERIFIED_CLOSED'
+                            ? '#047857'
+                            : s.key === 'IN_PROGRESS'
+                            ? '#7E22CE'
+                            : '#B45309'
+                          : 'var(--text-secondary)',
+                      }}
                     >
                       {s.label}
                     </button>
@@ -601,75 +1182,113 @@ export const CorrectiveActionsView: React.FC = () => {
                 </div>
               </div>
 
+              {/* If Verified Closed, show Formal Verification Section */}
               {newStatus === 'VERIFIED_CLOSED' && (
-                <div className="space-y-2 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded">
-                  <div className="text-[11px] font-bold text-emerald-300 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                <div
+                  style={{
+                    padding: '16px',
+                    borderRadius: '14px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    border: '1px solid rgba(16, 185, 129, 0.25)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#047857', fontWeight: 800, fontSize: '12px' }}>
+                    <CheckCircle2 style={{ width: '15px', height: '15px' }} />
                     <span>HSE Verification of Barrier Reinstatement</span>
                   </div>
-                  <div>
-                    <label className="form-label text-[11px]">Verifying Safety Inspector *</label>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '11px' }}>Verifying Safety Inspector *</label>
                     <input
                       type="text"
                       value={verifiedBy}
                       onChange={(e) => setVerifiedBy(e.target.value)}
                       required
-                      className="form-input text-xs bg-slate-950 border-slate-700"
+                      className="form-input"
                     />
                   </div>
-                  <div>
-                    <label className="form-label text-[11px]">Barrier Effectiveness Rating *</label>
-                    <div className="grid grid-cols-3 gap-1.5 pt-1">
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '11px' }}>Barrier Effectiveness Rating *</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                       {[
                         { key: 'EFFECTIVE', label: 'EFFECTIVE' },
                         { key: 'PARTIALLY_EFFECTIVE', label: 'PARTIAL' },
-                        { key: 'RECURRENT_HAZARD', label: 'RECURRENT' }
+                        { key: 'RECURRENT_HAZARD', label: 'RECURRENT' },
                       ].map((r) => (
                         <button
                           key={r.key}
                           type="button"
                           onClick={() => setEffectivenessRating(r.key as any)}
-                          className={`py-1 px-1.5 rounded text-center text-[10px] font-bold border transition ${
-                            effectivenessRating === r.key
+                          style={{
+                            padding: '6px 4px',
+                            borderRadius: '8px',
+                            textAlign: 'center',
+                            fontSize: '10.5px',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            border: effectivenessRating === r.key ? '2px solid' : '1px solid var(--border-color)',
+                            borderColor: effectivenessRating === r.key
                               ? r.key === 'RECURRENT_HAZARD'
-                                ? 'bg-rose-500/20 text-rose-300 border-rose-500'
+                                ? '#EF4444'
                                 : r.key === 'PARTIALLY_EFFECTIVE'
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500'
-                                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500'
-                              : 'bg-slate-900 text-slate-400 border-slate-800'
-                          }`}
+                                ? '#F59E0B'
+                                : '#10B981'
+                              : 'var(--border-color)',
+                            backgroundColor: effectivenessRating === r.key
+                              ? r.key === 'RECURRENT_HAZARD'
+                                ? 'rgba(239, 68, 68, 0.12)'
+                                : r.key === 'PARTIALLY_EFFECTIVE'
+                                ? 'rgba(245, 158, 11, 0.12)'
+                                : 'rgba(16, 185, 129, 0.12)'
+                              : 'var(--bg-surface)',
+                            color: effectivenessRating === r.key
+                              ? r.key === 'RECURRENT_HAZARD'
+                                ? '#B91C1C'
+                                : r.key === 'PARTIALLY_EFFECTIVE'
+                                ? '#B45309'
+                                : '#047857'
+                              : 'var(--text-secondary)',
+                          }}
                         >
                           {r.label}
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div>
-                    <label className="form-label text-[11px]">Field Verification Evidence *</label>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '11px' }}>Field Verification Evidence *</label>
                     <textarea
                       rows={2}
-                      placeholder="e.g. Field inspection confirmed clamp pressure rated, hydrotest passed, PTW closed..."
+                      placeholder="e.g. Field inspection confirmed blind installed, hydrotest passed, PTW closed..."
                       value={verificationNotes}
                       onChange={(e) => setVerificationNotes(e.target.value)}
                       required={newStatus === 'VERIFIED_CLOSED'}
-                      className="form-textarea text-xs bg-slate-950 border-slate-700"
+                      className="form-textarea"
                     />
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+              {/* Modal Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid var(--border-color-subtle)' }}>
                 <button
                   type="button"
                   onClick={() => setActiveAction(null)}
-                  className="btn btn-secondary text-xs"
+                  className="btn-secondary"
+                  style={{ padding: '8px 16px', fontSize: '12.5px' }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updatingStatus}
-                  className="btn btn-primary text-xs"
+                  className="btn-primary"
+                  style={{ padding: '8px 18px', fontSize: '12.5px' }}
                 >
                   {updatingStatus ? 'Updating...' : 'Confirm Status Update'}
                 </button>

@@ -3,16 +3,12 @@ API Endpoints for Generative AI & Grounded RAG Safety Assistant (Phase 21 & 22).
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query, status
+
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
-from ml.rag.safety_rag import (
-    safety_rag_engine,
-    InvestigationBriefResponse,
-    SafetyQAResponse,
-    SafetyCitation
-)
 from ml.rag.safety_corpus import APPROVED_SAFETY_CHUNKS
+from ml.rag.safety_rag import InvestigationBriefResponse, SafetyQAResponse, safety_rag_engine
 
 router = APIRouter()
 

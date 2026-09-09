@@ -4,21 +4,22 @@ Provides API endpoints for 8-dimension safety information extraction,
 token-level BIO sequence tagging, and explainable causal reasoning flows.
 """
 
+from typing import Dict, List
+
 from fastapi import APIRouter, HTTPException, status
-from typing import Dict, List, Any
 
 from backend.app.schemas.extraction import (
+    BIOTaggingResponse,
+    BIOTokenSchema,
+    CausalFlowSchema,
+    CausalStepSchema,
+    EntitySpanSchema,
     ExtractionRequest,
     ExtractionResponse,
-    EntitySpanSchema,
-    CausalStepSchema,
-    CausalFlowSchema,
-    BIOTokenSchema,
-    BIOTaggingResponse,
     NERTaxonomyResponse,
 )
-from ml.extraction.safety_ner import SafetyNER, SafetyEntityCategory
 from ml.extraction.causal_reasoner import CausalReasoner
+from ml.extraction.safety_ner import SafetyEntityCategory, SafetyNER
 
 router = APIRouter()
 

@@ -4,18 +4,20 @@ FastAPI router for Domain Ontology, Hierarchical Barriers, and SIF Exposure Fing
 
 import json
 import os
-from typing import List, Dict, Any
+from typing import Dict, List
+
 from fastapi import APIRouter, HTTPException
+
 from backend.app.schemas.ontology import (
-    OntologyTermsResponse,
-    BarrierDefinitionSchema,
     BarrierAnalysisResponse,
+    BarrierDefinitionSchema,
+    DetectedBarrierSchema,
+    OntologyTermsResponse,
     SIFFingerprintRequest,
     SIFFingerprintResponse,
-    DetectedBarrierSchema
 )
-from rules.barriers.barrier_taxonomy import barrier_analyzer, BarrierCategory
 from backend.app.services.precursor_cluster_service import precursor_cluster_service
+from rules.barriers.barrier_taxonomy import barrier_analyzer
 
 router = APIRouter()
 

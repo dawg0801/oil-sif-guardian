@@ -4,7 +4,8 @@ Data contracts for deterministic safety rule evaluation, zero-tolerance vetoes,
 catalog exploration, and statutory compliance auditing.
 """
 
-from typing import List, Dict, Any, Optional
+from typing import Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 

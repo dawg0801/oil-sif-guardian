@@ -3,8 +3,8 @@ OIL-SIF Guardian — Hybrid Decision Engine API Integration Tests
 Tests /api/v1/decision/triage, /calibration, /tune-weights, and /status endpoints.
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from backend.app.main import app
 
 client = TestClient(app)

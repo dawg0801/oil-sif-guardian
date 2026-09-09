@@ -16,7 +16,9 @@ import {
   ChevronRight,
   Sliders,
   Building2,
-  Info
+  Info,
+  Check,
+  ExternalLink
 } from 'lucide-react';
 import { api } from '../services/api';
 import {
@@ -118,15 +120,11 @@ export const PrecursorClusterView: React.FC = () => {
       text: 'Technician cracked open the casing wing valve on Rig OIL-45 without verifying zero energy state. Residual trapped pressure of 350 psi vented violently.'
     },
     {
-      title: 'Drop Zone (Rig OIL-78)',
-      text: 'A roustabout stood directly beneath a suspended 9.5-inch casing tubular on Rig OIL-78 during hoist without tagline deployment.'
+      title: 'Crane Drop Zone (Duliajan)',
+      text: 'Rigger walked directly under 6-ton drill collar suspended by mobile crane while tag line snapped during high wind gusts at Duliajan yard.'
     },
     {
-      title: 'Derrick Fall (NHK-204)',
-      text: 'Derrickman climbed 14 meters on the monkey board at Wellhead Cluster NHK-204 without safety harness dual lanyards anchored.'
-    },
-    {
-      title: 'Hot Work (OCS-4 Moran)',
+      title: 'Hot Work Near Flare (OCS-4)',
       text: 'Welder ignited cutting torch 4 meters from flare knock-out drum at OCS-4 Moran without continuous LEL monitoring or fire watch.'
     }
   ];
@@ -141,54 +139,114 @@ export const PrecursorClusterView: React.FC = () => {
   });
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
+      {/* ====================================================================
+          MASTER HEADER
+          ==================================================================== */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px',
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-amber-400">
-            <Network className="w-4 h-4" />
-            <span>Oil India Limited (OIL) • Precursor Intelligence</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                color: '#0D9488',
+                border: '1px solid rgba(13, 148, 136, 0.2)',
+              }}
+            >
+              <Network style={{ width: '13px', height: '13px' }} />
+              Precursor Topology & Barrier Intelligence
+            </span>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--bg-pill)',
+                color: 'var(--text-muted)',
+              }}
+            >
+              Swiss Cheese Model Calibrated
+            </span>
           </div>
-          <h2 className="text-2xl font-black text-slate-100 mt-1 flex items-center gap-2">
+
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
             Systemic Precursor Clusters & Barrier Taxonomy
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Automated SIF Exposure Fingerprinting, Swiss Cheese Barrier Degradation Tracking & Statistical Baseline Benchmark
+          </h1>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '6px 0 0 0', maxWidth: '720px' }}>
+            Automated SIF Exposure Fingerprinting, Swiss Cheese barrier degradation surveillance & multi-facility network topology.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={loadData}
-            disabled={loading}
-            className="btn btn-secondary text-xs flex items-center gap-1.5"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh Clusters</span>
-          </button>
-        </div>
+        <button
+          onClick={loadData}
+          disabled={loading}
+          className="btn-secondary"
+          style={{ padding: '9px 16px', fontSize: '12.5px' }}
+        >
+          <RefreshCw style={{ width: '14px', height: '14px' }} className={loading ? 'animate-spin' : ''} />
+          <span>Refresh Clusters</span>
+        </button>
       </div>
 
-      {/* SECTION 1: Interactive SIF Exposure Fingerprint Analyzer */}
-      <div className="glass-panel p-6 space-y-5 border border-amber-500/30">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
-              <Zap className="w-5 h-5" />
+      {/* ====================================================================
+          SECTION 1: Interactive SIF Exposure Fingerprint Analyzer
+          ==================================================================== */}
+      <div
+        className="card-panel"
+        style={{
+          padding: '24px',
+          background: 'linear-gradient(135deg, rgba(240, 253, 250, 0.6) 0%, var(--bg-surface) 100%)',
+          border: '1px solid rgba(13, 148, 136, 0.25)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '18px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(13, 148, 136, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#0D9488',
+              }}
+            >
+              <Zap style={{ width: '18px', height: '18px' }} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-100 text-sm">
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 Live SIF Exposure Fingerprint & Barrier Analyzer
               </h3>
-              <p className="text-xs text-slate-400">
-                Formula: <span className="font-mono text-amber-300/90">[ACTIVITY] | [ENERGY] | [HAZARD] | [BARRIER_FAILURE] | [IOGP_RULE]</span>
+              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '2px 0 0 0', fontFamily: 'var(--font-mono)' }}>
+                Formula: [ACTIVITY] | [ENERGY] | [HAZARD] | [BARRIER_FAILURE] | [IOGP_RULE]
               </p>
             </div>
           </div>
 
-          {/* Quick Presets */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-slate-500 font-mono mr-1">OIL Scenarios:</span>
+          {/* Preset Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>OIL Presets:</span>
             {presetScenarios.map((p, i) => (
               <button
                 key={i}
@@ -196,7 +254,17 @@ export const PrecursorClusterView: React.FC = () => {
                   setAnalyzerText(p.text);
                   runLiveAnalysis(p.text);
                 }}
-                className="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[11px] font-mono text-slate-300 hover:text-amber-300 transition"
+                style={{
+                  padding: '5px 10px',
+                  borderRadius: '9999px',
+                  border: '1px solid var(--border-color-subtle)',
+                  backgroundColor: 'var(--bg-surface)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
               >
                 {p.title}
               </button>
@@ -205,7 +273,7 @@ export const PrecursorClusterView: React.FC = () => {
         </div>
 
         {/* Narrative Input */}
-        <div className="space-y-2">
+        <div>
           <textarea
             value={analyzerText}
             onChange={(e) => {
@@ -213,73 +281,85 @@ export const PrecursorClusterView: React.FC = () => {
               runLiveAnalysis(e.target.value);
             }}
             rows={2}
-            className="input-field font-mono text-xs w-full resize-none"
+            className="form-textarea"
+            style={{ fontSize: '12.5px', lineHeight: 1.5, resize: 'none' }}
             placeholder="Type any incident narrative to extract SIF Exposure Fingerprint and inspect barrier health..."
           />
         </div>
 
-        {/* Fingerprint 5-Tuple Visual Breakdown */}
+        {/* 5-Tuple Visual Breakdown */}
         {fingerprint && (
-          <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase font-bold tracking-wider text-amber-400 flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5" />
-                Codified 5-Tuple SIF Fingerprint
+          <div
+            style={{
+              padding: '18px',
+              borderRadius: '16px',
+              backgroundColor: 'var(--bg-input)',
+              border: '1px solid var(--border-color-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#0D9488', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Sliders style={{ width: '14px', height: '14px' }} />
+                <span>Codified 5-Tuple SIF Fingerprint</span>
               </span>
 
               <button
                 onClick={handleCopyFingerprint}
-                className="btn btn-secondary py-1 px-2.5 text-[11px] flex items-center gap-1"
+                className="btn-secondary"
+                style={{ padding: '5px 12px', fontSize: '11px' }}
               >
-                <Copy className="w-3 h-3 text-slate-400" />
+                <Copy style={{ width: '12px', height: '12px' }} />
                 <span>{copiedFingerprint ? 'Copied!' : 'Copy Tuple'}</span>
               </button>
             </div>
 
-            {/* 5 Component Pills */}
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
-              <div className="p-2.5 rounded-lg bg-cyan-950/30 border border-cyan-500/30 space-y-1">
-                <div className="text-[10px] uppercase font-mono font-bold text-cyan-400">Activity</div>
-                <div className="text-xs font-mono font-bold text-slate-200 truncate" title={fingerprint.activity}>
+            {/* 5 Component Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
+              <div style={{ padding: '10px 12px', borderRadius: '12px', backgroundColor: 'rgba(6, 182, 212, 0.08)', border: '1px solid rgba(6, 182, 212, 0.25)' }}>
+                <div style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', color: '#0891B2' }}>Activity</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '3px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={fingerprint.activity}>
                   {fingerprint.activity}
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-purple-950/30 border border-purple-500/30 space-y-1">
-                <div className="text-[10px] uppercase font-mono font-bold text-purple-400">Energy</div>
-                <div className="text-xs font-mono font-bold text-slate-200 truncate" title={fingerprint.hazardous_energy}>
+              <div style={{ padding: '10px 12px', borderRadius: '12px', backgroundColor: 'rgba(147, 51, 234, 0.08)', border: '1px solid rgba(147, 51, 234, 0.25)' }}>
+                <div style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', color: '#9333EA' }}>Energy</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '3px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={fingerprint.hazardous_energy}>
                   {fingerprint.hazardous_energy}
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-rose-950/30 border border-rose-500/30 space-y-1">
-                <div className="text-[10px] uppercase font-mono font-bold text-rose-400">Hazard</div>
-                <div className="text-xs font-mono font-bold text-slate-200 truncate" title={fingerprint.hazard}>
+              <div style={{ padding: '10px 12px', borderRadius: '12px', backgroundColor: 'rgba(244, 63, 94, 0.08)', border: '1px solid rgba(244, 63, 94, 0.25)' }}>
+                <div style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', color: '#E11D48' }}>Hazard</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '3px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={fingerprint.hazard}>
                   {fingerprint.hazard}
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 space-y-1">
-                <div className="text-[10px] uppercase font-mono font-bold text-red-400">Barrier Failure</div>
-                <div className="text-xs font-mono font-bold text-red-300 truncate" title={fingerprint.barrier_failure}>
+              <div style={{ padding: '10px 12px', borderRadius: '12px', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)' }}>
+                <div style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', color: '#DC2626' }}>Barrier Failure</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#B91C1C', marginTop: '3px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={fingerprint.barrier_failure}>
                   {fingerprint.barrier_failure}
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-500/40 space-y-1">
-                <div className="text-[10px] uppercase font-mono font-bold text-amber-400">IOGP Rule</div>
-                <div className="text-xs font-mono font-bold text-amber-300 truncate" title={fingerprint.iogp_rule}>
+              <div style={{ padding: '10px 12px', borderRadius: '12px', backgroundColor: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+                <div style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', color: '#D97706' }}>IOGP Rule</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#B45309', marginTop: '3px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={fingerprint.iogp_rule}>
                   {fingerprint.iogp_rule}
                 </div>
               </div>
             </div>
 
-            {/* Formatted String Output */}
-            <div className="p-2.5 rounded bg-black/50 border border-slate-800/80 font-mono text-xs text-amber-300 break-all flex items-center justify-between">
-              <span>{fingerprint.fingerprint}</span>
+            {/* Tuple String Badge */}
+            <div style={{ padding: '8px 12px', borderRadius: '8px', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-color-subtle)', fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#0D9488', wordBreak: 'break-all' }}>
+              {fingerprint.fingerprint}
             </div>
 
-            <p className="text-xs text-slate-400 italic">
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
               "{fingerprint.explanation}"
             </p>
           </div>
@@ -287,44 +367,70 @@ export const PrecursorClusterView: React.FC = () => {
 
         {/* Barrier Health & Degradation Status */}
         {barrierAnalysis && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 320px) 1fr', gap: '16px' }}>
             {/* Barrier Health Score Card */}
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <div className="text-xs text-slate-400 font-mono uppercase">Barrier Health Index</div>
-              <div className="flex items-baseline gap-2">
-                <span className={`text-3xl font-mono font-black ${
-                  barrierAnalysis.barrier_health_score < 0.5 ? 'text-red-400' :
-                  barrierAnalysis.barrier_health_score < 0.8 ? 'text-amber-400' : 'text-emerald-400'
-                }`}>
+            <div
+              style={{
+                padding: '18px',
+                borderRadius: '16px',
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-color)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                Barrier Health Index
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                <span
+                  style={{
+                    fontSize: '34px',
+                    fontWeight: 900,
+                    lineHeight: 1,
+                    color: barrierAnalysis.barrier_health_score < 0.5 ? '#DC2626' : barrierAnalysis.barrier_health_score < 0.8 ? '#D97706' : '#059669',
+                  }}
+                >
                   {Math.round(barrierAnalysis.barrier_health_score * 100)}%
                 </span>
-                <span className={`badge ${
-                  barrierAnalysis.sif_barrier_flag === 'CRITICAL_FAILURE' ? 'badge-high' :
-                  barrierAnalysis.sif_barrier_flag === 'DEGRADED' ? 'badge-review' : 'badge-low'
-                } text-[10px]`}>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    textTransform: 'uppercase',
+                    backgroundColor: barrierAnalysis.sif_barrier_flag === 'CRITICAL_FAILURE' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
+                    color: barrierAnalysis.sif_barrier_flag === 'CRITICAL_FAILURE' ? '#DC2626' : '#059669',
+                  }}
+                >
                   {barrierAnalysis.sif_barrier_flag}
                 </span>
               </div>
 
-              <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              {/* Progress bar */}
+              <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--bg-input)', borderRadius: '9999px', overflow: 'hidden' }}>
                 <div
-                  className={`h-full rounded-full ${
-                    barrierAnalysis.barrier_health_score < 0.5 ? 'bg-red-500' :
-                    barrierAnalysis.barrier_health_score < 0.8 ? 'bg-amber-500' : 'bg-emerald-500'
-                  }`}
-                  style={{ width: `${barrierAnalysis.barrier_health_score * 100}%` }}
+                  style={{
+                    width: `${barrierAnalysis.barrier_health_score * 100}%`,
+                    height: '100%',
+                    backgroundColor: barrierAnalysis.barrier_health_score < 0.5 ? '#EF4444' : barrierAnalysis.barrier_health_score < 0.8 ? '#F59E0B' : '#10B981',
+                    borderRadius: '9999px',
+                    transition: 'width 0.4s ease',
+                  }}
                 />
               </div>
 
-              <div className="text-[11px] text-slate-400 pt-1">
+              <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
                 {barrierAnalysis.has_critical_failure ? (
-                  <span className="text-red-400 flex items-center gap-1 font-semibold">
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    Critical Life-Saving Barrier Compromised
+                  <span style={{ color: '#DC2626', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <AlertTriangle style={{ width: '14px', height: '14px' }} />
+                    Critical Barrier Compromised
                   </span>
                 ) : (
-                  <span className="text-emerald-400 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
+                  <span style={{ color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ShieldCheck style={{ width: '14px', height: '14px' }} />
                     Barriers Functionally Intact
                   </span>
                 )}
@@ -332,33 +438,61 @@ export const PrecursorClusterView: React.FC = () => {
             </div>
 
             {/* Manifested Barriers List */}
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 md:col-span-2 space-y-2">
-              <div className="text-xs text-slate-400 font-mono uppercase">
+            <div
+              style={{
+                padding: '18px',
+                borderRadius: '16px',
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-color)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
                 Detected Barriers & Degradation States ({barrierAnalysis.detected_barriers.length})
               </div>
 
-              <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '140px', overflowY: 'auto' }}>
                 {barrierAnalysis.detected_barriers.length === 0 ? (
-                  <div className="text-xs text-slate-500 italic py-2">No specific barriers manifested in narrative.</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '12px 0' }}>
+                    No specific barrier failures manifested in narrative.
+                  </div>
                 ) : (
                   barrierAnalysis.detected_barriers.map((b, idx) => (
                     <div
                       key={idx}
-                      className="p-2 rounded bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs"
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '10px',
+                        backgroundColor: 'var(--bg-input)',
+                        border: '1px solid var(--border-color-subtle)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: '12px',
+                      }}
                     >
-                      <div className="space-y-0.5">
-                        <div className="font-semibold text-slate-200 flex items-center gap-1.5">
-                          <span className="font-mono text-[10px] text-slate-400">[{b.barrier_id}]</span>
-                          <span>{b.name}</span>
+                      <div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: '#0D9488', marginRight: '6px' }}>
+                            [{b.barrier_id}]
+                          </span>
+                          {b.name}
                         </div>
-                        <div className="text-[11px] text-slate-400">{b.evidence}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{b.evidence}</div>
                       </div>
 
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                        b.state === 'EFFECTIVE' ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40' :
-                        b.state === 'DEGRADED' ? 'bg-amber-950 text-amber-300 border border-amber-500/40' :
-                        'bg-red-950 text-red-300 border border-red-500/40'
-                      }`}>
+                      <span
+                        style={{
+                          fontSize: '9.5px',
+                          fontWeight: 800,
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                          backgroundColor: b.state === 'EFFECTIVE' ? 'rgba(16, 185, 129, 0.12)' : b.state === 'DEGRADED' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                          color: b.state === 'EFFECTIVE' ? '#059669' : b.state === 'DEGRADED' ? '#D97706' : '#DC2626',
+                        }}
+                      >
                         {b.state}
                       </span>
                     </div>
@@ -370,33 +504,48 @@ export const PrecursorClusterView: React.FC = () => {
         )}
       </div>
 
-      {/* SECTION 2: Systemic Precursor Clusters Explorer */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-amber-400" />
-            <h3 className="text-lg font-bold text-slate-100">
+      {/* ====================================================================
+          SECTION 2: Systemic Precursor Clusters Explorer
+          ==================================================================== */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D97706' }}>
+              <Layers style={{ width: '16px', height: '16px' }} />
+            </div>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
               Recurring Precursor Clusters ({filteredClusters.length})
             </h3>
           </div>
 
           {/* Search and Filters */}
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', width: '220px' }}>
+              <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--text-muted)' }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search cluster theme or failure..."
-                className="input-field text-xs pl-8 py-1.5 w-56"
+                style={{
+                  width: '100%',
+                  height: '34px',
+                  backgroundColor: 'var(--bg-input)',
+                  border: '1px solid var(--border-color-subtle)',
+                  borderRadius: '9999px',
+                  padding: '0 12px 0 30px',
+                  fontSize: '11.5px',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                }}
               />
             </div>
 
             <select
               value={selectedRuleFilter}
               onChange={(e) => setSelectedRuleFilter(e.target.value)}
-              className="input-field text-xs py-1.5"
+              className="form-select"
+              style={{ height: '34px', fontSize: '11.5px', padding: '0 26px 0 10px' }}
             >
               <option value="ALL">All IOGP Rules</option>
               <option value="Confined Space">Confined Space</option>
@@ -413,377 +562,244 @@ export const PrecursorClusterView: React.FC = () => {
         </div>
 
         {/* Clusters Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredClusters.map((c) => (
-            <div
-              key={c.cluster_id}
-              onClick={() => setSelectedCluster(c)}
-              className={`p-5 rounded-xl glass-panel transition cursor-pointer border ${
-                selectedCluster?.cluster_id === c.cluster_id
-                  ? 'border-amber-500 shadow-glow-amber bg-slate-900/90'
-                  : 'border-slate-800 hover:border-slate-700 bg-slate-900/40'
-              }`}
-            >
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
-                <span className="badge badge-iogp text-[10px] font-mono">{c.cluster_id}</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1">
-                    <Flame className="w-3.5 h-3.5 text-amber-400" />
-                    {c.reports_count} Incidents
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '20px' }}>
+          {filteredClusters.map((c) => {
+            const isSelected = selectedCluster?.cluster_id === c.cluster_id;
+            return (
+              <div
+                key={c.cluster_id}
+                onClick={() => setSelectedCluster(c)}
+                className={`precursor-cluster-card ${isSelected ? 'active' : ''}`}
+                style={{
+                  border: isSelected ? '2px solid var(--accent-emerald-dark)' : '1px solid var(--border-color-subtle)',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border-color-subtle)' }}>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        fontFamily: 'var(--font-mono)',
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        color: '#0D9488',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {c.cluster_id}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '11.5px', fontWeight: 800, color: '#D97706', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Flame style={{ width: '13px', height: '13px' }} />
+                        {c.reports_count} Incidents
+                      </span>
+                      {c.high_psif_count > 0 && (
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                            color: '#DC2626',
+                          }}
+                        >
+                          {c.high_psif_count} PSIF
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '12px 0 8px 0', lineHeight: 1.35 }}>
+                    {c.theme}
+                  </h4>
+
+                  <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)' }}>Common Failure: </span>
+                      <strong style={{ color: '#B91C1C' }}>{c.common_failure}</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)' }}>Hazard: </span>
+                      <span style={{ color: 'var(--text-secondary)' }}>{c.hazard}</span>
+                    </div>
+                  </div>
+
+                  {/* Fingerprint Box */}
+                  <div
+                    style={{
+                      marginTop: '12px',
+                      padding: '8px 12px',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--bg-input)',
+                      border: '1px solid var(--border-color-subtle)',
+                      fontSize: '10.5px',
+                      fontFamily: 'var(--font-mono)',
+                      color: '#0D9488',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <Zap style={{ width: '11px', height: '11px', display: 'inline', marginRight: '4px', color: '#D97706' }} />
+                    {c.exposure_fingerprint}
+                  </div>
+                </div>
+
+                {/* Facilities & Recurrence */}
+                <div style={{ paddingTop: '12px', borderTop: '1px solid var(--border-color-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Building2 style={{ width: '13px', height: '13px' }} />
+                    {c.facility_count} Facilities
                   </span>
-                  {c.high_psif_count > 0 && (
-                    <span className="badge badge-high text-[9px]">{c.high_psif_count} PSIF</span>
-                  )}
+                  <span style={{ fontWeight: 700, color: '#D97706', padding: '2px 8px', borderRadius: '9999px', backgroundColor: 'rgba(245, 158, 11, 0.08)' }}>
+                    Recurrence Score: {c.recurrence_score}
+                  </span>
                 </div>
               </div>
-
-              <h4 className="font-bold text-sm text-slate-100 mt-2 line-clamp-2">{c.theme}</h4>
-
-              <div className="space-y-1.5 text-xs text-slate-400 mt-2.5">
-                <div>
-                  Common Failure: <strong className="text-red-300">{c.common_failure}</strong>
-                </div>
-                <div>
-                  Hazard Vector: <span className="text-slate-300">{c.hazard}</span>
-                </div>
-              </div>
-
-              {/* SIF Fingerprint Box */}
-              <div className="mt-3 p-2 rounded bg-black/40 border border-slate-800/80 text-[10px] font-mono text-amber-300/80 truncate">
-                <Zap className="w-3 h-3 inline mr-1 text-amber-400" />
-                {c.exposure_fingerprint}
-              </div>
-
-              {/* Affected Facilities Chips */}
-              <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                <span className="flex items-center gap-1 font-mono">
-                  <Building2 className="w-3 h-3 text-slate-500" />
-                  {c.facility_count} OIL Facilities
-                </span>
-                <span className="text-amber-400 font-mono text-[10px]">
-                  Recurrence: {c.recurrence_score}
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* SECTION 3: Interactive Network Topology Graph */}
-      {graphData && (
-        <div className="glass-panel p-6 space-y-4 border border-slate-800">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-2">
-              <Network className="w-5 h-5 text-amber-400" />
-              <h3 className="font-bold text-slate-100">
-                Precursor Network Graph Topology ({graphData.total_nodes} Nodes, {graphData.total_links} Links)
-              </h3>
+      {/* ====================================================================
+          SECTION 3: Statistical Baseline Benchmark
+          ==================================================================== */}
+      {comparison && (
+        <div className="card-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
+                <Cpu style={{ width: '16px', height: '16px' }} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                  Scientific Baseline Benchmark & Guardrail Verification
+                </h3>
+                <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
+                  Comparing Deterministic Guardrail vs TF-IDF Classifier vs Calibrated Hybrid Engine
+                </p>
+              </div>
             </div>
 
-            {/* Legend */}
-            <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1 text-amber-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" /> Cluster
-              </span>
-              <span className="flex items-center gap-1 text-sky-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-sky-400 inline-block" /> Asset / Facility
-              </span>
-              <span className="flex items-center gap-1 text-rose-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block" /> Failed Barrier
-              </span>
-              <span className="flex items-center gap-1 text-purple-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-400 inline-block" /> Incident
-              </span>
-            </div>
+            <button
+              onClick={handleRunComparativeBenchmark}
+              disabled={evaluating}
+              className="btn-secondary"
+              style={{ padding: '7px 14px', fontSize: '11.5px' }}
+            >
+              <RefreshCw style={{ width: '12px', height: '12px' }} className={evaluating ? 'animate-spin' : ''} />
+              <span>{evaluating ? 'Re-benchmarking...' : 'Re-run Benchmark'}</span>
+            </button>
           </div>
 
-          {/* SVG Visual Graph Representation */}
-          <div className="relative w-full h-80 bg-slate-950/80 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-center p-4">
-            <svg className="w-full h-full" viewBox="0 0 800 320">
-              <defs>
-                <linearGradient id="linkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.2" />
-                </linearGradient>
-              </defs>
+          {/* Benchmark Table */}
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12px' }}>
+              <thead>
+                <tr style={{ backgroundColor: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '10.5px', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '10px 14px' }}>Model Architecture</th>
+                  <th style={{ padding: '10px 14px' }}>High-PSIF Recall</th>
+                  <th style={{ padding: '10px 14px' }}>Precision</th>
+                  <th style={{ padding: '10px 14px' }}>F1 Score</th>
+                  <th style={{ padding: '10px 14px' }}>Accuracy</th>
+                  <th style={{ padding: '10px 14px' }}>Rule Match %</th>
+                  <th style={{ padding: '10px 14px' }}>Latency</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid var(--border-color-subtle)' }}>
+                  <td style={{ padding: '10px 14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Deterministic Rule Veto Engine
+                  </td>
+                  <td style={{ padding: '10px 14px', fontWeight: 800, color: '#059669' }}>
+                    {(comparison.deterministic_rule_engine.high_psif_recall * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
+                    {(comparison.deterministic_rule_engine.high_psif_precision * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
+                    {comparison.deterministic_rule_engine.high_psif_f1.toFixed(3)}
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
+                    {(comparison.deterministic_rule_engine.overall_accuracy * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: '#D97706', fontWeight: 700 }}>
+                    {(comparison.deterministic_rule_engine.iogp_rule_match_rate * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    {comparison.deterministic_rule_engine.average_latency_ms} ms
+                  </td>
+                </tr>
 
-              {/* Sample Connective Lines */}
-              {[
-                { x1: 200, y1: 160, x2: 400, y2: 80 },
-                { x1: 200, y1: 160, x2: 400, y2: 240 },
-                { x1: 600, y1: 160, x2: 400, y2: 80 },
-                { x1: 600, y1: 160, x2: 400, y2: 240 },
-                { x1: 400, y1: 80, x2: 150, y2: 60 },
-                { x1: 400, y1: 80, x2: 650, y2: 60 },
-                { x1: 400, y1: 240, x2: 150, y2: 260 },
-                { x1: 400, y1: 240, x2: 650, y2: 260 }
-              ].map((l, i) => (
-                <line
-                  key={i}
-                  x1={l.x1}
-                  y1={l.y1}
-                  x2={l.x2}
-                  y2={l.y2}
-                  stroke="url(#linkGrad)"
-                  strokeWidth="1.5"
-                  strokeDasharray={i % 2 === 0 ? '4,4' : undefined}
-                />
+                <tr style={{ borderBottom: '1px solid var(--border-color-subtle)' }}>
+                  <td style={{ padding: '10px 14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    TF-IDF Statistical Baseline
+                  </td>
+                  <td style={{ padding: '10px 14px', fontWeight: 800, color: '#0284C7' }}>
+                    {(comparison.tfidf_baseline.high_psif_recall * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
+                    {(comparison.tfidf_baseline.high_psif_precision * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
+                    {comparison.tfidf_baseline.high_psif_f1.toFixed(3)}
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
+                    {(comparison.tfidf_baseline.overall_accuracy * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: '#0284C7', fontWeight: 700 }}>
+                    {(comparison.tfidf_baseline.iogp_rule_match_rate * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    {comparison.tfidf_baseline.average_latency_ms} ms
+                  </td>
+                </tr>
+
+                <tr style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', borderBottom: '1px solid var(--border-color-subtle)' }}>
+                  <td style={{ padding: '10px 14px', fontWeight: 800, color: '#047857', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 style={{ width: '14px', height: '14px', color: '#10B981' }} />
+                    <span>Calibrated Hybrid Engine (Rule + AI)</span>
+                  </td>
+                  <td style={{ padding: '10px 14px', fontWeight: 900, color: '#047857' }}>
+                    {(comparison.calibrated_hybrid.high_psif_recall * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', fontWeight: 800, color: '#047857' }}>
+                    {(comparison.calibrated_hybrid.high_psif_precision * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', fontWeight: 800, color: '#047857' }}>
+                    {comparison.calibrated_hybrid.high_psif_f1.toFixed(3)}
+                  </td>
+                  <td style={{ padding: '10px 14px', fontWeight: 800, color: '#047857' }}>
+                    {(comparison.calibrated_hybrid.overall_accuracy * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', fontWeight: 800, color: '#047857' }}>
+                    {(comparison.calibrated_hybrid.iogp_rule_match_rate * 100).toFixed(1)}%
+                  </td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    {comparison.calibrated_hybrid.average_latency_ms} ms
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Key Findings */}
+          <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color-subtle)' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: '#D97706', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+              <Info style={{ width: '13px', height: '13px' }} />
+              <span>Benchmark Findings & Guardrail Verification</span>
+            </div>
+            <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '11.5px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              {comparison.key_findings.map((f, i) => (
+                <li key={i}>{f}</li>
               ))}
-
-              {/* Nodes Representation */}
-              {/* Center Cluster 1 */}
-              <g
-                className="cursor-pointer transform hover:scale-110 transition"
-                onClick={() => setSelectedGraphNode({ id: 'CL-CS-01', label: 'Vessel Entry (Gas Test Omitted)', type: 'CLUSTER', category: 'Confined Space', val: 20, priority: 'HIGH', fingerprint: 'VESSEL_ENTRY|CHEM|TOXIC|GAS_TEST|CONFINED_SPACE' })}
-              >
-                <circle cx="400" cy="80" r="28" fill="#78350f" stroke="#f59e0b" strokeWidth="2.5" />
-                <text x="400" y="84" textAnchor="middle" fill="#fef3c7" fontSize="11" fontWeight="bold" fontFamily="monospace">
-                  CL-CS-01
-                </text>
-              </g>
-
-              {/* Center Cluster 2 */}
-              <g
-                className="cursor-pointer transform hover:scale-110 transition"
-                onClick={() => setSelectedGraphNode({ id: 'CL-EI-01', label: 'Wellhead LOTO Failure', type: 'CLUSTER', category: 'Energy Isolation', val: 22, priority: 'HIGH', fingerprint: 'WELLHEAD|PRESSURE|RELEASE|LOTO_FAIL|ENERGY_ISOLATION' })}
-              >
-                <circle cx="400" cy="240" r="28" fill="#78350f" stroke="#f59e0b" strokeWidth="2.5" />
-                <text x="400" y="244" textAnchor="middle" fill="#fef3c7" fontSize="11" fontWeight="bold" fontFamily="monospace">
-                  CL-EI-01
-                </text>
-              </g>
-
-              {/* Asset Nodes */}
-              <g
-                className="cursor-pointer"
-                onClick={() => setSelectedGraphNode({ id: 'FAC-EPS-1', label: 'EPS-1 Early Production', type: 'ASSET', category: 'Facility', val: 14, priority: 'NORMAL' })}
-              >
-                <circle cx="200" cy="160" r="20" fill="#0c4a6e" stroke="#38bdf8" strokeWidth="2" />
-                <text x="200" y="164" textAnchor="middle" fill="#e0f2fe" fontSize="9" fontWeight="bold" fontFamily="monospace">
-                  EPS-1
-                </text>
-              </g>
-
-              <g
-                className="cursor-pointer"
-                onClick={() => setSelectedGraphNode({ id: 'FAC-OIL-45', label: 'Drilling Rig OIL-45', type: 'ASSET', category: 'Facility', val: 14, priority: 'NORMAL' })}
-              >
-                <circle cx="600" cy="160" r="20" fill="#0c4a6e" stroke="#38bdf8" strokeWidth="2" />
-                <text x="600" y="164" textAnchor="middle" fill="#e0f2fe" fontSize="9" fontWeight="bold" fontFamily="monospace">
-                  OIL-45
-                </text>
-              </g>
-
-              {/* Barrier Failure Nodes */}
-              <g
-                className="cursor-pointer"
-                onClick={() => setSelectedGraphNode({ id: 'BAR-GAS-TEST', label: 'Gas Test Omitted', type: 'BARRIER', category: 'Hardware F&G', val: 18, priority: 'HIGH' })}
-              >
-                <rect x="100" y="45" width="100" height="30" rx="6" fill="#4c0519" stroke="#f43f5e" strokeWidth="1.5" />
-                <text x="150" y="64" textAnchor="middle" fill="#ffe4e6" fontSize="9" fontWeight="bold" fontFamily="sans-serif">
-                  No Gas Test
-                </text>
-              </g>
-
-              <g
-                className="cursor-pointer"
-                onClick={() => setSelectedGraphNode({ id: 'BAR-LOTO-FAIL', label: 'LOTO Bypass / Leak', type: 'BARRIER', category: 'Administrative LOTO', val: 18, priority: 'HIGH' })}
-              >
-                <rect x="600" y="45" width="100" height="30" rx="6" fill="#4c0519" stroke="#f43f5e" strokeWidth="1.5" />
-                <text x="650" y="64" textAnchor="middle" fill="#ffe4e6" fontSize="9" fontWeight="bold" fontFamily="sans-serif">
-                  LOTO Leak
-                </text>
-              </g>
-
-              {/* Incident Nodes */}
-              <g
-                className="cursor-pointer"
-                onClick={() => setSelectedGraphNode({ id: 'INC-BM-001', label: 'BM-001: Tank Entry Without Gas Test', type: 'INCIDENT', category: 'HIGH', val: 12, priority: 'HIGH' })}
-              >
-                <circle cx="150" cy="260" r="12" fill="#3b0764" stroke="#a855f7" strokeWidth="1.5" />
-                <text x="150" y="263" textAnchor="middle" fill="#f3e8ff" fontSize="8" fontFamily="monospace">
-                  001
-                </text>
-              </g>
-
-              <g
-                className="cursor-pointer"
-                onClick={() => setSelectedGraphNode({ id: 'INC-BM-018', label: 'BM-018: Flowline 350 psi Unbolting', type: 'INCIDENT', category: 'HIGH', val: 12, priority: 'HIGH' })}
-              >
-                <circle cx="650" cy="260" r="12" fill="#3b0764" stroke="#a855f7" strokeWidth="1.5" />
-                <text x="650" y="263" textAnchor="middle" fill="#f3e8ff" fontSize="8" fontFamily="monospace">
-                  018
-                </text>
-              </g>
-            </svg>
-
-            {/* Selected Node Drawer */}
-            {selectedGraphNode && (
-              <div className="absolute bottom-3 left-3 right-3 p-3 rounded-lg bg-slate-900/95 border border-slate-700/80 shadow-2xl flex items-center justify-between text-xs backdrop-blur-md">
-                <div className="flex items-center gap-2">
-                  <span className={`badge ${
-                    selectedGraphNode.type === 'CLUSTER' ? 'badge-iogp' :
-                    selectedGraphNode.type === 'ASSET' ? 'bg-sky-950 text-sky-300 border-sky-500/40' :
-                    selectedGraphNode.type === 'BARRIER' ? 'badge-high' : 'bg-purple-950 text-purple-300'
-                  } text-[10px]`}>
-                    {selectedGraphNode.type}
-                  </span>
-                  <strong className="text-slate-100">{selectedGraphNode.label}</strong>
-                  {selectedGraphNode.fingerprint && (
-                    <span className="font-mono text-[10px] text-amber-400/90 hidden sm:inline">
-                      ({selectedGraphNode.fingerprint})
-                    </span>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => setSelectedGraphNode(null)}
-                  className="text-slate-400 hover:text-slate-200 text-xs px-2"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
+            </ul>
           </div>
         </div>
       )}
-
-      {/* SECTION 4: Head-to-Head Baseline Modeling Benchmark */}
-      <div className="glass-panel p-6 space-y-4 border border-blue-500/30">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-blue-400" />
-            <div>
-              <h3 className="font-bold text-slate-100 text-sm">
-                ML Model Benchmarking: Rule Engine vs TF-IDF Baseline vs Calibrated Hybrid
-              </h3>
-              <p className="text-xs text-slate-400">
-                124-Scenario Golden Evaluation Benchmark • High-PSIF Safety Guarantee & Recall
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={handleRunComparativeBenchmark}
-            disabled={evaluating}
-            className="btn btn-primary text-xs flex items-center gap-1.5"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${evaluating ? 'animate-spin' : ''}`} />
-            <span>{evaluating ? 'Evaluating...' : 'Run Comparative Benchmark'}</span>
-          </button>
-        </div>
-
-        {comparison && (
-          <div className="space-y-4">
-            {/* Comparative Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-slate-800 text-[11px] font-mono text-slate-400 uppercase">
-                    <th className="py-2.5 px-3">Model Architecture</th>
-                    <th className="py-2.5 px-3">High-PSIF Recall</th>
-                    <th className="py-2.5 px-3">Precision</th>
-                    <th className="py-2.5 px-3">F1-Score</th>
-                    <th className="py-2.5 px-3">Overall Accuracy</th>
-                    <th className="py-2.5 px-3">IOGP Match Rate</th>
-                    <th className="py-2.5 px-3">Latency</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60 font-mono">
-                  {/* Deterministic Rule Engine */}
-                  <tr className="bg-slate-900/30">
-                    <td className="py-3 px-3 font-sans font-bold text-amber-300">
-                      Deterministic Safety Rule Engine
-                    </td>
-                    <td className="py-3 px-3 font-bold text-emerald-400">
-                      {(comparison.deterministic_rule_engine.high_psif_recall * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-300">
-                      {(comparison.deterministic_rule_engine.high_psif_precision * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-300">
-                      {comparison.deterministic_rule_engine.high_psif_f1.toFixed(3)}
-                    </td>
-                    <td className="py-3 px-3 text-slate-300">
-                      {(comparison.deterministic_rule_engine.overall_accuracy * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-amber-300">
-                      {(comparison.deterministic_rule_engine.iogp_rule_match_rate * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-400">
-                      {comparison.deterministic_rule_engine.average_latency_ms} ms
-                    </td>
-                  </tr>
-
-                  {/* TF-IDF Baseline */}
-                  <tr className="bg-slate-900/10">
-                    <td className="py-3 px-3 font-sans font-bold text-sky-300">
-                      TF-IDF Statistical Baseline Classifier
-                    </td>
-                    <td className="py-3 px-3 text-sky-400 font-bold">
-                      {(comparison.tfidf_baseline.high_psif_recall * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-300">
-                      {(comparison.tfidf_baseline.high_psif_precision * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-300">
-                      {comparison.tfidf_baseline.high_psif_f1.toFixed(3)}
-                    </td>
-                    <td className="py-3 px-3 text-slate-300">
-                      {(comparison.tfidf_baseline.overall_accuracy * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-sky-300">
-                      {(comparison.tfidf_baseline.iogp_rule_match_rate * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-400">
-                      {comparison.tfidf_baseline.average_latency_ms} ms
-                    </td>
-                  </tr>
-
-                  {/* Calibrated Hybrid */}
-                  <tr className="bg-amber-950/20 border-l-2 border-amber-500">
-                    <td className="py-3 px-3 font-sans font-bold text-emerald-300 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span>Calibrated Hybrid Engine (Rule + TF-IDF)</span>
-                    </td>
-                    <td className="py-3 px-3 font-bold text-emerald-400 text-sm">
-                      {(comparison.calibrated_hybrid.high_psif_recall * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-emerald-300 font-bold">
-                      {(comparison.calibrated_hybrid.high_psif_precision * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-emerald-300 font-bold">
-                      {comparison.calibrated_hybrid.high_psif_f1.toFixed(3)}
-                    </td>
-                    <td className="py-3 px-3 text-emerald-400 font-bold">
-                      {(comparison.calibrated_hybrid.overall_accuracy * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-emerald-400 font-bold">
-                      {(comparison.calibrated_hybrid.iogp_rule_match_rate * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-400">
-                      {comparison.calibrated_hybrid.average_latency_ms} ms
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Key Findings Callout */}
-            <div className="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1 text-xs">
-              <div className="font-bold text-slate-200 flex items-center gap-1 text-[11px] uppercase tracking-wider text-amber-400">
-                <Info className="w-3.5 h-3.5" />
-                Benchmark Findings & Guardrail Verification
-              </div>
-              <ul className="list-disc list-inside space-y-1 text-slate-300 text-[11px] pt-1">
-                {comparison.key_findings.map((f, i) => (
-                  <li key={i}>{f}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

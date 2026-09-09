@@ -4,10 +4,11 @@ Codified industrial safety guardrails for fatal precursor detection.
 Adheres strictly to the 9 IOGP Life-Saving Rules and oil & gas process safety standards.
 """
 
-from typing import List, Dict, Any, Optional
-from dataclasses import asdict
 import re
-from rules.safety.catalog import CODIFIED_SAFETY_CATALOG, RuleSeverity, CodifiedRuleDefinition
+from dataclasses import asdict
+from typing import Any, Dict, List
+
+from rules.safety.catalog import CODIFIED_SAFETY_CATALOG, RuleSeverity
 
 
 class DeterministicSafetyRuleEngine:

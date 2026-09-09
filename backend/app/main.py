@@ -3,12 +3,13 @@ OIL-SIF Guardian — FastAPI Application Main Entrypoint.
 """
 
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from backend.app.api.v1.api import api_router
 from backend.app.core.config import settings
 from backend.app.core.database import init_db
-from backend.app.api.v1.api import api_router
-
 
 # Ensure tables exist immediately
 init_db()

@@ -2,20 +2,22 @@
 API Router for Corrective Action Assignment, Lifecycle Tracking, and Verification.
 """
 
-from datetime import datetime, timezone, date
+from datetime import date, datetime, timezone
 from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+
 from backend.app.core.database import get_db
-from backend.app.models.report import ReportModel, CorrectiveActionModel, AuditEventModel
+from backend.app.models.report import AuditEventModel, CorrectiveActionModel, ReportModel
 from backend.app.schemas.action import (
     CorrectiveActionCreate,
-    CorrectiveActionUpdate,
-    CorrectiveActionVerifyRequest,
     CorrectiveActionResponse,
     CorrectiveActionStatsResponse,
+    CorrectiveActionUpdate,
+    CorrectiveActionVerifyRequest,
     PrecursorRecurrenceRecord,
-    RecurrenceAnalyticsResponse
+    RecurrenceAnalyticsResponse,
 )
 
 router = APIRouter()

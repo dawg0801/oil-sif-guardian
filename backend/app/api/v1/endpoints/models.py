@@ -4,29 +4,30 @@ Provides inference, token attribution heatmaps, ensemble arbitration, 4-way benc
 and MLOps governance endpoints (Drift Detection, Model Card, and Regulatory Governance).
 """
 
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import Dict, List, Any, Optional
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
 from backend.app.models.report import ReportModel
 from backend.app.schemas.model_schemas import (
-    SequencePredictRequest,
-    SequencePredictResponse,
-    TokenAttributionRequest,
-    TokenAttributionResponse,
-    TokenAttributionItemSchema,
     EnsembleArbitrationRequest,
     EnsembleArbitrationResponse,
     FourWayBenchmarkResponse,
     ModelBenchmarkItemSchema,
     ModelStatusResponse,
+    SequencePredictRequest,
+    SequencePredictResponse,
+    TokenAttributionItemSchema,
+    TokenAttributionRequest,
+    TokenAttributionResponse,
 )
-from ml.models.sequence_classifier import ContextualSequenceClassifier, IOGP_NINE_RULES
-from ml.models.token_attribution import TokenAttributionEngine
-from ml.evaluation.ensemble_arbitrator import EnsembleArbitrator
-from ml.evaluation.drift_detector import DriftDetector
 from ml.evaluation.comprehensive_evaluator import comprehensive_safety_evaluator
+from ml.evaluation.drift_detector import DriftDetector
+from ml.evaluation.ensemble_arbitrator import EnsembleArbitrator
+from ml.models.sequence_classifier import IOGP_NINE_RULES, ContextualSequenceClassifier
+from ml.models.token_attribution import TokenAttributionEngine
 
 router = APIRouter()
 
@@ -175,7 +176,7 @@ def get_model_drift(db: Session = Depends(get_db)) -> Dict[str, Any]:
     drift between training baselines and runtime incident reports.
     """
     db_reports = db.query(ReportModel).order_by(ReportModel.created_at.desc()).limit(100).all()
-    
+
     report_dicts: List[Dict[str, Any]] = []
     for r in db_reports:
         prio = "REVIEW"

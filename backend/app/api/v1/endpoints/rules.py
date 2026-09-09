@@ -4,25 +4,26 @@ REST endpoints for deterministic safety rule evaluation, zero-tolerance vetoes,
 regulatory rulebook catalog browsing, and golden benchmark compliance statistics.
 """
 
-import time
 import json
 import os
+import time
 from collections import Counter
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, HTTPException, Query, status
 
-from rules.safety.catalog import CODIFIED_SAFETY_CATALOG, RuleSeverity
-from rules.safety.deterministic_rules import DeterministicSafetyRuleEngine
 from backend.app.schemas.rules_schemas import (
-    RuleEvaluationRequest,
-    RuleEvaluationResponse,
-    TriggeredRuleDetail,
     AuditTrailItem,
     RuleCatalogItem,
     RuleCatalogResponse,
-    RuleTriggerStat,
+    RuleEvaluationRequest,
+    RuleEvaluationResponse,
     RuleStatsResponse,
+    RuleTriggerStat,
+    TriggeredRuleDetail,
 )
+from rules.safety.catalog import CODIFIED_SAFETY_CATALOG
+from rules.safety.deterministic_rules import DeterministicSafetyRuleEngine
 
 router = APIRouter()
 

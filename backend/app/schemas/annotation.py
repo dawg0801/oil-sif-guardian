@@ -2,7 +2,8 @@
 OIL-SIF Guardian — Annotation & Benchmark Evaluation Schemas.
 """
 
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 

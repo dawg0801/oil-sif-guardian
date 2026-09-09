@@ -3,8 +3,8 @@ OIL-SIF Guardian — Deterministic Safety Rules API Integration Tests
 Tests /api/v1/rules/evaluate, /catalog, /catalog/{rule_id}, and /stats endpoints.
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from backend.app.main import app
 
 client = TestClient(app)

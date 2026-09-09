@@ -6,8 +6,8 @@ Automated Test Suite for Advanced Phases 19 to 32:
 - Phases 28-32: Multi-Dimensional Safety Evaluation Battery
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from backend.app.main import app
 
 client = TestClient(app)

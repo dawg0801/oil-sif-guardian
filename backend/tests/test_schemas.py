@@ -4,9 +4,10 @@ Schema Contract Validation Tests.
 
 import pytest
 from pydantic import ValidationError
+
+from backend.app.schemas.action import CorrectiveActionCreate
 from backend.app.schemas.report import ReportCreate
 from backend.app.schemas.review import ReviewCreate
-from backend.app.schemas.action import CorrectiveActionCreate
 
 
 def test_valid_report_create_schema():

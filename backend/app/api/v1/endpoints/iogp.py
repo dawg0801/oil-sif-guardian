@@ -4,23 +4,24 @@ Provides REST API endpoints for multi-label inference, 9x9 joint barrier co-occu
 decision threshold recalibration, and golden benchmark evaluation.
 """
 
-from fastapi import APIRouter, HTTPException, status
-from typing import Dict, Any
 import os
+from typing import Any, Dict
 
-from ml.models.iogp_multilabel import IOGPMultiLabelClassifier, CANONICAL_IOGP_RULES
-from ml.evaluation.multilabel_metrics import MultiLabelEvaluator
+from fastapi import APIRouter, HTTPException, status
+
 from backend.app.schemas.iogp_schemas import (
-    IOGPPredictRequest,
-    IOGPMultiLabelResponse,
-    IOGPRuleResult,
     IOGPCoOccurrenceItem,
-    IOGPMatrixResponse,
     IOGPEvaluationReportResponse,
+    IOGPMatrixResponse,
+    IOGPMultiLabelResponse,
     IOGPPerRuleReport,
+    IOGPPredictRequest,
+    IOGPRuleResult,
     IOGPThresholdUpdateRequest,
     IOGPThresholdUpdateResponse,
 )
+from ml.evaluation.multilabel_metrics import MultiLabelEvaluator
+from ml.models.iogp_multilabel import IOGPMultiLabelClassifier
 
 router = APIRouter()
 

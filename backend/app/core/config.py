@@ -3,6 +3,7 @@ Application Configuration and Settings via Pydantic.
 """
 
 from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

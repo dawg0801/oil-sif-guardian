@@ -2,8 +2,8 @@
 Integration tests for Phase 3 API endpoints (ontology, clusters, and baseline modeling).
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from backend.app.main import app
 
 client = TestClient(app)

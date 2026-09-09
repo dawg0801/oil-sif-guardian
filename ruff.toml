@@ -1,0 +1,35 @@
+target-version = "py311"
+line-length = 120
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+]
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "E711",   # Comparison to None (SQLAlchemy idiom: Model.col == None)
+    "B008",   # Do not perform function call in argument defaults (FastAPI Depends/Query/File idiom)
+    "B904",   # Within an except clause, raise exceptions with raise ... from err
+    "B006",   # Mutable default argument
+]
+
+[lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.params.Depends",
+    "fastapi.Query",
+    "fastapi.params.Query",
+    "fastapi.File",
+    "fastapi.params.File",
+    "fastapi.Header",
+    "fastapi.params.Header",
+    "fastapi.Body",
+    "fastapi.params.Body",
+]
+
+[lint.isort]
+known-first-party = ["backend", "rules"]

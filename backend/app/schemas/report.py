@@ -2,17 +2,14 @@
 Pydantic Schemas for Safety Report Ingestion and Canonical Representation.
 """
 
-from typing import List, Optional, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
-from backend.app.schemas.prediction import (
-    PSIFSchema,
-    IOGPRulePredictionSchema,
-    EntitiesSchema,
-    EvidenceSpanSchema
-)
-from backend.app.schemas.review import ReviewResponse
+
 from backend.app.schemas.action import CorrectiveActionResponse
+from backend.app.schemas.prediction import EntitiesSchema, EvidenceSpanSchema, IOGPRulePredictionSchema, PSIFSchema
+from backend.app.schemas.review import ReviewResponse
 
 
 class ReportCreate(BaseModel):

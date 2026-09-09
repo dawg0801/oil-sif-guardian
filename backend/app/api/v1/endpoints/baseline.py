@@ -2,19 +2,20 @@
 FastAPI router for TF-IDF Statistical Baseline Model training, status, and comparative evaluations.
 """
 
-from datetime import datetime, timezone
 import json
 import os
-from typing import Dict, Any
-from fastapi import APIRouter, HTTPException, Depends
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from backend.app.core.database import get_db
 from backend.app.models.report import ReportModel
 from backend.app.schemas.baseline import (
-    BaselineModelStatusResponse,
     BaselineComparisonResponse,
     BaselineEvaluationReportSchema,
-    TrainBaselineRequest
+    BaselineModelStatusResponse,
+    TrainBaselineRequest,
 )
 from ml.baseline.tfidf_baseline import tfidf_baseline_model
 

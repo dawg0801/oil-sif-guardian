@@ -4,16 +4,18 @@ FastAPI router for Systemic Precursor Clusters and Network Graph Topology.
 
 import json
 import os
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
 from backend.app.core.database import get_db
-from backend.app.models.report import ReportModel, PredictionModel
+from backend.app.models.report import ReportModel
 from backend.app.schemas.cluster import (
-    PrecursorClusterSchema,
-    ClusterGraphResponse,
+    ClusterGraphLinkSchema,
     ClusterGraphNodeSchema,
-    ClusterGraphLinkSchema
+    ClusterGraphResponse,
+    PrecursorClusterSchema,
 )
 from backend.app.services.precursor_cluster_service import precursor_cluster_service
 
@@ -112,12 +114,12 @@ def get_precursor_network_graph(db: Session = Depends(get_db)):
 
     links = [
         ClusterGraphLinkSchema(
-            source=l["source"],
-            target=l["target"],
-            relation=l["relation"],
-            weight=l["weight"]
+            source=link["source"],
+            target=link["target"],
+            relation=link["relation"],
+            weight=link["weight"],
         )
-        for l in graph_data["links"]
+        for link in graph_data["links"]
     ]
 
     return ClusterGraphResponse(

@@ -3,6 +3,7 @@ Integration Tests for Corrective Action Management Endpoints.
 """
 
 from fastapi.testclient import TestClient
+
 from backend.app.main import app
 
 client = TestClient(app)

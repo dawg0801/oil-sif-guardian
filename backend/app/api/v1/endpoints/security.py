@@ -3,16 +3,11 @@ OIL-SIF Guardian — Security & RBAC Governance Endpoints
 Provides security audit checks, RBAC verification, and statutory compliance status.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import Dict, Any, List
-from backend.app.core.security import (
-    get_current_user,
-    require_roles,
-    UserRole,
-    AuthUser,
-    get_security_audit_summary,
-    sanitize_narrative
-)
+from typing import Any, Dict
+
+from fastapi import APIRouter, Depends
+
+from backend.app.core.security import AuthUser, UserRole, get_current_user, get_security_audit_summary
 
 router = APIRouter()
 
